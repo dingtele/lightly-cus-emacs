@@ -26,10 +26,30 @@
 ;; for a more technical explanation.
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
-(load-theme 'tomorrow-night-bright t)
+(require 'ef-themes)
+(require 'gruvbox-theme)
+(load-theme 'ef-cyprus t)
 
-;; increase font size for better readability
-(set-face-attribute 'default nil :height 140)
+;; set-font
+(set-fontset-font t nil "Symbola" nil 'prepend)
+(set-face-attribute
+ 'default nil
+ :font (font-spec :name "Iosevka"
+                  ;;"IBM Plex Mono"
+                  ;;Iosevka;;cascadia mono;;
+                  :Weight 'normal
+                  :slant 'normal
+                  :size 11.5))
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font
+   (frame-parameter nil 'font)
+   charset
+   (font-spec :name "仓耳今楷02 W04"
+   ;(font-spec :name "LXGW WenKai"
+              :weight 'normal
+              :slant 'normal
+              :size
+              12.5)))
 
 ;; Uncomment the lines below by removing semicolons and play with the
 ;; values in order to set the width (in characters wide) and height
