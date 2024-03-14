@@ -1,0 +1,61 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("c:/Users/yuding/.emacs.d/" . "customizations/")
+ ("c:/Users/" . "yuding/")
+ ("c:/Users/yuding/iCloudDrive/Documents/" . "Mastering.Emacs/")
+ ("c:/Users/yuding/iCloudDrive/" . "Documents/")
+ ("c:/Users/yuding/" . "iCloudDrive/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ "/home/jordi/.emacs.d/"
+ "c:/Users/yuding/.emacs.d/customizations/"
+ "c:/Users/yuding/iCloudDrive/Documents/Mastering.Emacs/"
+ "c:/Users/yuding/.doom.d/"
+ "c:/Users/yuding/.emacs.d/"
+)
+
+;; ----- ido-work-file-list -----
+(
+ "init.el"
+ "editing.el"
+ "01.mastering.emacs.v0.org"
+ "ui.el"
+ "config.el"
+ "init-org.el"
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/home/jordi/.emacs.d/" (26098 47393 51223 194000) "projectile-bookmarks.eld" "./" "../" "var/" "customizations/" "themes/" ".DS_Store" "ido.last" ".smex-items" "ido.last~" "auto-save-list/" "init.el~" ".git/" "server/" "elpa/" "backups/" "README.md" "eshell/" ".gitignore" ".recentf" "eln-cache/" "init.el")
+
+ ("/home/jordi/" (26098 47274 860321 96000) ".dbus/" "./" "../" ".vscode-server/" ".fonts/" ".lesshst" ".node_repl_history" "#.emacs#" ".local/" ".emacs.d/" "target/" ".bashrc" "project/" ".viminfo" "Application/" ".bash_logout" ".profile" "doom-emacs.d/" "TAGS" ".gnupg/" ".telega/" ".emacs~" ".config/" ".motd_shown" ".proxyrc" ".wget-hsts" ".bash_history" ".cache/" "codebase/" "Downloads/" ".gitconfig" ".sudo_as_admin_successful" ".landscape/" ".nvm/" "document/" ".bsp/" ".npm/" ".doom.d/" ".python_history")
+
+ ("c:/Users/yuding/.emacs.d/" (26098 44518 0 0) "var/" "themes/" "server/" "README.md" "projectile-bookmarks.eld" "init.el~" "init.el" "ido.last" "eshell/" "elpa/" "eln-cache/" "customizations/" "backups/" "auto-save-list/" ".smex-items" ".recentf" ".gitignore" ".git/" ".DS_Store" ".#init.el" "../" "./")
+
+ ("c:/Users/yuding/iCloudDrive/Desktop/" (26019 17825 0 0) "Screenshot 2024-01-14 at 10.23.05.png" "Screenshot 2023-10-08 at 16.14.49.png" "Screenshot 2023-10-08 at 16.14.49 (2).png" "Desktop - yu.ding/" ".localized" "../" "./")
+
+ ("c:/Users/yuding/.emacs.d/customizations/" (26098 28167 0 0) "ui.el~" "ui.el" "shell-integration.el" "setup-js.el" "setup-clojure.el" "page-break-lines.el" "navigation.el" "misc.el" "init-org.el" "elisp-editing.el" "editing.el" "../" "./")
+
+ ("c:/Users/yuding/iCloudDrive/Documents/Mastering.Emacs/" (26095 7143 0 0) "media/" "Mastering.Emacs.epub" "01.mastering.emacs.v0.org" "../" "./")
+
+ ("c:/Users/yuding/iCloudDrive/" (26097 7561 0 0) "Lynx-0.kdbx" "logseq-graph/" "init.el" "iCloud~md~obsidian/" "iCloud~com~logseq~logseq/" "iCloud~com~liguangming~Shadowrocket/" "iCloud~com~appsonthemove~beorg/" "F3LWYJ7GM7~com~apple~mobilegarageband/" "Documents/" "desktop.ini" "Desktop/" "com~apple~QuickTimePlayerX/" "com~apple~Numbers/" "com~apple~Keynote/" ".Trash/" "../" "./")
+
+ ("c:/Users/yuding/Documents/" (26085 10269 0 0) "[ 小鹤音形 ]/" "Zoom/" "WPS Cloud Files/" "WindowsPowerShell/" "WeChat Files/" "Visual Studio 2017/" "Tencent Files/" "SQL Server Management Studio/" "PowerToys/" "play-samples-play-java-starter-example/" "Outlook Files/" "Navicat/" "My Videos/" "My Pictures/" "My Music/" "My Kindle Content/" "mredauto.1" "KingsoftData/" "FeedbackHub/" "Downloads/" "desktop.ini" "Default.rdp" "bookmarks_6_28_21.html" "bookmarks_6_21_21.html" "../" "./")
+
+ ("c:/Users/yuding/" (26096 1622 0 0) "「开始」菜单/" "Zotero/" "Videos/" "Templates/" "template/" "target/" "SendTo/" "Searches/" "scoop/" "Saved Games/" "remnote/" "Recent/" "project/" "PrintHood/" "Postman/" "postgresql_14.exe" "Pictures/" "OneDrive/" "ntuser.ini" "NTUSER.DAT{2adbce3d-59d0-11ed-b518-b07b251cbc8c}.TMContainer00000000000000000002.regtrans-ms" "NTUSER.DAT{2adbce3d-59d0-11ed-b518-b07b251cbc8c}.TMContainer00000000000000000001.regtrans-ms" "NTUSER.DAT{2adbce3d-59d0-11ed-b518-b07b251cbc8c}.TM.blf" "ntuser.dat.LOG2" "ntuser.dat.LOG1" "NTUSER.DAT" "NetHood/" "my_flutter_app/" "My Documents/" "Music/" "Local Settings/" "Links/" "IdeaProjects/" "iCloudDrive/" "h2db/" "Favorites/" "emacs_backtrace.txt" "emacs-distros/" "eis/" "edb_psqlodbc.exe" "eclipse-workspace/" "eclipse/" "Downloads/" "Documents/" "Desktop/" "Cookies/" "Contacts/" "clojure-noob/" "clogure-noob/" "Application Data/" "Apple/" "AppData/" "app/" "apachehttpd.exe" "abubu/" "3D Objects/" ".vscode/" ".ssh/" ".sbt/" ".rest-client/" ".p2/" ".ms-ad/" ".mix/" ".m2/" ".logseq/" ".lesshst" ".lemminx/" ".lein/" ".lcpr/" ".lc/" ".ivy2/" ".hex/" ".gnupg/" ".gitconfig" ".fonts/" ".emacs.d/" ".eclipse/" ".doom.d/" ".docker/" ".dbvis/" ".config/" ".cache/" ".bsp/" ".bash_history" ".android/" "../" "./")
+
+ ("c:/Users/yuding/.doom.d/" (26094 23196 0 0) "packages.el" "init.el" "custom.el" "config.el" ".git/" "../" "./")
+
+ ("c:/Users/" (25440 62822 0 0) "yuding/" "Public/" "desktop.ini" "Default User/" "Default/" "All Users/" "Administrator/" "../" "./")
+
+ ("c:/Users/yuding/iCloudDrive/Documents/" (26093 17429 0 0) "马可瓦尔多.zip" "马可瓦尔多 2/" "马可瓦尔多/" "食物营养表.numbers" "your_vocabulary.org" "scip-practice.scm" "scip/" "PWD/" "Mastering.Emacs/" "journal/" "github-recovery-codes.txt" "GitHub/" "emacs-bing_vocabulary.org" ".localized" "# DING Yue - Resume.md" "../" "./")
+
+ ("c:/Users/yuding/emacs-distros/" (26094 25446 0 0) "purcell-emacs.d/" "doom-emacs.d/" "../" "./")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t

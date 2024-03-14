@@ -10,6 +10,13 @@
 ;; Show line numbers
 (global-display-line-numbers-mode)
 
+(global-visual-line-mode t)
+(use-package visual-fill-column :ensure t)
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+(setq-default visual-fill-column-center-text t)
+(setq org-image-actual-width nil)
+(setq visual-fill-column-width 150)
+
 ;; You can uncomment this to remove the graphical toolbar at the top. After
 ;; awhile, you won't need the toolbar.
 ;; (when (fboundp 'tool-bar-mode)
@@ -31,25 +38,25 @@
 (load-theme 'ef-cyprus t)
 
 ;; set-font
-(set-fontset-font t nil "Symbola" nil 'prepend)
-(set-face-attribute
- 'default nil
- :font (font-spec :name "Iosevka"
-                  ;;"IBM Plex Mono"
-                  ;;Iosevka;;cascadia mono;;
-                  :Weight 'normal
-                  :slant 'normal
-                  :size 11.5))
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font
-   (frame-parameter nil 'font)
-   charset
-   (font-spec :name "仓耳今楷02 W04"
-   ;(font-spec :name "LXGW WenKai"
-              :weight 'normal
-              :slant 'normal
-              :size
-              12.5)))
+;; (set-fontset-font t nil "Symbola" nil 'prepend)
+;; (set-face-attribute
+;;  'default nil
+;;  :font (font-spec :name "Iosevka"
+;;                   ;;"IBM Plex Mono"
+;;                   ;;Iosevka;;cascadia mono;;
+;;                   :Weight 'normal
+;;                   :slant 'normal
+;;                   :size 11.5))
+;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
+;;   (set-fontset-font
+;;    (frame-parameter nil 'font)
+;;    charset
+;;    (font-spec :name "仓耳今楷02 W04"
+;;    ;(font-spec :name "LXGW WenKai"
+;;               :weight 'normal
+;;               :slant 'normal
+;;               :size
+;;               12.5)))
 
 ;; Uncomment the lines below by removing semicolons and play with the
 ;; values in order to set the width (in characters wide) and height
