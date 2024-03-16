@@ -1,23 +1,10 @@
-;;;;
-;; Packages
-;;;;
 
-;; Define package repositories
+(setq debug-on-error 1)
 (require 'package)
-;; (add-to-list 'package-archives
-;;              '("tromey" . "http://tromey.com/elpa/") t)
-;; (add-to-list 'package-archives
-;;              '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
- (setq package-archives '(
-;;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
-;;                          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-( "melpa" . "https://melpa.org/packages/")))
 
-(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-(add-to-list 'package-pinned-packages '(magit . "melpa-stable") t)
-
+(setq package-archives '(("melpa-stable" . "http://stable.melpa.org/packages/")			 
+			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
+                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 (package-initialize)
 
 ;;install use-package
@@ -32,17 +19,6 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-;; 快速打开配置文件
-(defun open-init-file()
-  (interactive)
-  (find-file "~/.emacs.d/init.el"))
-
-(defun open-editing-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/editing.el"))
-;; 这一行代码，将函数 open-init-file 绑定them
-(global-set-key (kbd "<f1>") 'open-init-file)
-(global-set-key (kbd "<f2>") 'open-editing-file)
 ;; Define he following variables to remove the compile-log warnings
 ;; when defining ido-ubiquitous
 (defvar ido-cur-item nil)
@@ -54,10 +30,13 @@
 (defvar my-packages
   '(
     ;; colorful parenthesis matching
+    paredit
     rainbow-delimiters
     magit
     bing-dict
     swiper
+clipetty
+bing-dict
     ))
 
 (if (eq system-type 'darwin)
@@ -67,7 +46,6 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
-(use-package magit :ensure t)
 ;; bing-dict
 (use-package bing-dict :ensure t)
 (global-set-key (kbd "C-c d") 'bing-dict-brief)
@@ -88,7 +66,7 @@
 (add-to-list 'load-path "~/.emacs.d/customizations")
  
 (load "shell-integration.el")
-;(load "navigation.el")
+(load "navigation.el")
 (load "ui.el")
 (load "editing.el")
 
@@ -116,19 +94,3 @@
  ;; If there is more than one, they won't work right.
  )
 
-(use-package corfu 
-  :ensure t
-  :init
-  (progn
-    (setq corfu-auto t)
-    (setq corfu-cycle t)
-    (setq corfu-quit-at-boundary t)
-    (setq corfu-quit-no-match t)
-    (setq corfu-preview-current nil)
-    (setq corfu-min-width 80)
-    (setq corfu-max-width 100)
-    (setq corfu-auto-delay 0.2)
-    (setq corfu-auto-prefix 1)
-    (setq corfu-on-exact-match nil)
-    (global-corfu-mode)
-    ))

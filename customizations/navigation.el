@@ -54,9 +54,26 @@
 ;; Enhances M-x to allow easier execution of commands. Provides
 ;; a filterable list of possible commands in the minibuffer
 ;; http://www.emacswiki.org/emacs/Smex
-(setq smex-save-file (concat user-emacs-directory ".smex-items"))
-(smex-initialize)
-(global-set-key (kbd "M-x") 'smex)
+;; (setq smex-save-file (concat user-emacs-directory ".smex-items"))
+;; (smex-initialize)
+;; (global-set-key (kbd "M-x") 'smex)
 
 ;; projectile everywhere!
 (projectile-global-mode)
+
+(use-package corfu
+  :ensure t
+  :init
+  (progn
+    (setq corfu-auto t)
+    (setq corfu-cycle t)
+    (setq corfu-quit-at-boundary t)
+    (setq corfu-quit-no-match t)
+    (setq corfu-preview-current nil)
+    (setq corfu-min-width 80)
+    (setq corfu-max-width 100)
+    (setq corfu-auto-delay 0.2)
+    (setq corfu-auto-prefix 1)
+    (setq corfu-on-exact-match nil)
+    (global-corfu-mode)
+    ))

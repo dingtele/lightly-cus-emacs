@@ -1,10 +1,33 @@
 ;; Customizations relating to editing a buffer.
 
-;; Key binding to use "hippie expand" for text autocompletion
-;; http://www.emacswiki.org/emacs/HippieExpand
-(global-set-key (kbd "M-/") 'hippie-expand)
+;; 快速打开配置文件
+(defun open-init-file()
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
 
-;; Lisp-friendly hippie expand
+(defun open-editing-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/editing.el"))
+
+(defun open-navigation-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/navigation.el"))
+
+(defun open-ui-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/ui.el"))
+
+(defun open-init-org-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/init-org.el"))
+
+(global-set-key (kbd "<f1>") 'open-init-file)
+(global-set-key (kbd "<f2>") 'open-editing-file)
+(global-set-key (kbd "<f3>") 'open-navigation-file)
+(global-set-key (kbd "<f4>") 'open-ui-file)
+(global-set-key (kbd "<f5>") 'open-init-org-file)
+
+(global-set-key (kbd "M-/") 'hippie-expand)
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
@@ -16,7 +39,7 @@
 (show-paren-mode 1)
 
 ;; Highlight current line
-;; (global-hl-line-mode 1)
+(global-hl-line-mode 1)
 
 ;; Interactive search key bindings. By default, C-s runs
 ;; isearch-forward, so this swaps the bindings.
@@ -32,7 +55,7 @@
 ;; was when you previously visited the same file.
 ;; http://www.emacswiki.org/emacs/SavePlace
 (require 'saveplace)
-(setq-default save-place t)
+(save-place-mode 1)
 ;; keep track of saved places in ~/.emacs.d/places
 (setq save-place-file (concat user-emacs-directory "places"))
 
