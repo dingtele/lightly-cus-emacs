@@ -67,12 +67,16 @@
 (setq auto-save-default nil)
 
 
-;; comments
+;; comments on lines
 (defun toggle-comment-on-line ()
-  "comment or uncomment current line"
+  "comment or uncomment current line and then move to the next line beginning"
   (interactive)
-  (comment-or-uncomment-region (line-beginning-position) (line-end-position)))
+  (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+(next-line)
+(beginning-of-visual-line))
 (global-set-key (kbd "C-;") 'toggle-comment-on-line)
+ 
+(delete-selection-mode t)
 
 ;; use 2 spaces for tabs
 (defun die-tabs ()
@@ -103,6 +107,22 @@
 
 (global-set-key "\M-n" 'next-multilines) ;;custom
 (global-set-key "\M-p" 'previous-multilines) ;;custom
+;; Move line up
+(defun move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (previous-line 2))
+
+;; Move line down
+(defun move-line-down ()
+  (interactive)
+  (next-line 1)
+  (transpose-lines 1)
+  (previous-line 1))
+
+;; Assign the custom keybindings
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
 
 (use-package clipetty
   :ensure t

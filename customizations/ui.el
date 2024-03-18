@@ -7,6 +7,16 @@
 ;; Turn off the menu bar at the top of each frame because it's distracting
 (menu-bar-mode -1)
 
+(setq inhibit-startup-screen t)
+(toggle-frame-maximized)
+
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
+(setq mouse-wheel-progressive-speed nil)
+
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
+;(setq-default cursor-type '(bar . 5))
 ;; Show line numbers
 (global-display-line-numbers-mode)
 
@@ -33,11 +43,14 @@
 ;; for a more technical explanation.
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
-(require 'ef-themes)
-(require 'gruvbox-theme)
+;(require 'ef-themes)
+;(require 'gruvbox-theme
 (load-theme 'ef-cyprus t)
+;; (use-package doom-themes)
+;; (load-theme 'doom-one 1)
 
 ;; set-font
+(set-face-attribute 'default nil :height 120)
 ;; (set-fontset-font t nil "Symbola" nil 'prepend)
 ;; (set-face-attribute
 ;;  'default nil

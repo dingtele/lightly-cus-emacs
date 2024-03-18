@@ -1,3 +1,6 @@
 mvn -version
 mvn --version
 choco list
+$HOME
+ls -a
+cd ..
