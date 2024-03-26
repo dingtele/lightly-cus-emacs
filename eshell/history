@@ -4,3 +4,13 @@ choco list
 $HOME
 ls -a
 cd ..
+ls -a
+cd /root/ 
+ls -a
+man dnf
+dnf --help-cmd 
+dnf list installed
+fedora-chromium-config.noarch                  3.0-2.fc39                 @fedora                       
+dnf install chromium
+dnf install chromium
+chromium
