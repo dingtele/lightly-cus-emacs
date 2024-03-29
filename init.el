@@ -4,12 +4,10 @@
 (require 'package)
 
 (setq package-archives '(
-                         ;("melpa-stable" . "http://stable.melpa.org/packages/")			 
-			 ;("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")			 
+			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
                         ; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                         ("gnu"   . "http://1.15.88.122/gnu/")
-                         ("nongnu" . "http://1.15.88.122/nongnu/")
-			 ("melpa" . "http://1.15.88.122/melpa/")))
+			 ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 
@@ -92,7 +90,7 @@ bing-dict
  '(custom-safe-themes
    '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
  '(package-selected-packages
-   '(json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
+   '(telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
  '(visual-fill-column-width 120)
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

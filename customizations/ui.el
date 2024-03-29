@@ -16,6 +16,16 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+;;modeline上显示我的所有的按键和执行的命令
+(package-install 'keycast)
+(keycast-mode-line-mode t)
+
+(package-install 'vertico)
+(vertico-mode t)
+
+(package-install 'orderless)
+(setq completion-styles '(orderless))
+
 ;(setq-default cursor-type '(bar . 5))
 ;; Show line numbers
 (global-display-line-numbers-mode)
