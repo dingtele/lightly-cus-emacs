@@ -25,9 +25,9 @@
 
 ;; Define he following variables to remove the compile-log warnings
 ;; when defining ido-ubiquitous
-(defvar ido-cur-item nil)
-(defvar ido-default-item nil)
-(defvar ido-cur-list nil)
+;; (defvar ido-cur-item nil)
+;; (defvar ido-default-item nil)
+;; (defvar ido-cur-list nil)
 (defvar predicate nil)
 (defvar inherit-input-method nil)      
 
@@ -90,7 +90,7 @@ bing-dict
  '(custom-safe-themes
    '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
  '(package-selected-packages
-   '(telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
+   '(restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
  '(visual-fill-column-width 120)
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

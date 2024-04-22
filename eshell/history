@@ -14,3 +14,5 @@ fedora-chromium-config.noarch                  3.0-2.fc39                 @fedor
 dnf install chromium
 dnf install chromium
 chromium
+cd ~/00-mli-codeBase/genesis-root/install/ 
+emacs install.sh 

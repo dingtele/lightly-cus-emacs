@@ -60,16 +60,17 @@
 ;; (load-theme 'doom-one 1)
 
 ;; set-font
+(setq font-use-system-font t)
 (set-face-attribute 'default nil :height 120)
 ;; (set-fontset-font t nil "Symbola" nil 'prepend)
-;; (set-face-attribute
-;;  'default nil
-;;  :font (font-spec :name "Iosevka"
-;;                   ;;"IBM Plex Mono"
-;;                   ;;Iosevka;;cascadia mono;;
-;;                   :Weight 'normal
-;;                   :slant 'normal
-;;                   :size 11.5))
+(set-face-attribute
+ 'default nil
+ :font (font-spec :name "JetBrainsMono"
+                  ;;"IBM Plex Mono"
+                  ;;Iosevka;;cascadia mono;;
+                  :Weight 'normal
+                  :slant 'normal
+                  :size 11.5))
 ;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
 ;;   (set-fontset-font
 ;;    (frame-parameter nil 'font)
