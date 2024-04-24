@@ -1,6 +1,6 @@
 
 (setq debug-on-error 1)
-(setq default-directory "/home/jordi/")
+;(setq default-directory "/home/jordi/")
 (require 'package)
 
 (setq package-archives '(
