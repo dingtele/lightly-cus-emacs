@@ -10,3 +10,5 @@
 
 
 (setq org-directory (concat user-emacs-directory "var/org"))
+
+(provide 'init-org)

@@ -121,8 +121,8 @@
   (previous-line 1))
 
 ;; Assign the custom keybindings
-(global-set-key (kbd "M-<up>") 'move-line-up)
-(global-set-key (kbd "M-<down>") 'move-line-down)
+(global-set-key (kbd "s-<up>") 'move-line-up)
+(global-set-key (kbd "s-<down>") 'move-line-down)
 
 (use-package clipetty
   :ensure t
@@ -148,7 +148,7 @@
 (global-set-key (kbd "C-c C-s") 'select-current-line)
 ;; (defun find-file()
 ;;   (kbd "C-x C-f"))
-(global-set-key (kbd "C-f") 'find-file)
+;; (global-set-key (kbd "C-f") 'find-file)
 (global-set-key (kbd "C-x g") 'magit-status)
 ;; Shift lines up and down with M-up and M-down. When paredit is enabled,
 ;; it will use those keybindings. For this reason, you might prefer to
@@ -161,3 +161,4 @@
 ;; enable this if you want `swiper' to use it
 ;; (setq search-default-mode #'char-fold-to-regexp)
 (global-set-key "\C-s" 'swiper)
+(provide 'editing)

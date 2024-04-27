@@ -1,28 +1,29 @@
-;;;;
-;; Packages
-;;;;
+;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
 
-;; Define package repositories
+;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+(setq debug-on-error t)
+;; ignore native compile warning
+(setq warning-minimum-level :emergency)
+;(setq default-directory "/home/jordi/")
 (require 'package)
-(add-to-list 'package-archives
-             '("tromey" . "http://tromey.com/elpa/") t)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
-(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-(add-to-list 'package-pinned-packages '(magit . "melpa-stable") t)
+(setq package-archives '(
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")			 
+			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
+                        ; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+			 ("melpa" . "https://melpa.org/packages/")))
 
-
-;; Load and activate emacs packages. Do this first so that the
-;; packages are loaded before you start trying to modify them.
-;; This also sets the load path.
 (package-initialize)
 
-;; Download the ELPA archive description if needed.
-;; This informs Emacs about the latest versions of all packages, and
-;; makes them available for download.
+;;install use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile
+  (require 'use-package))
+(require 'bind-key)
+
 (when (not package-archive-contents)
   (package-refresh-contents))
 
@@ -31,58 +32,20 @@
 ;; (defvar ido-cur-item nil)
 ;; (defvar ido-default-item nil)
 ;; (defvar ido-cur-list nil)
-;; (defvar predicate nil)
-;; (defvar inherit-input-method nil)
+(defvar predicate nil)
+(defvar inherit-input-method nil)      
 
-;; The packages you want installed. You can also install these
-;; manually with M-x package-install
-;; Add in your own as you wish:
 (defvar my-packages
-  '(;; makes handling lisp expressions much, much easier
-    ;; Cheatsheet: http://www.emacswiki.org/emacs/PareditCheatsheet
-    paredit
-
-    ;; key bindings and code colorization for Clojure
-    ;; https://github.com/clojure-emacs/clojure-mode
-    clojure-mode
-
-    ;; extra syntax highlighting for clojure
-    clojure-mode-extra-font-locking
-
-    ;; integration with a Clojure REPL
-    ;; https://github.com/clojure-emacs/cider
-    cider
-
-    ;; allow ido usage in as many contexts as possible. see
-    ;; customizations/navigation.el line 23 for a description
-    ;; of ido
-    ido-completing-read+
-
-    ;; Enhances M-x to allow easier execution of commands. Provides
-    ;; a filterable list of possible commands in the minibuffer
-    ;; http://www.emacswiki.org/emacs/Smex
-    smex
-
-    ;; project navigation
-    projectile
-
+  '(
     ;; colorful parenthesis matching
-    rainbow-delimiters
+    ;; paredit
+    ;; rainbow-delimiters
+    magit
+    swiper
+clipetty
+bing-dict
+    ))
 
-    ;; edit html tags like sexps
-    tagedit
-
-    ;; git integration
-    magit))
-
-;; On OS X, an Emacs instance started from the graphical user
-;; interface will have a different environment than a shell in a
-;; terminal window, because OS X does not run a shell during the
-;; login. Obviously this will lead to unexpected results when
-;; calling external utilities like make from Emacs.
-;; This library works around this problem by copying important
-;; environment variables from the user's shell.
-;; https://github.com/purcell/exec-path-from-shell
 (if (eq system-type 'darwin)
     (add-to-list 'my-packages 'exec-path-from-shell))
 
@@ -90,65 +53,53 @@
   (when (not (package-installed-p p))
     (package-install p)))
 
+;; bing-dict
+(use-package bing-dict :ensure t)
+(global-set-key (kbd "C-c d") 'bing-dict-brief)
+;; (setq bing-dict-vocabulary-file "~/Library/Mobile Documents/com~apple~CloudDocs/Documents/emacs-bing-vocabulary.org") 
+(setq bing-dict-vocabulary-save t)
+;;clipetty
+(use-package clipetty
+  :ensure t
+  :bind ("M-w" . clipetty-kill-ring-save))
 
-;; Place downloaded elisp files in ~/.emacs.d/vendor. You'll then be able
-;; to load them.
-;;
-;; For example, if you download yaml-mode.el to ~/.emacs.d/vendor,
-;; then you can add the following code to this file:
-;;
-;; (require 'yaml-mode)
-;; (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
-;; 
-;; Adding this code will make Emacs enter yaml mode whenever you open
-;; a .yml file
+(global-visual-line-mode t)
+(use-package visual-fill-column :ensure t)
+x(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+(setq-default visual-fill-column-center-text t)
+(setq org-image-actual-width nil)
+
 (add-to-list 'load-path "~/.emacs.d/vendor")
-
-
-;;;;
-;; Customization
-;;;;
-
-;; Add a directory to our load path so that when you `load` things
-;; below, Emacs knows where to look for the corresponding file.
-(add-to-list 'load-path "~/emacs-distro/clojure-emacs.d/customizations")
-
-;; Sets up exec-path-from-shell so that Emacs will use the correct
-;; environment variables
-(load "shell-integration.el")
-
-;; These customizations make it easier for you to navigate files,
-;; switch buffers, and choose options from the minibuffer.
+(add-to-list 'load-path "~/.emacs.d/customizations")
+ 
+(load "shell-integration.")
 (load "navigation.el")
-
-;; These customizations change the way emacs looks and disable/enable
-;; some user interface elements
-(load "ui.el")
-
-;; These customizations make editing a bit nicer.
+(require 'ui)
 (load "editing.el")
 
 ;; Hard-to-categorize customizations
 (load "misc.el")
 
-;; For editing lisps
-(load "elisp-editing.el")
-
 ;; Langauage-specific
-(load "setup-clojure.el")
-(load "setup-js.el")
+(load "elisp-editing.el")
+(load "init-org.el")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
+ '(custom-safe-themes
+   '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
  '(package-selected-packages
-   (quote
-    (magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))))
+   '(restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
+ '(visual-fill-column-width 120)
+ '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+

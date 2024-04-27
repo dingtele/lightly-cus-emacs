@@ -17,25 +17,13 @@
 (scroll-bar-mode -1)
 
 ;;modeline上显示我的所有的按键和执行的命令
-(package-install 'keycast)
+(require 'keycast)
 (keycast-mode-line-mode t)
-
-(package-install 'vertico)
-(vertico-mode t)
-
-(package-install 'orderless)
-(setq completion-styles '(orderless))
 
 ;(setq-default cursor-type '(bar . 5))
 ;; Show line numbers
-(global-display-line-numbers-mode)
+(global-display-line-numbers-mode t)
 
-(global-visual-line-mode t)
-(use-package visual-fill-column :ensure t)
-(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-(setq-default visual-fill-column-center-text t)
-(setq org-image-actual-width nil)
-(setq visual-fill-column-width 150)
 
 ;; You can uncomment this to remove the graphical toolbar at the top. After
 ;; awhile, you won't need the toolbar.
@@ -60,27 +48,27 @@
 ;; (load-theme 'doom-one 1)
 
 ;; set-font
-(setq font-use-system-font t)
-(set-face-attribute 'default nil :height 120)
+;; (setq font-use-system-font t)
+;; (set-face-attribute 'default nil :height 150)
 ;; (set-fontset-font t nil "Symbola" nil 'prepend)
 (set-face-attribute
  'default nil
- :font (font-spec :name "JetBrainsMono"
+ :font (font-spec :name "JetBrains Mono"
                   ;;"IBM Plex Mono"
                   ;;Iosevka;;cascadia mono;;
                   :Weight 'normal
                   :slant 'normal
-                  :size 11.5))
-;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
-;;   (set-fontset-font
-;;    (frame-parameter nil 'font)
-;;    charset
-;;    (font-spec :name "仓耳今楷02 W04"
-;;    ;(font-spec :name "LXGW WenKai"
-;;               :weight 'normal
-;;               :slant 'normal
-;;               :size
-;;               12.5)))
+                  :size 16.5))
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font
+   (frame-parameter nil 'font)
+   charset
+   (font-spec :name "TsangerJinKai02"
+   ;(font-spec :name "LXGW WenKai"
+              :weight 'normal
+              :slant 'normal
+              :size
+              17.5)))
 
 ;; Uncomment the lines below by removing semicolons and play with the
 ;; values in order to set the width (in characters wide) and height
@@ -114,7 +102,8 @@
 (setq-default frame-title-format "%b (%f)")
 
 ;; don't pop up font menu
-(global-set-key (kbd "s-t") '(lambda () (interactive)))
+;; (global-set-key (kbd "s-t") '(lambda () (interactive)))
 
 ;; no bell
 (setq ring-bell-function 'ignore)
+(provide 'ui)

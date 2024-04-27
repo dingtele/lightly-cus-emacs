@@ -1,6 +1,39 @@
+;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
 
-(setq debug-on-error 1)
+;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+(setq debug-on-error t)
+;; ignore native compile warning
+(setq warning-minimum-level :emergency)
 ;(setq default-directory "/home/jordi/")
+(defconst *IS-MAC* (eq system-type 'darwin))
+(defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst *IS-WINDOWS*  (memq system-type '(cygwin windows-nt ms-dos)))
+
+(when *IS-MAC*
+  ;; modify meta from ⌥ to ⌘
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super)
+  ;; Make mouse wheel / trackpad scrolling less jerky
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
+  (dolist (multiple '("" "double-" "triple-"))
+    (dolist (direction '("right" "left"))
+      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
+  (global-set-key (kbd "M-`") 'ns-next-frame))
+
+
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+(defun display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                     (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
+(add-hook 'emacs-startup-hook #'display-startup-time)
+
+
 (require 'package)
 
 (setq package-archives '(
@@ -11,25 +44,37 @@
 
 (package-initialize)
 
-;;install use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package))
-(require 'bind-key)
-
-(when (not package-archive-contents)
+(unless package-archive-contents
   (package-refresh-contents))
 
-;; Define he following variables to remove the compile-log warnings
-;; when defining ido-ubiquitous
-;; (defvar ido-cur-item nil)
-;; (defvar ido-default-item nil)
-;; (defvar ido-cur-list nil)
-(defvar predicate nil)
-(defvar inherit-input-method nil)      
+  ;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  (auto-package-update-at-time "09:00"))
+
+(global-visual-line-mode t)
+(use-package visual-fill-column
+  :ensure t
+  :init
+  (visual-fill-column-mode))
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+(setq-default visual-fill-column-center-text t)
+(setq visual-fill-column-width 150)
+(visual-fill-column-mode 1)
+
+(setq org-image-actual-width nil)
 
 (defvar my-packages
   '(
@@ -37,11 +82,10 @@
     paredit
     rainbow-delimiters
     magit
-    bing-dict
     swiper
-clipetty
-bing-dict
-    ))
+    clipetty
+    bing-dict
+    visual-fill-column))
 
 (if (eq system-type 'darwin)
     (add-to-list 'my-packages 'exec-path-from-shell))
@@ -60,26 +104,21 @@ bing-dict
   :ensure t
   :bind ("M-w" . clipetty-kill-ring-save))
 
-(global-visual-line-mode t)
-(use-package visual-fill-column :ensure t)
-(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-(setq-default visual-fill-column-center-text t)
-(setq org-image-actual-width nil)
-
+;;load modules
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/customizations")
  
-(load "shell-integration.el")
-(load "navigation.el")
-(load "ui.el")
-(load "editing.el")
+(require 'shell-integration)
+(require 'navigation)
+(require 'ui)
+(require 'editing)
 
 ;; Hard-to-categorize customizations
-(load "misc.el")
+(require 'misc)
 
 ;; Langauage-specific
-(load "elisp-editing.el")
-(load "init-org.el")
+(require 'elisp-editing)
+(require 'init-org)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -90,7 +129,7 @@ bing-dict
  '(custom-safe-themes
    '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
  '(package-selected-packages
-   '(restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters projectile smex ido-completing-read+ cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
+   '(auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
  '(visual-fill-column-width 120)
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

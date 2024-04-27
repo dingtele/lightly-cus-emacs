@@ -31,7 +31,7 @@
 ;; (global-set-key (kbd "M-x") 'smex)
 
 ;; projectile everywhere!
-(projectile-global-mode)
+;(projectile-global-mode)
 
 (use-package corfu
   :ensure t
@@ -109,3 +109,4 @@
   ;; mode.  Vertico commands are hidden in normal buffers. This setting is
   ;; useful beyond Vertico.
   (setq read-extended-command-predicate #'command-completion-default-include-p))
+(provide 'navigation)
