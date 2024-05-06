@@ -30,7 +30,6 @@
                    (float-time
                      (time-subtract after-init-time before-init-time)))
            gcs-done))
-
 (add-hook 'emacs-startup-hook #'display-startup-time)
 
 
@@ -39,8 +38,10 @@
 (setq package-archives '(
                          ("melpa-stable" . "http://stable.melpa.org/packages/")			 
 			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
-                        ; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                         ("org" . "https://orgmode.org/elpa/"))
+			 ;; ("melpa" . "https://melpa.org/packages/"))
+                          )
 
 (package-initialize)
 
@@ -54,16 +55,6 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-
-(use-package auto-package-update
-  :custom
-  (auto-package-update-interval 7)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-hide-results t)
-  :config
-  (auto-package-update-maybe)
-  (auto-package-update-at-time "09:00"))
-
 (global-visual-line-mode t)
 (use-package visual-fill-column
   :ensure t
@@ -72,14 +63,13 @@
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
 (setq visual-fill-column-width 150)
-(visual-fill-column-mode 1)
+
 
 (setq org-image-actual-width nil)
 
 (defvar my-packages
   '(
     ;; colorful parenthesis matching
-    paredit
     rainbow-delimiters
     magit
     swiper
@@ -97,8 +87,8 @@
 ;; bing-dict
 (use-package bing-dict :ensure t)
 (global-set-key (kbd "C-c d") 'bing-dict-brief)
-;; (setq bing-dict-vocabulary-file "~/Library/Mobile Documents/com~apple~CloudDocs/Documents/emacs-bing-vocabulary.org") 
 (setq bing-dict-vocabulary-save t)
+
 ;;clipetty
 (use-package clipetty
   :ensure t
@@ -107,17 +97,20 @@
 ;;load modules
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/customizations")
- 
-(require 'shell-integration)
-(require 'navigation)
+
 (require 'ui)
 (require 'editing)
+(require 'shell-integration)
+(require 'navigation)
+(require 'misc)
+
+
 
 ;; Hard-to-categorize customizations
 (require 'misc)
 
 ;; Langauage-specific
-(require 'elisp-editing)
+;; (require 'elisp-editing)
 (require 'init-org)
 
 (custom-set-variables
@@ -127,10 +120,9 @@
  ;; If there is more than one, they won't work right.
  '(coffee-tab-width 2)
  '(custom-safe-themes
-   '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
+   '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
  '(package-selected-packages
-   '(auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode paredit exec-path-from-shell))
- '(visual-fill-column-width 120)
+   '(hydra helpful ivy-prescient counsel which-key all-the-icons command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

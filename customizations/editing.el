@@ -21,11 +21,16 @@
   (interactive)
   (find-file "~/.emacs.d/customizations/init-org.el"))
 
+(defun open-misc-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/misc.el"))
+
 (global-set-key (kbd "<f1>") 'open-init-file)
 (global-set-key (kbd "<f2>") 'open-editing-file)
 (global-set-key (kbd "<f3>") 'open-navigation-file)
 (global-set-key (kbd "<f4>") 'open-ui-file)
 (global-set-key (kbd "<f5>") 'open-init-org-file)
+(global-set-key (kbd "<f6>") 'open-misc-file)
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 (setq hippie-expand-try-functions-list
@@ -34,7 +39,6 @@
         try-expand-dabbrev-from-kill
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-
 ;; Highlights matching parenthesis
 (show-paren-mode 1)
 
@@ -150,15 +154,18 @@
 ;;   (kbd "C-x C-f"))
 ;; (global-set-key (kbd "C-f") 'find-file)
 (global-set-key (kbd "C-x g") 'magit-status)
-;; Shift lines up and down with M-up and M-down. When paredit is enabled,
+;; Shift lines up and down withM-up and M-down. When paredit is enabled,
 ;; it will use those keybindings. For this reason, you might prefer to
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
 
-;;config ivy mode
-;;(ivy-mode)
-;; (setq ivy-use-virtual-buffers t)
-;; (setq enable-recursive-minibuffers t)
-;; enable this if you want `swiper' to use it
-;; (setq search-default-mode #'char-fold-to-regexp)
-(global-set-key "\C-s" 'swiper)
+;;design a transient key binding
+(use-package hydra
+  :defer t)
+;;use the macro defhydra to define the hydra and its heads
+(defhydra hydra-text-scale (global-map "<f12>")
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+;; hercules arrives with any other key bindings
 (provide 'editing)

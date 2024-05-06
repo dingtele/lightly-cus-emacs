@@ -1,6 +1,12 @@
 ((:container
   ((elisp org-element--headline-cache)
    (elisp org-element--cache))
+  :persist-file "89/00852f-0dc8-4920-8ed5-3a77ed719da3" :associated
+  (:hash "c927470b94bb8793b3274d9cb9cee7b7" :file "/Users/dingyu/.emacs.d/var/bing-dict/vocabulary.org" :inode 68041246)
+  :expiry 30 :last-access 1714664054.207849 :last-access-hr "2024-05-02T23:34:14+0800")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
   :persist-file "45/76fb30-ea1a-40b1-bb60-eec55c4b9662" :associated
   (:hash "5689746eda13404d76397d2f0bd6ef1d" :file "/Users/dingyu/.emacs.d/var/books/Mastering.Emacs/01.mastering.emacs.v0.org" :inode 65278403)
   :expiry 30 :last-access 1714206215.772718 :last-access-hr "2024-04-27T16:23:35+0800")
@@ -12,4 +18,4 @@
   :expiry 30 :last-access 1714193372.261127 :last-access-hr "2024-04-27T12:49:32+0800")
  (:container
   ((index "3.1"))
-  :persist-file "3c/46aee8-c63a-4179-8f8c-d6eafe7b4eea" :associated nil :expiry never :last-access 1714230191.349827 :last-access-hr "2024-04-27T23:03:11+0800"))
+  :persist-file "3c/46aee8-c63a-4179-8f8c-d6eafe7b4eea" :associated nil :expiry never :last-access 1714664054.208461 :last-access-hr "2024-05-02T23:34:14+0800"))
