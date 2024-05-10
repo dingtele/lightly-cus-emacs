@@ -37,10 +37,10 @@
 
 (setq package-archives '(
                          ("melpa-stable" . "http://stable.melpa.org/packages/")			 
-			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                         ("org" . "https://orgmode.org/elpa/"))
-			 ;; ("melpa" . "https://melpa.org/packages/"))
+			 ;; ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
+                         ;; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                         ("org" . "https://orgmode.org/elpa/")
+			  ("melpa" . "https://melpa.org/packages/"))
                           )
 
 (package-initialize)
@@ -55,13 +55,13 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(global-visual-line-mode t)
-(use-package visual-fill-column
-  :ensure t
-  :init
-  (visual-fill-column-mode))
-(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-(setq-default visual-fill-column-center-text t)
+;; (global-visual-line-mode t)
+;; (use-package visual-fill-column
+;;   :ensure t
+;;   :init
+;;   (visual-fill-column-mode))
+;; (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+;; (setq-default visual-fill-column-center-text t)
 (setq visual-fill-column-width 150)
 
 
@@ -111,6 +111,40 @@
 
 ;; Langauage-specific
 ;; (require 'elisp-editing)
+(use-package erlang
+  :load-path ("D:\04_program_file\Erlang OTP\lib\tools-3.6\emacs")
+  :mode (("\\.erl?$" . erlang-mode)
+         ("rebar\\.config$" . erlang-mode)
+         ("relx\\.config$" . erlang-mode)
+         ("sys\\.config\\.src$" . erlang-mode)
+         ("sys\\.config$" . erlang-mode)
+         ("\\.config\\.src?$" . erlang-mode)
+         ("\\.config\\.script?$" . erlang-mode)
+         ("\\.hrl?$" . erlang-mode)
+         ("\\.app?$" . erlang-mode)
+         ("\\.app.src?$" . erlang-mode)
+         ("\\Emakefile" . erlang-mode)))
+
+(use-package ivy-erlang-complete
+  :ensure t)
+
+(use-package erlang
+  :load-path ("<PATH TO OTP>/lib/erlang/lib/tools-3.0/emacs/")
+  :hook (after-save . ivy-erlang-complete-reparse)
+  :custom (ivy-erlang-complete-erlang-root "<PATH TO OTP>/lib/erlang/")
+  :config (ivy-erlang-complete-init)
+  :mode (("\\.erl?$" . erlang-mode)
+         ("rebar\\.config$" . erlang-mode)
+         ("relx\\.config$" . erlang-mode)
+         ("sys\\.config\\.src$" . erlang-mode)
+         ("sys\\.config$" . erlang-mode)
+         ("\\.config\\.src?$" . erlang-mode)
+         ("\\.config\\.script?$" . erlang-mode)
+         ("\\.hrl?$" . erlang-mode)
+         ("\\.app?$" . erlang-mode)
+         ("\\.app.src?$" . erlang-mode)
+         ("\\Emakefile" . erlang-mode)))
+
 (require 'init-org)
 
 (custom-set-variables

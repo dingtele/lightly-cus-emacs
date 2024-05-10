@@ -70,16 +70,9 @@
                                                "backups"))))
 (setq auto-save-default nil)
 
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
-;; comments on lines
-(defun toggle-comment-on-line ()
-  "comment or uncomment current line and then move to the next line beginning"
-  (interactive)
-  (comment-or-uncomment-region (line-beginning-position) (line-end-position))
-(next-line)
-(beginning-of-visual-line))
-(global-set-key (kbd "C-;") 'toggle-comment-on-line)
- 
 (delete-selection-mode t)
 
 ;; use 2 spaces for tabs

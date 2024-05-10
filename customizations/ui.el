@@ -45,7 +45,7 @@
 ;; for a more technical explanation.
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
-;(require 'ef-themes)
+(require 'ef-themes)
 ;(require 'gruvbox-theme
 (load-theme 'ef-cyprus t)
 ;; (use-package doom-themes)
@@ -55,8 +55,8 @@
 ;; set-font
 ;; (setq font-use-system-font t)
 ;; (set-fontset-font t nil "Symbola" nil 'prepend)
-(defvar font-size (cond ((eq t *IS-MAC*) 16.5)
-                        (eq t *IS-WINDOWS*) 12.5))
+(defvar font-size (if *IS-MAC* 16.5)
+                       (if *IS-WINDOWS* 12.5))
 (set-face-attribute
    'default nil
    :font (font-spec :name "JetBrains Mono"
@@ -72,8 +72,7 @@
    ;(font-spec :name "LXGW WenKai"
               :weight 'normal
               :slant 'normal
-              :size
-              17.5)))
+              :size 17.5)))
 
 ;; ;; Uncomment the lines below by removing semicolons and play with the
 ;; ;; values in order to set the width (in characters wide) and height
