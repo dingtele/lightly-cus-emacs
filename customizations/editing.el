@@ -125,14 +125,6 @@
   :ensure t
   :bind ("M-w" . clipetty-kill-ring-save))
 
-
-(global-visual-line-mode t)
-(use-package visual-fill-column :ensure t)
-(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
-(setq-default visual-fill-column-center-text) t
-(setq org-image-actual-width nil)
-(setq visual-fill-column-width 150)
-
 ;;key-bindings
 (defun select-current-line ()
   "Select the line at the current cursor position."
