@@ -39,13 +39,10 @@
 (set-fringe-mode 10)        ; Give some breathing room
 
 (global-visual-line-mode t)
-(use-package visual-fill-column
-  :ensure t
-  :init
-  (visual-fill-column-mode))
+(require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq visual-fill-column-width 170)
+(setq-default visual-fill-column-width 100)
 
 ;; Color Themes
 ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
