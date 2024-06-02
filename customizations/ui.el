@@ -42,21 +42,65 @@
 (require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq-default visual-fill-column-width 100)
+(setq-default visual-fill-column-width 120)
 
 ;; Color Themes
 ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
 ;; for a great explanation of emacs color themes.
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Custom-Themes.html
 ;; for a more technical explanation.
+
+;; Don't prompt to confirm theme safety. This avoids problems with
+;; first-time startup on Emacs > 26.3.
+(setq custom-safe-themes t)
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
-;(require 'gruvbox-theme
-(load-theme 'ef-cyprus t)
-;; (use-package doom-themes)
-;; (load-theme 'doom-one 1)
-;; (load-theme 'doom-palenight t)
+
+(setq-default custom-enabled-themes '(ef-cyprus))
+
+;; Ensure that themes will be applied even if they have not been customized
+(defun reapply-themes ()
+  "Forcibly load the themes listed in `custom-enabled-themes'."
+  (dolist (theme custom-enabled-themes)
+    (unless (custom-theme-p theme)
+      (load-theme theme)))
+  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes))))
+
+(add-hook 'after-init-hook 'reapply-themes)
+
+
+;; Toggle between light and dark
+
+(defun light ()
+  "Activate a light color theme."
+  (interactive)
+  (disable-theme (car custom-enabled-themes))
+  (setq custom-enabled-themes '(ef-cyprus))
+  (reapply-themes))
+
+(defun dark ()
+  "Activate a dark color theme."
+  (interactive)
+  (disable-theme (car custom-enabled-themes))
+  (setq custom-enabled-themes '(doom-palenight))
+  (reapply-themes))
+
+
+;; (when (maybe-require-package 'dimmer)
+;;   (setq-default dimmer-fraction 0.15)
+;;   (add-hook 'after-init-hook 'dimmer-mode)
+;;   (with-eval-after-load 'dimmer
+;;     ;; TODO: file upstream as a PR
+;;     (advice-add 'frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all))))
+;;   (with-eval-after-load 'dimmer
+;;     ;; Don't dim in terminal windows. Even with 256 colours it can
+;;     ;; lead to poor contrast.  Better would be to vary dimmer-fraction
+;;     ;; according to frame type.
+;;     (defun sanityinc/display-non-graphic-p ()
+;;       (not (display-graphic-p)))
+;;     (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p)))
 
 ;; set-font
 ;; (setq font-use-system-font t)
@@ -65,7 +109,8 @@
                        (if *IS-WINDOWS* 12.5))
 (set-face-attribute
    'default nil
-   :font (font-spec :name "JetBrains Mono"
+   :font (font-spec :name "menlo"
+	  ;; :name "JetBrains Mono"
                     :Weight 'normal
                     :slant 'normal
 		    :size font-size))
