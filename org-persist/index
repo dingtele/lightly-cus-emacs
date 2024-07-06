@@ -1,21 +1,9 @@
 ((:container
   ((elisp org-element--headline-cache)
    (elisp org-element--cache))
-  :persist-file "89/00852f-0dc8-4920-8ed5-3a77ed719da3" :associated
-  (:hash "c927470b94bb8793b3274d9cb9cee7b7" :file "/Users/dingyu/.emacs.d/var/bing-dict/vocabulary.org" :inode 68041246)
-  :expiry 30 :last-access 1714664054.207849 :last-access-hr "2024-05-02T23:34:14+0800")
- (:container
-  ((elisp org-element--headline-cache)
-   (elisp org-element--cache))
-  :persist-file "45/76fb30-ea1a-40b1-bb60-eec55c4b9662" :associated
-  (:hash "5689746eda13404d76397d2f0bd6ef1d" :file "/Users/dingyu/.emacs.d/var/books/Mastering.Emacs/01.mastering.emacs.v0.org" :inode 65278403)
-  :expiry 30 :last-access 1714206215.772718 :last-access-hr "2024-04-27T16:23:35+0800")
- (:container
-  ((elisp org-element--headline-cache)
-   (elisp org-element--cache))
-  :persist-file "8c/a64df2-a383-44a0-a860-936bd50cb2b0" :associated
-  (:hash "f8b4b5530bc5200ad336f1df3c5f0ee1" :file "/Users/dingyu/Documents/GitHub/SICP-in-Elisp/03.abstract-with-modularity-object-and-state.org" :inode 62589953)
-  :expiry 30 :last-access 1714193372.261127 :last-access-hr "2024-04-27T12:49:32+0800")
+  :persist-file "5e/537f16-f376-4bec-b3e9-ab7498260cea" :associated
+  (:hash "f28aa400c05dfe4b853b3ec795702c69" :file "/Users/dingyu/Documents/BookBase/Mastering.Emacs/01.mastering.emacs.v0.org" :inode 71847354)
+  :expiry 30 :last-access 1717817829.266132 :last-access-hr "2024-06-08T11:37:09+0800")
  (:container
   ((index "3.1"))
-  :persist-file "3c/46aee8-c63a-4179-8f8c-d6eafe7b4eea" :associated nil :expiry never :last-access 1714664054.208461 :last-access-hr "2024-05-02T23:34:14+0800"))
+  :persist-file "3c/46aee8-c63a-4179-8f8c-d6eafe7b4eea" :associated nil :expiry never :last-access 1717817829.269928 :last-access-hr "2024-06-08T11:37:09+0800"))

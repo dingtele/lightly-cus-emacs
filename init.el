@@ -144,43 +144,10 @@
 
 ;; ) ;; unbind, see more in the Wiki
 ;; Hard-to-categorize customizations
-(require 'misc)
+;(require 'misc)
 
 ;; Langauage-specific
 ;; (require 'elisp-editing)
-(use-package erlang
-  :load-path ("D:\04_program_file\Erlang OTP\lib\tools-3.6\emacs")
-  :mode (("\\.erl?$" . erlang-mode)
-         ("rebar\\.config$" . erlang-mode)
-         ("relx\\.config$" . erlang-mode)
-         ("sys\\.config\\.src$" . erlang-mode)
-         ("sys\\.config$" . erlang-mode)
-         ("\\.config\\.src?$" . erlang-mode)
-         ("\\.config\\.script?$" . erlang-mode)
-         ("\\.hrl?$" . erlang-mode)
-         ("\\.app?$" . erlang-mode)
-         ("\\.app.src?$" . erlang-mode)
-         ("\\Emakefile" . erlang-mode)))
-
-(use-package ivy-erlang-complete
-  :ensure t)
-
-(use-package erlang
-  :load-path ("<PATH TO OTP>/lib/erlang/lib/tools-3.0/emacs/")
-  :hook (after-save . ivy-erlang-complete-reparse)
-  :custom (ivy-erlang-complete-erlang-root "<PATH TO OTP>/lib/erlang/")
-  :config (ivy-erlang-complete-init)
-  :mode (("\\.erl?$" . erlang-mode)
-         ("rebar\\.config$" . erlang-mode)
-         ("relx\\.config$" . erlang-mode)
-         ("sys\\.config\\.src$" . erlang-mode)
-         ("sys\\.config$" . erlang-mode)
-         ("\\.config\\.src?$" . erlang-mode)
-         ("\\.config\\.script?$" . erlang-mode)
-         ("\\.hrl?$" . erlang-mode)
-         ("\\.app?$" . erlang-mode)
-         ("\\.app.src?$" . erlang-mode)
-         ("\\Emakefile" . erlang-mode)))
 
 (require 'init-org)
 
@@ -193,8 +160,14 @@
  '(custom-enabled-themes '(doom-palenight))
  '(custom-safe-themes
    '("4871b9580169db848da98ba561259089fd83cbbe7b12481db6ca2d906a844154" "95d5336ac1ba49c76ea64028945cc72dfaf98dde7edea58aca4f11874d3191ca" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "6f1f6a1a3cff62cc860ad6e787151b9b8599f4471d40ed746ea2819fcd184e1a" "4ade6b630ba8cbab10703b27fd05bb43aaf8a3e5ba8c2dc1ea4a2de5f8d45882" "79a8c85692a05a0ce0502168bb0e00d25f021a75d8b0136b46978bddf25e3b72" "84b04a13facae7bf10f6f1e7b8526a83ca7ada36913d1a2d14902e35de4d146f" "2ca3da7d36b0d326f984530a07be54b272b5c313b1361989acf747d8b5616162" "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d" default))
+ '(highlight-indent-guides-auto-character-face-perc 20)
+ '(highlight-indent-guides-auto-enabled nil)
+ '(highlight-indent-guides-auto-even-face-perc 15)
+ '(highlight-indent-guides-auto-odd-face-perc 15)
+ '(highlight-indent-guides-character '|)
+ '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
+   '(highlight-indent-guides treemacs org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
