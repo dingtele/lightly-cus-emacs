@@ -241,12 +241,12 @@ Optional for Org-mode file: `LINK'."
   (org-yank-adjusted-subtrees t)
 
   ;; TOOD的关键词设置，可以设置不同的组
-  (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
+  (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "IN-PROGRESS(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
 					   (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
   ;; TODO关键词的样式设置
   (org-todo-keyword-faces '(("TODO"       :foreground "#7c7c75" :weight bold)
 							("HOLD"       :foreground "#feb24c" :weight bold)
-							("WIP"        :foreground "#0098dd" :weight bold)
+							("IN-PROGRESS"        :foreground "#0098dd" :weight bold)
 							("WAIT"       :foreground "#9f7efe" :weight bold)
 							("DONE"       :foreground "#50a14f" :weight bold)
 							("CANCELLED"  :foreground "#ff6480" :weight bold)

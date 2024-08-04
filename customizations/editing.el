@@ -32,14 +32,15 @@
 (global-set-key (kbd "<f5>") 'open-init-org-file)
 (global-set-key (kbd "<f6>") 'open-misc-file)
 
+;; auto completion of function name
 (global-set-key (kbd "M-/") 'hippie-expand)
-(setq hippie-expand-try-functions-list
+(setq hippie-expand-try-functions-list  
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-;; Highlights matching parenthesis
+;; Highlights matching parenthesis(highlight paren or expression)
 (show-paren-mode 1)
 
 ;; Highlight current line
@@ -64,7 +65,7 @@
 (setq auto-save-default nil)
 
 (use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+  :bind ("M-;" . evilnc-comment-or-uncomment-lines))
 
 (delete-selection-mode t)
 
