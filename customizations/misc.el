@@ -40,40 +40,5 @@
 (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
 (setq highlight-indent-guides-method 'character)
 
-;; erlang
-(use-package erlang
-  :load-path ("D:\04_program_file\Erlang OTP\lib\tools-3.6\emacs")
-  :mode (("\\.erl?$" . erlang-mode)
-         ("rebar\\.config$" . erlang-mode)
-         ("sys\\.config\\.src$" . erlang-mode)
-         ("relx\\.config$" . erlang-mode)
-         ("sys\\.config$" . erlang-mode)
-         ("\\.config\\.src?$" . erlang-mode)
-         ("\\.config\\.script?$" . erlang-mode)
-         ("\\.hrl?$" . erlang-mode)
-         ("\\.app?$" . erlang-mode)
-         ("\\.app.src?$" . erlang-mode)
-         ("\\Emakefile" . erlang-mode)))
-
-(use-package ivy-erlang-complete
-  :ensure t)
-
-(use-package erlang
-  :load-path ("<PATH TO OTP>/lib/erlang/lib/tools-3.0/emacs/")
-  :hook (after-save . ivy-erlang-complete-reparse)
-  :custom (ivy-erlang-complete-erlang-root "<PATH TO OTP>/lib/erlang/")
-  :config (ivy-erlang-complete-init)
-  :mode (("\\.erl?$" . erlang-mode)
-         ("rebar\\.config$" . erlang-mode)
-         ("relx\\.config$" . erlang-mode)
-         ("sys\\.config\\.src$" . erlang-mode)
-         ("sys\\.config$" . erlang-mode)
-         ("\\.config\\.src?$" . erlang-mode)
-         ("\\.config\\.script?$" . erlang-mode)
-         ("\\.hrl?$" . erlang-mode)
-         ("\\.app?$" . erlang-mode)
-         ("\\.app.src?$" . erlang-mode)
-         ("\\Emakefile" . erlang-mode)))
-
 
 (provide 'misc)

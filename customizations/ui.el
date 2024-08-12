@@ -182,4 +182,27 @@
 
 ;; (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
 
+(add-hook 'switch-buffer-functions
+          (lambda (prev curr)
+            (cl-assert (eq curr (current-buffer)))  ;; Always t
+            (message "%S -> %S" prev curr))) ;;TODO
+
+(use-package winner
+  :ensure nil
+  :hook (after-init . winner-mode)
+  :commands (winner-undo winner-redo)
+  :config
+  (setq winner-boring-buffers
+        '("*Completions*"
+          "*Compile-Log*"
+          "*inferior-lisp*"
+          "*Fuzzy Completions*"
+          "*Apropos*"
+          "*Help*"
+          "*cvs*"
+          "*Buffer List*"
+          "*Ibuffer*"
+          "*esh command on file*"))
+  )
+
 (provide 'ui)
