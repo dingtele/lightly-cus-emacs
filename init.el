@@ -168,7 +168,7 @@
  '(highlight-indent-guides-character '|)
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil nord-theme one-themes highlight-indent-guides treemacs org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
+   '(ibuffer-project treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil nord-theme one-themes highlight-indent-guides treemacs org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
  '(show-paren-style 'expression)
  '(warning-suppress-types '((use-package))))
 (custom-set-faces

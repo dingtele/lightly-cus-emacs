@@ -123,6 +123,72 @@
                         ("\\.pptx\\'"    . default)
                         ("\\.docx\\'"    . default)))
   :custom
+;; 设置Org mode的目录
+  (org-directory "~/org")
+  ;; 设置笔记的默认存储位置
+  (org-default-notes-file (expand-file-name "capture.org" org-directory))
+  ;; 启用一些子模块
+  (org-modules '(ol-bibtex ol-gnus ol-info ol-eww org-habit org-protocol))
+  ;; 在按M-RET时，是否根据光标所在的位置分行，这里设置为是
+  ;; (org-M-RET-may-split-line '((default . nil)))
+  ;; 一些Org mode自带的美化设置
+  ;; 标题行美化
+  ;; (org-fontify-whole-heading-line t)
+  ;; ;; 设置标题行折叠符号
+  ;; ;; (org-ellipsis " ▾")
+  ;; ;; 在活动区域内的所有标题栏执行某些命令
+  ;; (org-loop-over-headlines-in-active-region t)
+  ;; ;; TODO标签美化
+  ;; (org-fontify-todo-headline t)
+  ;; ;; DONE标签美化
+  ;; (org-fontify-done-headline t)
+  ;; ;; 引用块美化
+  ;; (org-fontify-quote-and-verse-blocks t)
+  ;; ;; 隐藏宏标记
+  ;; (org-hide-macro-markers t)
+  ;; ;; 隐藏强调标签
+  ;; (org-hide-emphasis-markers t)
+  ;; ;; 高亮latex语法
+  ;; (org-highlight-latex-and-related '(native script entities))
+  ;; ;; 以UTF-8显示
+  ;; (org-pretty-entities t)
+  ;; ;; 是否隐藏标题栏的前置星号，这里我们通过org-modern来隐藏
+  ;; ;; (org-hide-leading-stars t)
+  ;; ;; 当启用缩进模式时自动隐藏前置星号
+  ;; (org-indent-mode-turns-on-hiding-stars t)
+  ;; ;; 自动启用缩进
+  ;; (org-startup-indented nil)
+  ;; ;; 根据标题栏自动缩进文本
+  ;; (org-adapt-indentation nil)
+  ;; ;; 自动显示图片
+  ;; (org-startup-with-inline-images t)
+  ;; ;; 默认以Overview的模式展示标题行
+  ;; (org-startup-folded 'overview)
+  ;; ;; 允许字母列表
+  ;; (org-list-allow-alphabetical t)
+  ;; ;; 列表的下一级设置
+  ;; ;; (org-list-demote-modify-bullet '(
+  ;; ;;       							   ("-"  . "+")
+  ;; ;;                                  ("+"  . "1.")
+  ;; ;;       							   ("1." . "a.")
+  ;; ;;       							   ))
+  ;; ;; 编辑时检查是否在折叠的不可见区域
+  ;; (org-fold-catch-invisible-edits 'smart)
+  ;; ;; 在当前位置插入新标题行还是在当前标题行后插入，这里设置为当前位置
+  ;; (org-insert-heading-respect-content nil)
+  ;; ;; 设置图片的最大宽度，如果有imagemagick支持将会改变图片实际宽度
+  ;; ;; 四种设置方法：(1080), 1080, t, nil
+  ;; (org-image-actual-width nil)
+  ;; ;; imenu的最大深度，默认为2
+  ;; (org-imenu-depth 4)
+  ;; ;; 回车要不要触发链接，这里设置不触发
+  ;; (org-return-follows-link nil)
+  ;; ;; 上标^下标_是否需要特殊字符包裹，这里设置需要用大括号包裹
+  ;; (org-use-sub-superscripts '{})
+  ;; ;; 复制粘贴标题行的时候删除id
+  ;; (org-clone-delete-id t)
+  ;; ;; 粘贴时调整标题行的级别
+  ;; (org-yank-adjusted-subtrees t)
 ;; TOOD的关键词设置，可以设置不同的组
   (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
 					   (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
@@ -214,41 +280,6 @@
 (use-package org-contrib
   :ensure t)
 
-(use-package org-modern
-  :ensure t
-  :hook (after-init . (lambda ()
-                        ;; (setq org-modern-hide-stars 'leading)
-                        (global-org-modern-mode t)))
-  :config
-  ;; 标题行型号字符
-  ;; (setq org-modern-star ["◉" "○" "✸" "✳" "◈" "◇" "✿" "❀" "✜"])
-  ;; 额外的行间距，0.1表示10%，1表示1px
-  (setq-default line-spacing 0.1)
-  ;; tag边框宽度，还可以设置为 `auto' 即自动计算
-  ;; (setq org-modern-label-border 1)
-  ;; 设置表格竖线宽度，默认为3
-  (setq org-modern-table-vertical 2)
-  ;; 设置表格横线为0，默认为0.1
-  (setq org-modern-table-horizontal 0)
-  ;; 复选框美化
-  (setq org-modern-checkbox
-        '((?X . #("▢✓" 0 2 (composition ((2)))))
-          (?- . #("▢–" 0 2 (composition ((2)))))
-          (?\s . #("▢" 0 1 (composition ((1)))))))
-  ;; 列表符号美化
-  (setq org-modern-list
-        '((?- . "•")
-          (?+ . "◦")
-          ;; (?* . "▹")
-          ))
-  ;; 代码块左边加上一条竖边线（需要Org mode顶头，如果启用了 `visual-fill-column-mode' 会很难看）
-  (setq org-modern-block-fringe t)
-  ;; 代码块类型美化，我们使用了 `prettify-symbols-mode'
-  (setq org-modern-block-name nil)
-  ;; #+关键字美化，我们使用了 `prettify-symbols-mode'
-  (setq org-modern-keyword nil)
-  )
-
 (use-package org-appear
   :ensure t
   :hook (org-mode . org-appear-mode)
@@ -258,6 +289,42 @@
   (setq org-appear-autoentities t)
   (setq org-appear-autokeywords t)
   (setq org-appear-inside-latex t)
+  )
+
+(global-set-key (kbd "C-c c") 'org-capture)
+(setq org-default-notes-file "~/org/inbox.org")
+
+(use-package org-capture
+  :ensure nil
+  :bind ("\e\e c" . (lambda () (interactive) (org-capture)))
+  :hook ((org-capture-mode . (lambda ()
+                               (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
+         (org-capture-mode . delete-other-windows))
+  :custom
+  (org-capture-use-agenda-date nil)
+  ;; define common template
+  (org-capture-templates `(("t" "Tasks" entry (file+headline "tasks.org" "Reminders")
+                            "* TODO %i%?"
+                            :empty-lines-after 1
+                            :prepend t)
+                           ("n" "Notes" entry (file+headline "capture.org" "Notes")
+                            "* %? %^g\n%i\n"
+                            :empty-lines-after 1)
+                           ;; For EWW
+                           ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
+                            "* %:description\n\n%a%?"
+                            :empty-lines 1
+                            :immediate-finish t)
+                           ("d" "Diary")
+                           ("dt" "Today's TODO list" entry (file+olp+datetree "diary.org")
+                            "* Today's TODO list [/]\n%T\n\n** TODO %?"
+                            :empty-lines 1
+                            :jump-to-captured t)
+                           ("do" "Other stuff" entry (file+olp+datetree "diary.org")
+                            "* %?\n%T\n\n%i"
+                            :empty-lines 1
+                            :jump-to-captured t)
+                           ))
   )
 
 (provide 'init-org)

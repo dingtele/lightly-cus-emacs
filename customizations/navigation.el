@@ -163,4 +163,11 @@
   (prescient-persist-mode 1)
   (ivy-prescient-mode 1))
 
+(add-hook
+ 'ibuffer-hook
+ (lambda ()
+   (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+   (unless (eq ibuffer-sorting-mode 'project-file-relative)
+     (ibuffer-do-sort-by-project-file-relative))))
+
 (provide 'navigation)
