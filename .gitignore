@@ -11,3 +11,13 @@ backups
 melpa-stable
 archive-contents
 *.elc
+var
+.idea
+eaf
+elpa
+history
+.cache
+.DS_Store
+eln-cache
+org-persist
+transient
