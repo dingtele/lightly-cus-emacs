@@ -19,8 +19,9 @@
 
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
-  (setq mac-command-modifier 'meta)
+  (setq mac-command-modifier 'control)
   (setq mac-option-modifier 'super)
+  (setq mac-control-modifier 'meta)
   ;; Make mouse wheel / trackpad scrolling less jerky
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
   (dolist (multiple '("" "double-" "triple-"))
