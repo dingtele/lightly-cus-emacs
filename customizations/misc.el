@@ -41,4 +41,22 @@
 (setq highlight-indent-guides-method 'character)
 
 
+(require 'plantuml)
+(setq plantuml-jar-path "~/.emacs.d/site-lisp/plantuml-1.2024.6.jar"
+      plantuml-output-type "svg"
+      plantuml-relative-path "/home/madcomet/Pictures/plantuml-image/"
+      plantuml-theme "plain"
+      plantuml-font "source code pro medium"
+      plantuml-add-index-number t
+      plantuml-log-command t
+      plantuml-mindmap-contains-org-content t
+      plantuml-org-headline-bold t)
+
+(use-package eshell-syntax-highlighting
+  :after eshell-mode
+  :ensure t ;; Install if not already installed.
+  :config
+  ;; Enable in all Eshell buffers.
+  (eshell-syntax-highlighting-global-mode +1))
+
 (provide 'misc)

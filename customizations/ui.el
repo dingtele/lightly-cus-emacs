@@ -84,7 +84,8 @@
   "Activate a dark color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(doom-palenight))
+  (setq custom-enabled-themes '(ef-winter))
+  ;; (setq custom-enabled-themes '(doom-palenight))
   (reapply-themes))
 
 
@@ -109,21 +110,22 @@
                        (if *IS-WINDOWS* 12.5))
 (set-face-attribute
    'default nil
-   :font (font-spec :name "menlo"
+   :font (font-spec
+                    :name "iosevka"
 	  ;; :name "JetBrains Mono"
                     :Weight 'normal
                     :slant 'normal
 		    :size font-size))
 
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-  (set-fontset-font
-   (frame-parameter nil 'font)
-   charset
-   (font-spec :name "TsangerJinKai02"
-   ;(font-spec :name "LXGW WenKai"
-              :weight 'normal
-              :slant 'normal
-              :size 17.5)))
+;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
+;;   (set-fontset-font
+;;    (frame-parameter nil 'font)
+;;    charset
+;;    (font-spec :name "TsangerJinKai02"
+;;    ;(font-spec :name "LXGW WenKai"
+;;               :weight 'normal
+;;               :slant 'normal
+;;               :size 17.5)))
 
 ;; ;; Uncomment the lines below by removing semicolons and play with the
 ;; ;; values in order to set the width (in characters wide) and height

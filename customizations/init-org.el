@@ -241,30 +241,60 @@
   :custom
   (org-capture-use-agenda-date nil)
   ;; define common template
-  (org-capture-templates `(("t" "Tasks" entry (file+headline "tasks.org" "Reminders")
+  (org-capture-templates `(
+                           ("s" "Schedule")
+                           ("st" "Tasks" entry (file+headline "Tasks.org" "TO-DO Queque")
                             "* TODO %i%?"
                             :empty-lines-after 1
                             :prepend t)
-                           ("n" "Notes" entry (file+headline "capture.org" "Notes")
+                           ("sc" "Class-Schedule" entry (file+headline "Tasks.org" "Class-Schedule")
+                            "* TODO %i%?"
+                            :empty-lines-after 1
+                            :prepend t)
+                           ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
                             "* %? %^g\n%i\n"
                             :empty-lines-after 1)
                            ;; For EWW
-                           ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
-                            "* %:description\n\n%a%?"
-                            :empty-lines 1
-                            :immediate-finish t)
-                           ("d" "Diary")
-                           ("dt" "Today's TODO list" entry (file+olp+datetree "diary.org")
+                           ;; ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
+                           ;;  "* %:description\n\n%a%?"
+                           ;;  :empty-lines 1
+                           ;;  :immediate-finish t)
+                           ("j" "Journal")
+                           ("jt" "Today's TODO list" entry (file+olp+datetree "Journal.org")
                             "* Today's TODO list [/]\n%T\n\n** TODO %?"
                             :empty-lines 1
                             :jump-to-captured t)
-                           ("do" "Other stuff" entry (file+olp+datetree "diary.org")
+                           ("jd" "diary" entry (file+olp+datetree "Journal.org")
                             "* %?\n%T\n\n%i"
                             :empty-lines 1
                             :jump-to-captured t)
                            ))
   )
 
-
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i"    . completion-at-point))
+  :config
+  (org-roam-setup)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
 
 (provide 'init-org)
