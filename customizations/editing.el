@@ -25,12 +25,17 @@
   (interactive)
   (find-file "~/.emacs.d/customizations/misc.el"))
 
+(defun open-tools-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/tools.el"))
+
 (global-set-key (kbd "<f1>") 'open-init-file)
 (global-set-key (kbd "<f2>") 'open-editing-file)
 (global-set-key (kbd "<f3>") 'open-navigation-file)
 (global-set-key (kbd "<f4>") 'open-ui-file)
 (global-set-key (kbd "<f5>") 'open-init-org-file)
 (global-set-key (kbd "<f6>") 'open-misc-file)
+(global-set-key (kbd "<f9>") 'open-tools-file)
 
 ;; auto completion of function name
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -112,8 +117,8 @@
   (previous-line 1))
 
 ;; Assign the custom keybindings
-(global-set-key (kbd "s-<up>") 'move-line-up)
-(global-set-key (kbd "s-<down>") 'move-line-down)
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
 
 (global-set-key (kbd "M-o") 'other-window)
 (windmove-default-keybindings)

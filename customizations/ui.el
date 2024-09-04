@@ -89,30 +89,43 @@
   (reapply-themes))
 
 
-;; (when (maybe-require-package 'dimmer)
-;;   (setq-default dimmer-fraction 0.15)
-;;   (add-hook 'after-init-hook 'dimmer-mode)
-;;   (with-eval-after-load 'dimmer
-;;     ;; TODO: file upstream as a PR
-;;     (advice-add 'frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all))))
-;;   (with-eval-after-load 'dimmer
-;;     ;; Don't dim in terminal windows. Even with 256 colours it can
-;;     ;; lead to poor contrast.  Better would be to vary dimmer-fraction
-;;     ;; according to frame type.
-;;     (defun sanityinc/display-non-graphic-p ()
-;;       (not (display-graphic-p)))
-;;     (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p)))
+(use-package dimmer
+  :ensure t
+  :hook (after-init . dimmer-mode)
+  :config
+  (dimmer-configure-which-key)
+  (dimmer-configure-helm)
+  (setq-default dimmer-fraction 0.35)
+  (with-eval-after-load 'dimmer
+    ;; TODO: file upstream as a PR
+    (advice-add 'frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all))))
+  (with-eval-after-load 'dimmer
+    ;; Don't dim in terminal windows. Even with 256 colours it can
+    ;; lead to poor contrast.  Better would be to vary dimmer-fraction
+    ;; according to frame type.
+    (defun sanityinc/display-non-graphic-p ()
+      (not (display-graphic-p)))
+    (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p))
+)
 
 ;; set-font
 ;; (setq font-use-system-font t)
 ;; (set-fontset-font t nil "Symbola" nil 'prepend)
-(defvar font-size (if *IS-MAC* 15.5)
-                       (if *IS-WINDOWS* 12.5))
+
+(defvar font-name 
+  (cond ( *IS-LINUX* "iosevka medium extended")
+        ( *IS-MAC* "menlo")
+        ( *IS-WINDOWS* "JetBrains Mono")))
+super_L
+(defvar font-size 
+  (cond ( *IS-LINUX* 14)
+        ( *IS-MAC* 15.5)
+        ( *IS-WINDOWS* 12.5)))
+
 (set-face-attribute
    'default nil
    :font (font-spec
-                    :name "iosevka"
-	  ;; :name "JetBrains Mono"
+                    :name font-name
                     :Weight 'normal
                     :slant 'normal
 		    :size font-size))

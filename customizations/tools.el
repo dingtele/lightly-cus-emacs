@@ -9,7 +9,7 @@
   (defalias 'browse-web #'eaf-open-browser)
   ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
   ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
   (require 'eaf-browser)
 
 ) ;; unbind, see more in the Wiki
@@ -83,7 +83,7 @@
    (let ((new-buffer-name (concat "*eshell-" name "*")))
      (rename-buffer new-buffer-name t)))
 
-(global-set-key (kbd "M-o s") #'my/shell-create)
+;; (global-set-key (kbd "/M-o s") #'my/shell-create)
 
 (use-package popper
    :init
@@ -98,3 +98,5 @@
    (popper-window-height 15))
 
 (bind-key* (kbd "C-;") #'popper-toggle)
+
+(provide 'tools)

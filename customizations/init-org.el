@@ -260,12 +260,12 @@
                            ;;  :empty-lines 1
                            ;;  :immediate-finish t)
                            ("j" "Journal")
-                           ("jt" "Today's TODO list" entry (file+olp+datetree "Journal.org")
-                            "* Today's TODO list [/]\n%T\n\n** TODO %?"
+                           ("jt" "Today's TODO list" item (file+olp+datetree "Journal.org")
+                            "- Today's TODO list [/] %T\n %?"
                             :empty-lines 1
                             :jump-to-captured t)
-                           ("jd" "diary" entry (file+olp+datetree "Journal.org")
-                            "* %?\n%T\n\n%i"
+                           ("jd" "diary" item (file+olp+datetree "Journal.org")
+                            "- Note taken on %T\n\n%i"
                             :empty-lines 1
                             :jump-to-captured t)
                            ))
@@ -296,5 +296,9 @@
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
   (require 'org-roam-protocol))
+
+;; (use-package corg
+  ;; :ensure t
+  ;; :hook (org-mode . #'corg-setup))
 
 (provide 'init-org)

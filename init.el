@@ -35,7 +35,7 @@
 (defun display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
-                   (float-timedd
+                   (float-time
                      (time-subtract after-init-time before-init-time)))
            gcs-done))
 (add-hook 'emacs-startup-hook #'display-startup-time)
@@ -45,7 +45,7 @@
 
 (setq package-archives '(
                          ;; ("melpa-stable" . "http://stable.melpa.org/packages/")			 
-			 ;; ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
+			 ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") 
                          ;; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                          ("org" . "https://orgmode.org/elpa/")
 			  ("melpa" . "https://melpa.org/packages/")
@@ -107,8 +107,10 @@
 (require 'misc)
 
 ;; Langauage-specific
+
 ;; (require 'elisp-editing)
 (require 'init-org)
+(require 'tools)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -127,7 +129,7 @@
  '(highlight-indent-guides-character '|)
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(all-the-icons-nerd-fonts all-the-icons-gnus eshell-syntax-highlighting org-roam emacsql-sqlite all-the-icons treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil nord-theme one-themes highlight-indent-guides treemacs org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
+   '(capf-autosuggest sicp corg dimmer all-the-icons-nerd-fonts all-the-icons-gnus eshell-syntax-highlighting org-roam emacsql-sqlite all-the-icons treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil nord-theme one-themes highlight-indent-guides treemacs org-modern org-contrib hydra helpful ivy-prescient counsel which-key command-log-mode no-littering auto-package-update restclient docker-compose-mode docker telega marginalia orderless vertico keycast json-navigator json-mode doom ewal-doom-themes corfu magit tagedit rainbow-delimiters cider clojure-mode-extra-font-locking clojure-mode exec-path-from-shell))
  '(show-paren-style 'expression)
  '(telega-server-libs-prefix "/usr/local")
  '(warning-suppress-types '((use-package))))
