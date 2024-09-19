@@ -72,7 +72,7 @@
 (use-package org
   :ensure nil
   :mode ("\\.org\\'" . org-mode)
-  :hook ((org-mode . visual-line-mode))
+  :hook ((org-mode . visual-line-mode) (org-mode . my/org-prettify-symbols))
   :commands (org-find-exact-headline-in-buffer org-set-tags)
   :custom-face
    ;; 设置Org mode标题以及每级标题行的大小
@@ -90,10 +90,45 @@
   (org-block-begin-line ((t (:underline t :background unspecified))))
   (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
   :config
-  ;; 设置标题行之间总是有空格；列表之间根据情况自动加空格
-  (setq org-blank-before-new-entry '((heading . t)
-                                     (plain-list-item . auto)))
-
+  ;; ;; 设置标题行之间总是有空格；列表之间根据情况自动加空格
+  ;; (setq org-blank-before-new-entry '((heading . t)
+  ;;                                    (plain-list-item . auto)))
+  ;; 在org mode里美化字符串
+  ;; ================================
+  (defun my/org-prettify-symbols ()
+	(setq prettify-symbols-alist
+		  (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+				  '(
+					;; ("[ ]"              . 9744)         ; ☐
+					;; ("[X]"              . 9745)         ; ☑
+					;; ("[-]"              . 8863)         ; ⊟
+					("#+begin_src"      . 9998)         ; ✎
+					("#+end_src"        . 9633)         ; □
+					("#+begin_example"  . 129083)       ; 🠻
+					("#+end_example"    . 129081)       ; 🠹
+					("#+results:"       . 9776)         ; ☰
+					("#+attr_latex:"    . "🄛")
+					("#+attr_html:"     . "🄗")
+					("#+attr_org:"      . "🄞")
+					("#+name:"          . "🄝")         ; 127261
+					("#+caption:"       . "🄒")         ; 127250
+					("#+date:"          . "📅")         ; 128197
+					("#+author:"        . "💁")         ; 128100
+					("#+setupfile:"     . 128221)       ; 📝
+					("#+email:"         . 128231)       ; 📧
+					("#+startup:"       . 10034)        ; ✲
+					("#+options:"       . 9965)         ; ⛭
+					("#+title:"         . 10162)        ; ➲
+					("#+subtitle:"      . 11146)        ; ⮊
+					("#+downloaded://///:"    . 8650)         ; ⇊
+					("#+language:"      . 128441)       ; 🖹
+					("#+begin_quote"    . 187)          ; »
+					("#+end_quote"      . 171)          ; «
+                    ("#+begin_results"  . 8943)         ; ⋯
+                    ("#+end_results"    . 8943)         ; ⋯
+					)))
+    (setq prettify-symbols-unprettify-at-point t)
+	(prettify-symbols-mode 1))
   ;; ======================================
   ;; 设置打开Org links的程序
   ;; ======================================
@@ -120,7 +155,7 @@
                         ("\\.pptx\\'"    . default)
                         ("\\.docx\\'"    . default)))
   :custom
-;; 设置Org mode的目录
+  ;; 设置Org mode的目录
   (org-directory "~/Dropbox/org")
   ;; 设置笔记的默认存储位置
   (org-default-notes-file (expand-file-name "capture.org" org-directory))
@@ -265,7 +300,7 @@
                             :empty-lines 1
                             :jump-to-captured t)
                            ("jd" "diary" item (file+olp+datetree "Journal.org")
-                            "- Note taken on %T\n\n%i"
+                            "- Note taken on %U\n\n%i%?"
                             :empty-lines 1
                             :jump-to-captured t)
                            ))
@@ -301,4 +336,5 @@
   ;; :ensure t
   ;; :hook (org-mode . #'corg-setup))
 
+(customize-set-variable 'org-anki-default-deck "org-deck")
 (provide 'init-org)

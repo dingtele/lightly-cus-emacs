@@ -1,3 +1,53 @@
+;; set-font
+(defun ding-font-existsp (font)
+  (if (null (x-list-fonts font))
+      nil
+    t))
+;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
+(defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "HanaMinB"))
+(defvar en-font-list '("iosevka" "Latin Modern Mono" "Fira Code" "IBM Plex Mono"))
+
+(defun ding-make-font-string (font-name font-size)
+  (if (and (stringp font-size)
+           (equal ":" (string (elt font-size 0))))
+      (format "%s%s" font-name font-size)
+    (format "%s %s" font-name font-size)))
+
+(defun ding-set-font (english-fonts
+                       english-font-size
+                       chinese-fonts
+                       &optional chinese-font-scale)
+
+  (setq chinese-font-scale (or chinese-font-scale 1))
+
+  (setq face-font-rescale-alist
+        (cl-loop for x in zh-font-list
+              collect (cons x chinese-font-scale)))
+
+  "english-font-size could be set to \":pixelsize=18\" or a integer.
+If set/leave chinese-font-scale to nil, it will follow english-font-size"
+
+  (let ((en-font (ding-make-font-string
+                  (cl-find-if #'ding-font-existsp english-fonts)
+                  english-font-size))
+        (zh-font (font-spec :family (cl-find-if #'ding-font-existsp chinese-fonts))))
+
+    ;; Set the default English font
+    (message "Set English Font to %s" en-font)
+    (set-face-attribute 'default nil :font en-font)
+
+    ;; Set Chinese font
+    ;; Do not use 'unicode charset, it will cause the English font setting invalid
+    (message "Set Chinese Font to %s" zh-font)
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+      (set-fontset-font (frame-parameter nil 'font)
+                        charset zh-font))))
+
+(ding-set-font en-font-list 11 zh-font-list)
+(add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
+
+;; (setq font-use-system-font t)
+
 (menu-bar-mode -1)
 ;; Set up the visible bell
 (setq visible-bell t)
@@ -10,7 +60,7 @@
 
 ;;modeline上显示我的所有的按键和执行的命令
 (require 'keycast)
-(keycast-header-line-mode t)
+(keycast-mode-line-mode t)
 
 ;(setq-default cursor-type '(bar . 5))
 (column-number-mode)
@@ -18,10 +68,10 @@
 
 ;; Set frame transparency
 ;; Make frame transparency overridable
-(defvar frame-transparency '(95 . 95))
+;; (defvar frame-transparency '(95 . 95))
 
-(set-frame-parameter (selected-frame) 'alpha frame-transparency)
-(add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
+;; (set-frame-parameter (selected-frame) 'alpha frame-transparency)
+;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -58,7 +108,7 @@
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
 
-(setq-default custom-enabled-themes '(ef-cyprus))
+(setq-default custom-enabled-themes '(spacemacs-light))
 
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
@@ -77,15 +127,14 @@
   "Activate a light color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(ef-cyprus))
+  (setq custom-enabled-themes '(spacemacs-light ef-cyprus))
   (reapply-themes))
 
 (defun dark ()
   "Activate a dark color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(ef-winter))
-  ;; (setq custom-enabled-themes '(doom-palenight))
+  (setq custom-enabled-themes '(ef-winter doom-palenight))
   (reapply-themes))
 
 
@@ -108,42 +157,10 @@
     (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p))
 )
 
-;; set-font
-;; (setq font-use-system-font t)
-;; (set-fontset-font t nil "Symbola" nil 'prepend)
 
-(defvar font-name 
-  (cond ( *IS-LINUX* "iosevka medium extended")
-        ( *IS-MAC* "menlo")
-        ( *IS-WINDOWS* "JetBrains Mono")))
-super_L
-(defvar font-size 
-  (cond ( *IS-LINUX* 14)
-        ( *IS-MAC* 15.5)
-        ( *IS-WINDOWS* 12.5)))
-
-(set-face-attribute
-   'default nil
-   :font (font-spec
-                    :name font-name
-                    :Weight 'normal
-                    :slant 'normal
-		    :size font-size))
-
-;; (dolist (charset '(kana han symbol cjk-misc bopomofo))
-;;   (set-fontset-font
-;;    (frame-parameter nil 'font)
-;;    charset
-;;    (font-spec :name "TsangerJinKai02"
-;;    ;(font-spec :name "LXGW WenKai"
-;;               :weight 'normal
-;;               :slant 'normal
-;;               :size 17.5)))
-
-;; ;; Uncomment the lines below by removing semicolons and play with the
-;; ;; values in order to set the width (in characters wide) and height
-;; ;; (in lines high) Emacs will have whenever you start it
-;; ;; (setq initial-frame-alist '((top . 0) (left . 0) (width . 177) (height . 53)))
+;;set the width (in characters wide) and height
+;; (in lines high) Emacs will have whenever you start it
+;; (setq initial-frame-alist '((top . 0) (left . 0) (width . 177) (height . 53)))
 
 ;; ;; These settings relate to how emacs interacts with your operating system
 ;; (setq ;; makes killing/yanking interact with the clipboard
@@ -160,6 +177,7 @@ super_L
             (cl-assert (eq curr (current-buffer)))  ;; Always t
             (message "%S -> %S" prev curr))) ;;TODO
 
+;; emacs windows configuration layout stack
 (use-package winner
   :ensure nil
   :hook (after-init . winner-mode)
@@ -177,5 +195,9 @@ super_L
           "*Ibuffer*"
           "*esh command on file*"))
   )
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 
 (provide 'ui)

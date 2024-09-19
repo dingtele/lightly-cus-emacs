@@ -41,7 +41,8 @@
 (setq highlight-indent-guides-method 'character)
 
 
-(require 'plantuml)
+(use-package plantuml
+            :load-path "~/.emacs.d/site-lisp/plantuml-emacs/")
 (setq plantuml-jar-path "~/.emacs.d/site-lisp/plantuml-1.2024.6.jar"
       plantuml-output-type "svg"
       plantuml-relative-path "/home/madcomet/Pictures/plantuml-image/"
