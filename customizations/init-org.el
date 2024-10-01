@@ -278,11 +278,11 @@
   ;; define common template
   (org-capture-templates `(
                            ("s" "Schedule")
-                           ("st" "Tasks" entry (file+headline "Tasks.org" "TO-DO Queque")
-                            "* TODO %i%?"
+                           ("st" "Task" entry (file+headline "Task.org" "TO-DO Queque")
+                            "* TODO %U [/] \n - [ ] %?"
                             :empty-lines-after 1
                             :prepend t)
-                           ("sc" "Class-Schedule" entry (file+headline "Tasks.org" "Class-Schedule")
+                           ("sc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
                             "* TODO %i%?"
                             :empty-lines-after 1
                             :prepend t)
@@ -294,15 +294,16 @@
                            ;;  "* %:description\n\n%a%?"
                            ;;  :empty-lines 1
                            ;;  :immediate-finish t)
-                           ("j" "Journal")
-                           ("jt" "Today's TODO list" item (file+olp+datetree "Journal.org")
-                            "- Today's TODO list [/] %T\n %?"
-                            :empty-lines 1
-                            :jump-to-captured t)
-                           ("jd" "diary" item (file+olp+datetree "Journal.org")
-                            "- Note taken on %U\n\n%i%?"
-                            :empty-lines 1
-                            :jump-to-captured t)
+                           ;; ("j" "Journal")
+                           ;; ("jt" "Today's TODO" entry (file+olp+datetree "Journal.org" "Today's TODO")
+                           ;;  "* TODO %U [/] \n - [ ] %?"
+                           ;;  :empty-lines 1
+                           ;;  :jump-to-captured t
+                           ;;  :prepend f)
+                           ("j" "diary" entry (file+olp+datetree "Journal.org")
+                            "* %U - :%?"
+                            :empty-lines-after 1
+                            :prepend f)
                            ))
   )
 

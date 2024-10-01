@@ -1,57 +1,180 @@
 * Vocabulary
 
+** vocabulary [voʊˈkæbjəˌleri]
+n. 词汇量；（某一语言的）词汇；（某学科中所使用的）词汇 | 网络 词汇表；字汇；单字
+
+** omitted [oʊˈmɪt]
+v. 忽略；疏忽；略去 | 网络 遗漏；省略；省略作答
+
+** exposition [ˌekspəˈzɪʃ(ə)n]
+n. 阐述；（产品的）展销；商品交易会；产品博览会 | 网络 说明文；呈示部；展览会
+
+** stratified [ˈstrætɪˌfaɪd]
+v. “stratify”的过去式 | 网络 分层；成层的；分层的
+
+** feasibility [ˌfizəˈbɪləti]
+n. 可行性；现实性 | 网络 可能性；可行性研究；可行的
+
+** erected [ɪˈrekt]
+v. 建立；竖；创立(理论等)；安装(机械等) | adj. 直立的；垂直的；(头,手等)朝上举的；直竖的 | 网络 正立的；竖立；矗立
+
+** circuits [ˈsɜrkɪt]
+n. 回路；圈；巡回；(某一范围的)周边一圈 | v. (绕…)环行 | 网络 电路；电路中；电路板
+
+** pervasive [pərˈveɪsɪv]
+adj. 遍布的；充斥各处的；弥漫的 | 网络 普遍的；普遍深入的；渗透的
+
+** linguistic [lɪŋˈɡwɪstɪk]
+adj. 语言的；语言学的 | 网络 语言上的；语言学上的；语法
+
+** embody [ɪmˈbɑdi]
+v. 体现；包含；收录；包括 | 网络 使具体化；具体表达；使具体化，具体表现
+
+** discipline [ˈdɪsəplɪn]
+n. 纪律；训练；自制力；风纪 | v. 训练；管教；惩罚；处罚 | 网络 学科；规训；自律
+
+** coping with 
+网络 应对；应付
+
+** Concatenate [kɑnˈkæt(ə)ˌneɪt]
+adj. 连锁状的 | v. 使(成串地)连结[衔接]起来 | 网络 连接；串联；多联体
+
+** excursion [ɪkˈskɜrʒ(ə)n]
+n. 短途旅行；涉猎 | 网络 远足；游览；离题
+
+** preedit 
+n. 事先编辑 | 网络 预编辑
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863553177
+:END:
+
+** cloze [kloz]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586251
+:END:
+adj. 【教】补漏测验法的 | 网络 完型填空；漏字；克漏字
+
 ** meditations [ˌmedɪˈteɪʃ(ə)n]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863516478
+:END:
 n. 熟虑；(特指宗教上的)默想；冥想录 | 网络 沉思录；沈思录；沉思集
 
 ** counterparts [ˈkaʊntərˌpɑrt]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586246
+:END:
 n. 【法】(正副两份中的)一份；骑缝图章的一半；相对物；变体 | 网络 同行；副本；同行新闻
 
 ** noninflammatory 
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586243
+:END:
 un. 非炎性的 | 网络 非炎症性；非发炎性；无炎的
 
 ** rephrase [ˌriˈfreɪz]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586236
+:END:
 v. 换个说法说 | 网络 重新措辞；改述；改用别的话表示
 
 ** unleashes [ʌnˈliʃ]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586227
+:END:
 v. 〈比喻〉解放；放纵；发动；解开…的皮带[链索] | 网络 释放；发泄；松开
 
 ** spindle [ˈspɪnd(ə)l]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586221
+:END:
 n. 轴；纺锤；心轴；指轴 | v. 长成细长茎；长(变)得细长；装锭子于 | adj. 像锭子的；母方的 | 网络 主轴；纺锤体；纱锭
 
 ** manuscript [ˈmænjəˌskrɪpt]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586217
+:END:
 n. 手稿；原稿；（印刷术发明以前书籍或文献的）手写本 | adj. 手抄的 | 网络 底稿；手抄本；文稿
 
 **  tall order 
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586210
+:END:
 n. 难办到的事；苛求 | 网络 离谱的要求；难以完成的任务；苛刻的要求
 
 ** heuristics [hjuˈrɪstɪks]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586205
+:END:
 n. 探索法；启发式 | 网络 启发法；试探法；启发式方法
 
-** manicured [ˈmænɪˌkJʊrd]
+"** manicured [ˈmænɪˌkJʊrd]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586199
+:END:
 adj. 精心护理的；修剪整齐的；护理得很好的 | v. “manicure”的过去分词和过去式 | 网络 修剪过的；修过指甲一样；整修的
 ** accommodate [əˈkɑməˌdeɪt]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586194
+:END:
 v. 容纳；顺应；提供住宿（或膳宿、座位等）；提供空间 | 网络 适应；调节；供应
 ** destructive [dɪˈstrʌktɪv]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586191
+:END:
 adj. 破坏性的；极其危险的 | 网络 破坏的；毁灭性的；毁灭的
 ** obsolete [ˌɑbsəˈlit]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586184
+:END:
 adj. 淘汰的；废弃的；过时的 | n. 废词；被废弃的事物 | 网络 已废弃的；陈旧的；作废的
 ** hassle [ˈhæs(ə)l]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586178
+:END:
 n. 麻烦；困难；分歧；争论 | v. 麻烦 | 网络 激战；激烈争论；争辩
 ** beforehand [bɪˈfɔrˌhænd]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586171
+:END:
 adv. 预先；事先 | 网络 提前；事前；事先地
 ** paramount [ˈperəˌmaʊnt]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586165
+:END:
 n. 最高；有最高权力的人；元首；首长 | adj. 至为重要的；首要的；至高无上的；至尊的 | 网络 派拉蒙；派拉蒙公司；派拉蒙影业
 ** crop up [旺旺英语论坛]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586159
+:END:
 v. 突然发生；出现 | 网络 突然出现；出其不意；突然发生或出现
 ** TRAMP [træmp]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586155
+:END:
 n. 流浪汉；流浪乞丐；沉重的脚步声；长途步行 | v. 踩 | 网络 流浪者；不定期船；践踏
 ** transformational [ˌtrænsfə'meɪʃənl]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586149
+:END:
 adj. 【语】转换(生成)的；【数】变换的；变形的 | 网络 转换性；变革型；转换型
 ** impaired [ɪmˈperd]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586146
+:END:
 adj. 受损的；损坏的；出毛病的；有（身体或智力）缺陷的 | v. “impair”的过去式和过去分词 | 网络 障碍；受损害的；削弱的
 ** key stroke 
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586140
+:END:
 un. 键击打；键触击 | 网络 击键；键深；按键
 ** deter [dɪˈtɜr]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586132
+:END:
 v. 阻止；制止；威慑；使不敢 | 网络 吓住；妨碍；防止
 ** manifold [ˈmænɪˌfoʊld]
+:PROPERTIES:
+:ANKI_NOTE_ID: 1725863586125
+:END:
 n. 管汇；汇集；复写本；【机械工程】歧管 | adj. 许多的；多样的；由许多部分形成的；繁茂的 | v. 复印 | 网络 流形；多方面的；多支管

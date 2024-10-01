@@ -256,7 +256,7 @@ The value could be `synonym', `antonym', `both', or nil.")
           (let ((word (substring-no-properties (car args))))
             ;; key   : word
             ;; value : (result-with-properties . seconds)
-            (pushnew (cons word (cons result (time-to-seconds)))
+            (cl-pushnew (cons word (cons result (time-to-seconds)))
                      bing-dict--cache))
           (bing-dict--update-cache))))
 
@@ -441,16 +441,18 @@ The value could be `synonym', `antonym', `both', or nil.")
 (defun bing-dict-brief (word &optional sync-p)
   "Show the explanation of WORD from Bing in the echo area."
   (interactive
-   (let* ((default (if (use-region-p)
+   (let* (
+          (default (if (use-region-p)
                        (buffer-substring-no-properties
                         (region-beginning) (region-end))
                      (let ((text (thing-at-point 'word)))
                        (if text (substring-no-properties text)))))
-          (prompt (if (stringp default)
-                      (format "Search Bing dict (default \"%s\"): " default)
-                    "Search Bing dict: "))
-          (string (read-string prompt nil 'bing-dict-history default)))
-     (list string)))
+          ;; (prompt (if (stringp default)
+          ;;             (format "Search Bing dict (default \"%s\"): " default)
+          ;;           "Search Bing dict: "))
+          ;; (string (read-string prompt nil 'bing-dict-history default))
+          )
+     (list default)))
 
   (and bing-dict-cache-auto-save
        (not bing-dict--cache)

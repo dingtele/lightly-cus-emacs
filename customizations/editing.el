@@ -154,5 +154,7 @@
   ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
-;; hercules arrives with any other key bindings
+;; hercules arrives with any other key binding
+
+(define-key dired-mode-map "c" 'find-file)
 (provide 'editing)

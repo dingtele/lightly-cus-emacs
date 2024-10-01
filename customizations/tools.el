@@ -27,6 +27,47 @@
            (string-match-p "^[\/#]" string)))
 )
 
+;; Restore Opened Files
+(progn
+  ;; (desktop-save-mode 1)
+  ;; ;; save when quit
+  ;; (setq desktop-save t)
+
+  ;; ;; no ask if crashed
+  ;; (setq desktop-load-locked-desktop t)
+
+  ;; (setq desktop-restore-frames t)
+
+  ;; (setq desktop-auto-save-timeout 300)
+
+  ;; ;; save some global vars
+  ;; (setq desktop-globals-to-save nil)
+  ;; ;; 2023-09-16 default
+  ;; ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
+  ;; (setq desktop-dirname "~/.emacs.d/var/desktop/")
+)
+
+(progn
+;; (require ' desktop-recover)
+;;  ;; optionallly:
+;; (setq desktop-recover-location
+;;     (desktop-recover-fixdir "~/.emacs.d/var/desktop/")) 
+;;  ;; Brings up the interactive buffer restore menu
+;; (desktop-recover-interactive)
+ ;; Note that after using this menu, your desktop will be saved
+ ;; automatically (triggered by the auto-save mechanism).
+ ;; For finer-grained control of the frequency of desktop saves,
+ ;; you can add the standard keybindings to your set-up:
+ ;;  (desktop-recover-define-global-key-bindings "\C-c%")
+ )
+
+(require 'workgroups)
+(setq wg-prefix-key (kbd "C-c w"))
+(workgroups-mode 1)
+(wg-load "~/.emacs.d/var/workgroups")
+
+(require 'layout-restore)
+
 (use-package gptel
   :ensure t
   :config
@@ -37,9 +78,26 @@
                    :host "localhost:11434"
                    :stream t
                    :models '("codegeex4:latest")))
+  ;; ;; DeepSeek offers an OpenAI compatible API
+  ;; (setq gptel-model   "deepseek-chat"
+  ;;       gptel-backend
+  ;;       (gptel-make-openai "DeepSeek"     ;Any name you want
+  ;;         :host "api.deepseek.com"
+  ;;         :endpoint "/chat/completions"
+  ;;         :stream t
+  ;;         :key (get-openai-api-key)             ;can be a function that returns the key
+  ;;         :models '("deepseek-chat" "deepseek-coder")))
+
+  ;; (defun get-openai-api-key ()
+  ;; "Return the OpenAI API key from ~/.authinfo."
+  ;; (let ((authinfo-file (expand-file-name "~/.authinfo")))
+  ;;   (with-temp-buffer
+  ;;     (insert-file-contents authinfo-file)
+  ;;     (goto-char (point-min))
+  ;;     (when (re-search-forward "^machine api\\.deepseek\\.com login apikey password \\(\\S-+\\)$" nil t)
+  ;;       (match-string 1)))))
 )
 
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-immersive-translate/")
 (require 'immersive-translate)
 (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
 (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
@@ -52,9 +110,11 @@
          ("C-c M-g" . magit-file-dispatch))
   :custom
   (magit-diff-refine-hunk t)
-  (magit-ediff-dwim-show-on-hunks t))
+  (magit-ediff-dwim-show-on-hunks t)
+)
 
-(package-vc
+(use-package ts-fold
+  :vc (:fetcher github :repo "emacs-tree-sitter/ts-fold"))
 
 ;; (use-package eaf
 ;;   :load-path "~/codebase/emacs-application-framework"

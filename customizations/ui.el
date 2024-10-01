@@ -5,7 +5,7 @@
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
 (defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "HanaMinB"))
-(defvar en-font-list '("iosevka" "Latin Modern Mono" "Fira Code" "IBM Plex Mono"))
+(defvar en-font-list '("iosevka" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 
 (defun ding-make-font-string (font-name font-size)
   (if (and (stringp font-size)
@@ -60,7 +60,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
 ;;modeline上显示我的所有的按键和执行的命令
 (require 'keycast)
-(keycast-mode-line-mode t)
+(keycast-header-line-mode t)
 
 ;(setq-default cursor-type '(bar . 5))
 (column-number-mode)
@@ -72,8 +72,8 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
 ;; (set-frame-parameter (selected-frame) 'alpha frame-transparency)
 ;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
-(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -102,13 +102,13 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
 ;; Don't prompt to confirm theme safety. This avoids problems with
 ;; first-time startup on Emacs > 26.3.
-(setq custom-safe-themes t)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
 
-(setq-default custom-enabled-themes '(spacemacs-light))
+(setq custom-safe-themes t)
+(setq-default custom-enabled-themes '(nord))
 
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
@@ -127,7 +127,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   "Activate a light color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(spacemacs-light ef-cyprus))
+  (setq custom-enabled-themes '(spacemacs-light))
   (reapply-themes))
 
 (defun dark ()
