@@ -156,5 +156,5 @@
   ("f" nil "finished" :exit t))
 ;; hercules arrives with any other key binding
 
-(define-key dired-mode-map "c" 'find-file)
+;; (eval(define-key dired-mode-map "c" 'find-file)
 (provide 'editing)

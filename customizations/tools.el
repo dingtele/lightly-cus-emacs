@@ -61,12 +61,12 @@
  ;;  (desktop-recover-define-global-key-bindings "\C-c%")
  )
 
-(require 'workgroups)
-(setq wg-prefix-key (kbd "C-c w"))
-(workgroups-mode 1)
-(wg-load "~/.emacs.d/var/workgroups")
+;; (require 'workgroups)
+;; (setq wg-prefix-key (kbd "C-c w"))
+;; (workgroups-mode 1)
+;; (wg-load "~/.emacs.d/var/workgroups")
 
-(require 'layout-restore)
+;; (require 'layout-restore)
 
 (use-package gptel
   :ensure t
