@@ -4,7 +4,7 @@
       nil
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
-(defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "HanaMinB"))
+(defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "LXGW Bright Medium" "HanaMinB"))
 (defvar en-font-list '("iosevka" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 
 (defun ding-make-font-string (font-name font-size)
@@ -43,7 +43,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))))
 
-(ding-set-font en-font-list 11 zh-font-list)
+(ding-set-font en-font-list 12 zh-font-list)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
 ;; (setq font-use-system-font t)
@@ -92,7 +92,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq-default visual-fill-column-width 120)
+(setq-default visual-fill-column-width 180)
 
 ;; Color Themes
 ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
@@ -108,7 +108,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (require 'ef-themes)
 
 (setq custom-safe-themes t)
-(setq-default custom-enabled-themes '(nord))
+(setq-default custom-enabled-themes '(ef-trio-light))
 
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
@@ -127,7 +127,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   "Activate a light color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(spacemacs-light))
+  (setq custom-enabled-themes '(doom-opera-light))
   (reapply-themes))
 
 (defun dark ()
@@ -137,6 +137,14 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   (setq custom-enabled-themes '(ef-winter doom-palenight))
   (reapply-themes))
 
+(use-package nerd-icons
+  :ensure t
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
 
 (use-package dimmer
   :ensure t

@@ -1,34 +1,19 @@
-;; These customizations make it easier for you to navigate files,
-;; switch buffers, and choose options from the minibuffer.
+;; ;; "When several buffers visit identically-named files,
+;; ;; Emacs must give the buffers distinct names. The usual method
+;; ;; for making buffer names unique adds ‘<2>’, ‘<3>’, etc. to the end
+;; ;; of the buffer names (all but one of them).
+;; ;; The forward naming method includes part of the file's directory
+;; ;; name at the beginning of the buffer name
+;; ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Uniquify.html
+;; (require 'uniquify)
+;; (setq uniquify-buffer-name-style 'forward)
 
-
-;; "When several buffers visit identically-named files,
-;; Emacs must give the buffers distinct names. The usual method
-;; for making buffer names unique adds ‘<2>’, ‘<3>’, etc. to the end
-;; of the buffer names (all but one of them).
-;; The forward naming method includes part of the file's directory
-;; name at the beginning of the buffer name
-;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Uniquify.html
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
-;; Turn on recent file mode so that you can more easily switch to
-;; recently edited files when you first start emacs
-(setq recentf-save-file (concat user-emacs-directory ".recentf"))
-(require 'recentf)
-(recentf-mode 1)
-(setq recentf-max-menu-items 40)
-
-;; Shows a list of buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-
-;; Enhances M-x to allow easier execution of commands. Provides
-;; a filterable list of possible commands in the minibuffer
-;; http://www.emacswiki.org/emacs/Smex
-;; (setq smex-save-file (concat user-emacs-directory ".smex-items"))
-;; (smex-initialize)
-;; (global-set-key (kbd "M-x") 'smex)
+;; ;; Turn on recent file mode so that you can more easily switch to
+;; ;; recently edited files when you first start emacs
+;; (setq recentf-save-file (concat user-emacs-directory ".recentf"))
+;; (require 'recentf)
+;; (recentf-mode 1)
+;; (setq recentf-max-menu-items 40)
 
 ;; projectile everywhere!
 ;(projectile-global-mode)
@@ -50,124 +35,82 @@
     (global-corfu-mode)
     ))
 
-
-;; Enable vertico
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode)
-
-  ;; Different scroll margin
-  ;; (setq vertico-scroll-margin 0)
-
-  ;; Show more candidates
-  ;; (setq vertico-count 20)
-
-  ;; Grow and shrink the Vertico minibuffer
-  ;; (setq vertico-resize t)
-
-  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-  (setq vertico-cycle t)
-  )
-
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
+(use-package ibuffer
   :ensure nil
-  :hook (after-init . savehist-mode)
-  :config
-  ;; Allow commands in minibuffers, will affect `dired-do-dired-do-find-regexp-and-replace' command:
-  (setq enable-recursive-minibuffers t)
-  (setq history-length 1000)
-  (setq savehist-additional-variables '(mark-ring
-                                        global-mark-ring
-                                        search-ring
-                                        regexp-search-ring
-                                        extended-command-history
-                                        register-alist))
-  (setq savehist-autosave-interval 300))
+  :bind ("C-x C-b" . ibuffer)
+  :init (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold))))
 
-(use-package marginalia
-  :after vertico
+(use-package nerd-icons-ibuffer
   :ensure t
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :init
-  (marginalia-mode))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                 (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Support opening new minibuffers from inside existing minibuffers.
-  (setq enable-recursive-minibuffers t)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not work in the current
-  ;; mode.  Vertico commands are hidden in normal buffers. This setting is
-  ;; useful beyond Vertico.
-  (setq read-extended-command-predicate #'command-completion-default-include-p))
-
-;;config ivy mode
-;; (use-package ivy
-;;   :diminish
-;;   :bind (("C-s" . swiper)
-;;          :map ivy-minibuffer-map
-;;          ("TAB" . ivy-alt-done)
-;;          ("C-l" . ivy-alt-done)
-;;          ("C-j" . ivy-next-line)
-;;          ("C-k" . ivy-previous-line)
-;;          :map ivy-switch-buffer-map
-;;          ("C-k" . ivy-previous-line)
-;;          ("C-l" . ivy-done)
-;;          ("C-d" . ivy-switch-buffer-kill)
-;;          :map ivy-reverse-i-search-map
-;;          ("C-k" . ivy-previous-line)
-;;          ("C-d" . ivy-reverse-i-search-kill))
-;;   :config
-;;   (ivy-mode 1))
-
-;; (use-package ivy-rich
-;;   :after ivy
-;;   :init
-;;   (ivy-rich-mode 1))
-
-;; (use-package counsel
-;;   :bind (("C-M-j" . 'counsel-switch-buffer)
-;;          :map minibuffer-local-map
-;;          ("C-r" . 'counsel-minibuffer-history))
-;;   :custom
-;;   (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
-;;   :config
-;;   (counsel-mode 1))
-
-(use-package ivy-prescient
-  :after counsel
-  :custom
-  (ivy-prescient-enable-filtering nil)
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :config
-  ;; Uncomment the following line to have sorting remembered across sessions!
-  (prescient-persist-mode 1)
-  (ivy-prescient-mode 1))
+  ;; Whether display the icons.
+(setq nerd-icons-ibuffer-icon t)
+(setq nerd-icons-ibuffer-color-icon t)
+(setq nerd-icons-ibuffer-icon-size 1.0)
+(setq  nerd-icons-ibuffer-human-readable-size t)
+;; A list of ways to display buffer lines with `nerd-icons'.
+;; See `ibuffer-formats' for details.
+nerd-icons-ibuffer-formats
 
-(add-hook
- 'ibuffer-hook
- (lambda ()
-   (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-   (unless (eq ibuffer-sorting-mode 'project-file-relative)
-     (ibuffer-do-sort-by-project-file-relative))))
+;; Slow Rendering
+;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+;; you can try setting the following variable
+(setq inhibit-compacting-font-caches t))
+
+(use-package ibuffer-project
+  :hook (ibuffer . (lambda ()
+                     "Group ibuffer's list by project."
+                     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+                     (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                       (ibuffer-do-sort-by-project-file-relative))))
+  :init (setq ibuffer-project-use-cache t)
+  :config
+  (defun my-ibuffer-project-group-name (root type)
+    "Return group name for project ROOT and TYPE."
+    (if (and (stringp type) (> (length type) 0))
+        (format "%s %s" type root)
+      (format "%s" root)))
+  (progn
+        (advice-add #'ibuffer-project-group-name :override #'my-ibuffer-project-group-name)
+        (setq ibuffer-project-root-functions
+              `((ibuffer-project-project-root . ,(nerd-icons-octicon "nf-oct-repo" :height 1.2 :face ibuffer-filter-group-name-face))
+                (file-remote-p . ,(nerd-icons-codicon "nf-cod-radio_tower" :height 1.2 :face ibuffer-filter-group-name-face)))))
+    (progn
+      (advice-remove #'ibuffer-project-group-name #'my-ibuffer-project-group-name)
+      (setq ibuffer-project-root-functions
+            '((ibuffer-project-project-root . "Project")
+              (file-remote-p . "Remote"))))
+    (setq ibuffer-formats
+      '((mark modified read-only " "
+              (name 18 18 :left :elide)
+              " "
+              (size 9 -1 :right)
+              " "
+              (mode 16 16 :left :elide)
+              " "
+              project-relative-file))))
+
+
+(use-package buffer-name-relative
+  :ensure t
+  :vc (:fetcher codeberg :repo "ideasman42/emacs-buffer-name-relative")
+  :hook (after-init . buffer-name-relative-mode)
+  :config
+  (setq buffer-name-relative-prefix '("" . "/")))
+ 
+;; (use-package ibuffer-sidebar
+;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"
+;;   :ensure nil
+;;   :commands (ibuffer-sidebar-toggle-sidebar)
+;;   :config
+;;   (setq ibuffer-sidebar-use-custom-font t)
+;;   (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
+
+;; (defun +sidebar-toggle ()
+;;   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
+;;   (interactive)
+;;   (dired-sidebar-toggle-sidebar)
+;;   (ibuffer-sidebar-toggle-sidebar))
 
 (provide 'navigation)

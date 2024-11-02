@@ -232,7 +232,7 @@ The value could be `synonym', `antonym', `both', or nil.")
       (insert definition))
     (write-region nil nil bing-dict-vocabulary-file)))
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defun bing-dict--message (format-string &rest args)
   (let ((result (apply #'format format-string args)))

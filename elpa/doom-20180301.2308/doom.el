@@ -57,8 +57,7 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl-lib)
-  (require 'cl))
+  (require 'cl-lib))
 (require 'xml)
 
 ;; FIXME: Use symbols instead of numbers?

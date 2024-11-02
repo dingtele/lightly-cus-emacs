@@ -1,0 +1,372 @@
+!SESSION 2024-10-30 10:50:37.011 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=21.0.4
+java.vendor=Red Hat, Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/madcomet/.emacs.d/eglot-java-eclipse-jdt-cache/04aaabb4acf4dc7c2563b1e4da35c4ab
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.210
+!MESSAGE class org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin is started
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.314
+!MESSAGE Main thread is waiting
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.333
+!MESSAGE >> initialize
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.334
+!MESSAGE Initializing Java Language Server 1.40.0.202409261450
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.335
+!MESSAGE Started org.eclipse.m2e.core 0ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.949
+!MESSAGE ProjectRegistryRefreshJob finished 614ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:38.959
+!MESSAGE Started org.eclipse.buildship.core 9ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:39.032
+!MESSAGE Static Commands: []
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:39.032
+!MESSAGE Non-Static Commands: [java.project.import, java.project.changeImportedProjects, java.navigate.openTypeHierarchy, java.project.resolveStackTraceLocation, java.edit.handlePasteEvent, java.edit.stringFormatting, java.project.getSettings, java.project.resolveWorkspaceSymbol, java.project.upgradeGradle, java.project.createModuleInfo, java.vm.getAllInstalls, java.edit.organizeImports, java.project.refreshDiagnostics, java.project.removeFromSourcePath, java.project.listSourcePaths, java.project.updateSettings, java.project.getAll, java.reloadBundles, java.project.isTestFile, java.project.resolveText, java.project.getClasspaths, java.navigate.resolveTypeHierarchy, java.edit.smartSemicolonDetection, java.project.updateSourceAttachment, java.project.updateClassPaths, java.decompile, java.protobuf.generateSources, java.project.resolveSourceAttachment, java.project.updateJdk, java.project.addToSourcePath, java.completion.onDidSelect]
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:39.044
+!MESSAGE RepositoryRegistryUpdateJob finished 0ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:39.055
+!MESSAGE >> initialized
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:39.196
+!MESSAGE Importing Maven project(s)
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:50:41.864
+!MESSAGE Projects size:103
+
+!ENTRY org.eclipse.jdt.ls.core 4 0 2024-10-30 10:51:18.137
+!MESSAGE Initialization failed 
+!STACK 0
+java.lang.NullPointerException: Cannot invoke "org.eclipse.core.resources.IProject.open(org.eclipse.core.runtime.IProgressMonitor)" because "project" is null
+	at org.eclipse.jdt.ls.core.internal.managers.MavenProjectImporter.updateProjects(MavenProjectImporter.java:291)
+	at org.eclipse.jdt.ls.core.internal.managers.MavenProjectImporter.importToWorkspace(MavenProjectImporter.java:239)
+	at org.eclipse.jdt.ls.core.internal.managers.ProjectsManager.importProjects(ProjectsManager.java:164)
+	at org.eclipse.jdt.ls.core.internal.managers.ProjectsManager.initializeProjects(ProjectsManager.java:126)
+	at org.eclipse.jdt.ls.core.internal.handlers.InitHandler$1.runInWorkspace(InitHandler.java:277)
+	at org.eclipse.core.internal.resources.InternalWorkspaceJob.run(InternalWorkspaceJob.java:43)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:18.146
+!MESSAGE >> initialization job finished
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:18.668
+!MESSAGE Reconciled 1. Took 3 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:19.181
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:19.258
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:20.080
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:20.081
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:20.083
+!MESSAGE Validated 1. Took 174 ms
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-10-30 10:51:20.208
+!MESSAGE Running override createConfiguration() CouchbaseAnnotationProcessor
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-10-30 10:51:20.217
+!MESSAGE java.lang.NoClassDefFoundError: javax/inject/Inject add a dependency on javax.inject:javax.inject to create querydsl classes
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.081
+!MESSAGE Reconciled 1. Took 1 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.541
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.542
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.542
+!MESSAGE Validated 1. Took 10 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.742
+!MESSAGE Reconciled 1. Took 1 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:21.941
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:22.158
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:22.159
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:22.159
+!MESSAGE Validated 1. Took 15 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:23.173
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:23.586
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:23.586
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:23.587
+!MESSAGE Validated 1. Took 13 ms
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-10-30 10:51:31.183
+!MESSAGE Running override createConfiguration() CouchbaseAnnotationProcessor
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-10-30 10:51:31.187
+!MESSAGE java.lang.NoClassDefFoundError: javax/inject/Inject add a dependency on javax.inject:javax.inject to create querydsl classes
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:40.381
+!MESSAGE Reconciled 1. Took 0 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:40.841
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:40.841
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:40.841
+!MESSAGE Validated 1. Took 9 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:42.282
+!MESSAGE >> build jobs finished
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:42.283
+!MESSAGE >> registerWatchers'
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-10-30 10:51:42.289
+!MESSAGE >> registerFeature 'workspace/didChangeWatchedFiles'
+!SESSION 2024-11-01 21:19:49.753 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=21.0.4
+java.vendor=Red Hat, Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/madcomet/.emacs.d/eglot-java-eclipse-jdt-cache/04aaabb4acf4dc7c2563b1e4da35c4ab
+
+!ENTRY org.eclipse.core.resources 2 10035 2024-11-01 21:19:50.610
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.635
+!MESSAGE class org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin is started
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.828
+!MESSAGE Main thread is waiting
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.857
+!MESSAGE >> initialize
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.859
+!MESSAGE Initializing Java Language Server 1.41.0.202410311350
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.860
+!MESSAGE Started org.eclipse.m2e.core 0ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.863
+!MESSAGE ProjectRegistryRefreshJob finished 1ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:51.889
+!MESSAGE Started org.eclipse.buildship.core 26ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:52.587
+!MESSAGE Static Commands: []
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:52.588
+!MESSAGE Non-Static Commands: [java.project.import, java.project.changeImportedProjects, java.navigate.openTypeHierarchy, java.project.resolveStackTraceLocation, java.edit.handlePasteEvent, java.edit.stringFormatting, java.project.getSettings, java.project.resolveWorkspaceSymbol, java.project.upgradeGradle, java.project.createModuleInfo, java.vm.getAllInstalls, java.edit.organizeImports, java.project.refreshDiagnostics, java.project.removeFromSourcePath, java.project.listSourcePaths, java.project.updateSettings, java.project.getAll, java.reloadBundles, java.project.isTestFile, java.project.resolveText, java.project.getClasspaths, java.navigate.resolveTypeHierarchy, java.edit.smartSemicolonDetection, java.project.updateSourceAttachment, java.project.updateClassPaths, java.decompile, java.protobuf.generateSources, java.project.resolveSourceAttachment, java.project.updateJdk, java.project.addToSourcePath, java.completion.onDidSelect]
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:52.617
+!MESSAGE >> initialized
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:53.443
+!MESSAGE RepositoryRegistryUpdateJob finished 1ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:53.644
+!MESSAGE Importing Maven project(s)
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:59.589
+!MESSAGE Workspace initialized in 6147ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:19:59.664
+!MESSAGE >> initialization job finished
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:00.191
+!MESSAGE Reconciled 1. Took 5 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:01.059
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:01.062
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:01.068
+!MESSAGE Validated 1. Took 271 ms
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-11-01 21:20:03.386
+!MESSAGE Running override createConfiguration() CouchbaseAnnotationProcessor
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-11-01 21:20:03.402
+!MESSAGE java.lang.NoClassDefFoundError: javax/inject/Inject add a dependency on javax.inject:javax.inject to create querydsl classes
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:08.676
+!MESSAGE Reconciled 1. Took 12 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:09.067
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:09.196
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:09.540
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:09.541
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:09.542
+!MESSAGE Validated 1. Took 18 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:10.076
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:10.492
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:10.492
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:10.492
+!MESSAGE Validated 1. Took 15 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:11.609
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:12.028
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:12.028
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:12.029
+!MESSAGE Validated 1. Took 19 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:12.852
+!MESSAGE Reconciled 1. Took 1 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:12.908
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:13.267
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:13.268
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:13.269
+!MESSAGE Validated 1. Took 17 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:14.509
+!MESSAGE Reconciled 1. Took 3 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:14.734
+!MESSAGE Reconciled 1. Took 1 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:14.752
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:14.923
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:14.930
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:15.386
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:15.386
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:15.387
+!MESSAGE Validated 1. Took 14 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:16.650
+!MESSAGE Completion request completed
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:16.695
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:17.108
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:17.108
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:17.108
+!MESSAGE Validated 1. Took 13 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:18.018
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:18.475
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:18.475
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:18.475
+!MESSAGE Validated 1. Took 6 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:19.676
+!MESSAGE Reconciled 1. Took 1 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:20.136
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:20.137
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:20.138
+!MESSAGE Validated 1. Took 11 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:22.035
+!MESSAGE Reconciled 1. Took 2 ms
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:22.467
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:22.467
+!MESSAGE 3 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:22.468
+!MESSAGE Validated 1. Took 11 ms
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-11-01 21:20:23.145
+!MESSAGE Running override createConfiguration() CouchbaseAnnotationProcessor
+
+!ENTRY org.eclipse.jdt.apt.pluggable.core 1 1 2024-11-01 21:20:23.149
+!MESSAGE java.lang.NoClassDefFoundError: javax/inject/Inject add a dependency on javax.inject:javax.inject to create querydsl classes
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:30.966
+!MESSAGE begin problem for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:30.966
+!MESSAGE 2 problems reported for /Post.java
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:35.160
+!MESSAGE >> build jobs finished
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:35.161
+!MESSAGE >> registerWatchers'
+
+!ENTRY org.eclipse.jdt.ls.core 1 0 2024-11-01 21:20:35.168
+!MESSAGE >> registerFeature 'workspace/didChangeWatchedFiles'

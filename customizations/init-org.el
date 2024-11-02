@@ -72,8 +72,13 @@
 (use-package org
   :ensure nil
   :mode ("\\.org\\'" . org-mode)
-  :hook ((org-mode . visual-line-mode) (org-mode . my/org-prettify-symbols))
-  :commands (org-find-exact-headline-in-buffer org-set-tags)
+  :hook 
+  ((org-mode . visual-line-mode) 
+   (org-mode . my/org-prettify-symbols) 
+  )
+  :commands (org-find-exact-headline-in-buffer 
+             org-set-tags
+            )
   :custom-face
    ;; 设置Org mode标题以及每级标题行的大小
   (org-document-title ((t (:height 1.75 :weight bold))))
@@ -90,6 +95,7 @@
   (org-block-begin-line ((t (:underline t :background unspecified))))
   (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
   :config
+  (setq org-startup-with-inline-images t)
   ;; ;; 设置标题行之间总是有空格；列表之间根据情况自动加空格
   ;; (setq org-blank-before-new-entry '((heading . t)
   ;;                                    (plain-list-item . auto)))
@@ -236,6 +242,7 @@
 			      ("study"    . ?s)
 			      ("work"     . ?w)))
   ;; 预定义好的标签
+
   (org-tag-alist '((:startgroup)
 		   ("crypt"    . ?c)
 		   ("linux"    . ?l)
@@ -243,6 +250,7 @@
 		   ("noexport" . ?n)
 		   ("ignore"   . ?i)
 		   ("toc"      . ?t)
+                   ("短评" . ?d)
 		   (:endgroup)))
 
   ;; 归档设置
@@ -338,4 +346,38 @@
   ;; :hook (org-mode . #'corg-setup))
 
 (customize-set-variable 'org-anki-default-deck "org-deck")
+
+(use-package org-remark
+  :bind (;; :bind keyword also implicitly defers org-remark itself.
+         ;; Keybindings before :map is set for global-map.
+         ("C-c n m" . org-remark-mark)
+         ("C-c n l" . org-remark-mark-line)
+         :map org-remark-mode-map
+         ("C-c n o" . org-remark-open)
+         ("C-c n ]" . org-remark-view-next)
+         ("C-c n [" . org-remark-view-prev)
+         ("C-c n r" . org-remark-remove)
+         ("C-c n d" . org-remark-delete))
+  ;; Alternative way to enable `org-remark-global-tracking-mode' in
+  ;; `after-init-hook'.
+  ;; :hook (after-init . org-remark-global-tracking-mode)
+  :init
+  ;; It is recommended that `org-remark-global-tracking-mode' be
+  ;; enabled when Emacs initializes. Alternatively, you can put it to
+  ;; `after-init-hook' as in the comment above
+  (org-remark-global-tracking-mode +1)
+  ;; :config
+  ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
+  ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
+  ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
+)
+
+(use-package org-zettel-ref-mode
+  :ensure t
+  :vc (:fetcher github :repo "yibie/org-zettel-ref-mode")
+  :init 
+  (setq org-zettel-ref-mode-type 'denote)
+  (setq org-zettel-ref-overview-directory "~/Dropbox/book-notes")
+)
+
 (provide 'init-org)

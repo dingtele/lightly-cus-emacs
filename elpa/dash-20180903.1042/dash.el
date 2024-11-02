@@ -698,10 +698,10 @@ See also: `-last-item'."
 ;; TODO: gv was introduced in 24.3, so we can remove the if statement
 ;; when support for earlier versions is dropped
 (eval-when-compile
-  (require 'cl)
+  (require 'cl-lib)
   (if (fboundp 'gv-define-simple-setter)
       (gv-define-simple-setter -first-item setcar)
-    (require 'cl)
+    (require 'cl-lib)
     (with-no-warnings
       (defsetf -first-item (x) (val) `(setcar ,x ,val)))))
 

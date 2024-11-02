@@ -27,7 +27,7 @@
 
 (defun open-tools-file()
   (interactive)
-  (find-file "~/.emacs.d/customizations/tools.el"))
+  (find-file "~/.emacs.d/customizations/tools.org"))
 
 (global-set-key (kbd "<f1>") 'open-init-file)
 (global-set-key (kbd "<f2>") 'open-editing-file)
@@ -157,4 +157,80 @@
 ;; hercules arrives with any other key binding
 
 ;; (eval(define-key dired-mode-map "c" 'find-file)
+
+(defun add-space-between-chinese-and-english ()
+  "在中英文之间自动添加空格。"
+  (let ((current-char (char-before))
+        (prev-char (char-before (1- (point)))))
+    (when (and current-char prev-char
+               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
+                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
+      (save-excursion
+        (goto-char (1- (point)))
+        (insert " ")))))
+
+(defun is-chinese-character (char)
+  "判断字符是否为中文字符。"
+  (and char (or (and (>= char #x4e00) (<= char #x9fff))
+                (and (>= char #x3400) (<= char #x4dbf))
+                (and (>= char #x20000) (<= char #x2a6df))
+                (and (>= char #x2a700) (<= char #x2b73f))
+                (and (>= char #x2b740) (<= char #x2b81f))
+                (and (>= char #x2b820) (<= char #x2ceaf)))))
+
+(defun is-halfwidth-character (char)
+  "判断字符是否为半角字符，包括英文字母、数字和标点符号。"
+  (and char (or (and (>= char ?a) (<= char ?z))
+                (and (>= char ?A) (<= char ?Z))
+                (and (>= char ?0) (<= char ?9))
+                )))
+
+(defun delayed-add-space-between-chinese-and-english ()
+  "延迟执行，在中英文之间自动添加空格。"
+  (run-with-idle-timer 0 nil 'add-space-between-chinese-and-english))
+
+(define-minor-mode auto-space-mode
+  "在中英文之间自动添加空格的模式。"
+  :lighter " Auto-Space"
+  :global t
+  (if auto-space-mode️
+      (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)
+    (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)))
+
+(defun get-sentence-around-word ()
+  "Capture the sentence around the current word."
+  (interactive)
+  (let* ((pos-start (point))
+         (pos-end pos-start))
+    ;; Move backward until we find the start of the sentence
+    (skip-syntax-backward "-")
+    
+    ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
+    (when (eq (char-before) nil)
+      (setq pos-start (point-min)))
+    
+    ;; Move forward until we find the end of the sentence
+    (skip-syntax-forward "w")
+    
+    ;; Mark the beginning of the sentence area
+    (set-mark-command nil)
+    
+    ;; Save the current buffer position and mark as the end position
+    (setq pos-end (point))
+    
+    ;; Go back to the start of the sentence
+    (goto-char pos-start)
+    
+    ;; Select the marked area
+    (exchange-point-and-mark)
+
+    ;; Return the text within the sentence area
+    (buffer-substring-no-properties (region-beginning) (region-end))))
+
+(global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
+
+
+
+
 (provide 'editing)

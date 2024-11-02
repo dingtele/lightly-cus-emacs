@@ -47,7 +47,7 @@
 
 (provide 'desktop-recover)
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 
 (require 'desktop)
 (require 'thingatpt)
