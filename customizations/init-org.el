@@ -62,7 +62,8 @@
 
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python")))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (global-set-key (kbd "C-< s") 'tempo-template-org-src-emacs-lisp))
 
 ;; config org-src ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (use-package org-src

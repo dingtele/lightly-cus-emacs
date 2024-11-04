@@ -43,7 +43,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))))
 
-(ding-set-font en-font-list 12 zh-font-list)
+(ding-set-font en-font-list 10 zh-font-list)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
 ;; (setq font-use-system-font t)
@@ -92,7 +92,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq-default visual-fill-column-width 180)
+(setq-default visual-fill-column-width 190)
 
 ;; Color Themes
 ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
