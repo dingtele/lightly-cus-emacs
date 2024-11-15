@@ -1,42 +1,5 @@
 ;; Customizations relating to editing a buffer.
 
-;; 快速打开配置文件
-(defun open-init-file()
-  (interactive)
-  (find-file "~/.emacs.d/init.el"))
-
-(defun open-editing-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/editing.el"))
-
-(defun open-navigation-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/navigation.el"))
-
-(defun open-ui-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/ui.el"))
-
-(defun open-init-org-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/init-org.el"))
-
-(defun open-misc-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/misc.el"))
-
-(defun open-tools-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/tools.org"))
-
-(global-set-key (kbd "<f1>") 'open-init-file)
-(global-set-key (kbd "<f2>") 'open-editing-file)
-(global-set-key (kbd "<f3>") 'open-navigation-file)
-(global-set-key (kbd "<f4>") 'open-ui-file)
-(global-set-key (kbd "<f5>") 'open-init-org-file)
-(global-set-key (kbd "<f6>") 'open-misc-file)
-(global-set-key (kbd "<f9>") 'open-tools-file)
-
 ;; auto completion of function name
 (global-set-key (kbd "M-/") 'hippie-expand)
 (setq hippie-expand-try-functions-list  
@@ -145,16 +108,6 @@
 ;; it will use those keybindings. For this reason, you might prefer to
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
 
-;;design a transient key binding
-(use-package hydra
-  :defer t)
-;;use the macro defhydra to define the hydra and its heads
-(defhydra hydra-text-scale (global-map "<f12>")
-  "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
-;; hercules arrives with any other key binding
 
 ;; (eval(define-key dired-mode-map "c" 'find-file)
 

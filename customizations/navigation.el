@@ -92,12 +92,12 @@ nerd-icons-ibuffer-formats
               project-relative-file))))
 
 
-(use-package buffer-name-relative
-  :ensure t
-  :vc (:fetcher codeberg :repo "ideasman42/emacs-buffer-name-relative")
-  :hook (after-init . buffer-name-relative-mode)
-  :config
-  (setq buffer-name-relative-prefix '("" . "/")))
+;; (use-package buffer-name-relative
+;;   :ensure t
+;;   :vc (:url "https://codeberg.org/ideasman42/emacs-buffer-name-relative")
+;;   :hook (after-init . buffer-name-relative-mode)
+;;   :config
+;;   (setq buffer-name-relative-prefix '("" . "/")))
  
 ;; (use-package ibuffer-sidebar
 ;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"

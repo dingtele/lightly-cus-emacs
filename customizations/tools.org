@@ -1,59 +1,380 @@
+* Key Binding
+** Meow
+** Hydra 
+https://github.com/abo-abo/hydra
+#+begin_src emacs-lisp
+;;design a transient key binding
+(use-package hydra
+  :defer t)
+;;use the macro defhydra to define the hydra and its heads
+(defhydra hydra-text-scale (global-map "<f12>")
+  "scale text"
+  ("j" move-line-up "up")
+  ("k" move-line-down "down")
+  ("f" nil "finished" :exit t))
+;; hercules arrives with any other key binding
+
+#+end_src
 * Org Mode
+** Org mode itself
 #+begin_src emacs-lisp
 
 
 #+end_src
-* Desktop and layouts
+
+** Org-roam
+*** org-roam
 #+begin_src emacs-lisp
-
-;; Restore Opened Files
-(progn
-  (desktop-save-mode 1)
-  ;; save when quit
-  (setq desktop-save t)
-
-  ;; no ask if crashed
-  (setq desktop-load-locked-desktop t)
-  (setq desktop-restore-frames t)
-  (setq desktop-auto-save-timeout 300)
-
-  ;; save some global vars
-  (setq desktop-globals-to-save nil)
-  ;; 2023-09-16 default
-  ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
-  (setq desktop-dirname "~/.emacs.d/var/desktop/")
-)
-
-;; (progn
-;;   (require ' desktop-recover)
-;;   ;; optionallly:
-;;   (setq desktop-recover-location
-;;         (desktop-recover-fixdir "~/.emacs.d/var/desktop/")) 
-;;   ;; Brings up the interactive buffer restore menu
-;;   (desktop-recover-interactive)
-;;   ;; Note that after using this menu, your desktop will be saved
-;;   ;; automatically (triggered by the auto-save mechanism).
-;;   ;; For finer-grained control of the frequency of desktop saves,
-;;   ;; you can add the standard keybindings to your set-up:
-;;   (desktop-recover-define-global-key-bindings "\C-c%")
-;; )
-
-(use-package workgroups2
-  :init (setq wg-prefix-key (kbd "C-c w"))
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory (file-truename "~/Documents/org-roam-files/"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
   :config
-  (workgroups-mode 1)
-  (setq wg-session-file "~/.emacs.d/var/workgroups")
-)
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
 
 #+end_src
+*** org-roam-ui
+org-roam-ui requires org-roam, websocket, simple-httpd, f and Emacs >= 27 for fast JSON parsing.
 
+* Desktop, window  and layouts
+** shackle 
+https://depp.brause.cc/shackle/
+
+#+begin_src emacs-lisp
+  (use-package shackle
+      :config
+      (progn
+        (setq shackle-lighter "")
+        (setq shackle-select-reused-windows nil) ; default nil
+        (setq shackle-default-alignment 'below) ; default below
+        (setq shackle-default-size 0.4) ; default 0.5
+
+        (setq shackle-rules
+              ;; CONDITION(:regexp)            :select     :inhibit-window-quit   :size+:align|:other     :same|:popup
+              '((compilation-mode              :select nil                                               )
+                ("*undo-tree*"                                                    :size 0.25 :align right)
+                ("*eshell*"                    :select t                          :other t               )
+                ("*Shell Command Output*"      :select nil                                               )
+                ("\\*Async Shell.*\\*"                      :regexp t :ignore t                          )
+                (occur-mode                    :select nil                                   :align t    )
+                ("*Help*"                      :select t   :inhibit-window-quit t :other t   :align right)
+                ("*Completions*"                                                  :size 0.3  :align t    )
+                ("*Messages*"                  :select nil :inhibit-window-quit t :other t   :align right)
+                ("\\*[Wo]*Man.*\\*"  :regexp t :select t   :inhibit-window-quit t :other t               )
+                ("\\*poporg.*\\*"    :regexp t :select t                          :other t               )
+                ("\\`\\*helm.*?\\*\\'" :regexp t                                  :size 0.3  :align t    )
+                ("*Calendar*"                  :select t                          :size 0.3  )
+                ("*info*"                      :select t   :inhibit-window-quit t                         :same t)
+                (magit-status-mode             :select t   :inhibit-window-quit t                         :same t)
+                (magit-log-mode                :select t   :inhibit-window-quit t                         :same t)
+  	      ;; ("CAPTURE-Task.org" :select t :inhibit-window-quit t :size 0.15 :align right :popup t)
+                ))
+
+        (shackle-mode 1)))
+
+#+end_src
+;; Elements of the `shackle-rules' alist:
+;;
+;; |-----------+------------------------+--------------------------------------------------|
+;; | CONDITION | symbol                 | Major mode of the buffer to match                |
+;; |           | string                 | Name of the buffer                               |
+;; |           |                        | - which can be turned into regexp matching       |
+;; |           |                        | by using the :regexp key with a value of t       |
+;; |           |                        | in the key-value part                            |
+;; |           | list of either         | a list groups either symbols or strings          |
+;; |           | symbol or string       | (as described earlier) while requiring at        |
+;; |           |                        | least one element to match                       |
+;; |           | t                      | t as the fallback rule to follow when no         |
+;; |           |                        | other match succeeds.                            |
+;; |           |                        | If you set up a fallback rule, make sure         |
+;; |           |                        | it's the last rule in shackle-rules,             |
+;; |           |                        | otherwise it will always be used.                |
+;; |-----------+------------------------+--------------------------------------------------|
+;; | KEY-VALUE | :select t              | Select the popped up window. The                 |
+;; |           |                        | `shackle-select-reused-windows' option makes     |
+;; |           |                        | this the default for windows already             |
+;; |           |                        | displaying the buffer.                           |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :inhibit-window-quit t | Special buffers usually have `q' bound to        |
+;; |           |                        | `quit-window' which commonly buries the buffer   |
+;; |           |                        | and deletes the window. This option inhibits the |
+;; |           |                        | latter which is especially useful in combination |
+;; |           |                        | with :same, but can also be used with other keys |
+;; |           |                        | like :other as well.                             |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :ignore t              | Skip handling the display of the buffer in       |
+;; |           |                        | question. Keep in mind that while this avoids    |
+;; |           |                        | switching buffers, popping up windows and        |
+;; |           |                        | displaying frames, it does not inhibit what may  |
+;; |           |                        | have preceded this command, such as the          |
+;; |           |                        | creation/update of the buffer to be displayed.   |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :same t                | Display buffer in the current window.            |
+;; |           | :popup t               | Pop up a new window instead of displaying        |
+;; |           | *mutually exclusive*   | the buffer in the current one.                   |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :other t               | Reuse the window `other-window' would select if  |
+;; |           | *must not be used      | there's more than one window open, otherwise pop |
+;; |           | with :align, :size*    | up a new window. When used in combination with   |
+;; |           |                        | the :frame key, do the equivalent to             |
+;; |           |                        | other-frame or a new frame                       |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :align                 | Align a new window at the respective side of     |
+;; |           | 'above, 'below,        | the current frame or with the default alignment  |
+;; |           | 'left, 'right,         | (customizable with `shackle-default-alignment')  |
+;; |           | or t (default)         | by deleting every other window than the          |
+;; |           |                        | currently selected one, then wait for the window |
+;; |           |                        | to be "dealt" with. This can either happen by    |
+;; |           |                        | burying its buffer with q or by deleting its     |
+;; |           |                        | window with C-x 0.                               |
+;; |           | :size                  | Aligned window use a default ratio of 0.5 to     |
+;; |           | a floating point       | split up the original window in half             |
+;; |           | value between 0 and 1  | (customizable with `shackle-default-size'), the  |
+;; |           | is interpreted as a    | size can be changed on a per-case basis by       |
+;; |           | ratio. An integer >=1  | providing a different floating point value like  |
+;; |           | is interpreted as a    | 0.33 to make it occupy a third of the original   |
+;; |           | number of lines.       | window's size.                                   |
+;; |-----------+------------------------+--------------------------------------------------|
+;; |           | :frame t               | Pop buffer to a frame instead of a window.       |
+;; |-----------+------------------------+--------------------------------------------------|
+;;
+;; http://emacs.stackexchange.com/a/13687/115
+;; Don't show Async Shell Command buffers
+
+** popper
+https://github.com/karthink/popper
+#+begin_src emacs-lisp
+  (use-package popper
+        :ensure t
+        :bind (("C-`"   . popper-toggle)
+               ("M-`"   . popper-cycle)
+               ("C-M-`" . popper-toggle-type))
+        :init
+        (setq popper-reference-obuffers
+              '("Output\\*$"
+                "*Help*"
+                "\\*Async Shell Command\\*"
+                messages-buffer-mode
+                help-mode
+                helpful-mode
+                compilation-mode))
+       
+        (popper-mode +1)
+        (popper-echo-mode +1)
+        :config
+        (setq popper-display-control 'user))     
+
+#+end_src
+** tab-line
+https://www.reddit.com/r/emacs/comments/1c3oqqh/modern_tabs_in_emacs/
+
+#+begin_src emacs-lisp 
+;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+
+(defun my/set-tab-theme ()
+  (let ((bg (face-attribute 'mode-line :background))
+        (fg (face-attribute 'default :foreground))
+	(hg (face-attribute 'default :background))
+        (base (face-attribute 'mode-line :background))
+        (box-width (/ (line-pixel-height) 4)))
+    (set-face-attribute 'tab-line nil
+			:background base
+			:foreground fg
+			:height 0.8
+			:inherit nil
+			:box (list :line-width -1 :color base)
+			)
+    (set-face-attribute 'tab-line-tab nil
+			:foreground fg
+			:background bg
+			:weight 'normal
+			:inherit nil
+			:box (list :line-width box-width :color bg))
+    (set-face-attribute 'tab-line-tab-inactive nil
+			:foreground fg
+			:background base
+			:weight 'normal
+			:inherit nil
+			:box (list :line-width box-width :color base))
+    (set-face-attribute 'tab-line-highlight nil
+			:foreground fg
+			:background hg
+			:weight 'normal
+			:inherit nil
+			:box (list :line-width box-width :color hg))
+    (set-face-attribute 'tab-line-tab-current nil
+			:foreground fg
+			:background hg
+			:weight 'normal
+			:inherit nil
+			:box (list :line-width box-width :color hg))))
+
+(defun my/tab-line-name-buffer (buffer &rest _buffers)
+  "Create name for tab with padding and truncation.
+If buffer name is shorter than `tab-line-tab-max-width' it gets
+centered with spaces, otherwise it is truncated, to preserve
+equal width for all tabs.  This function also tries to fit as
+many tabs in window as possible, so if there are no room for tabs
+with maximum width, it calculates new width for each tab and
+truncates text if needed.  Minimal width can be set with
+`tab-line-tab-min-width' variable."
+  (with-current-buffer buffer
+    (let* ((window-width (window-width (get-buffer-window)))
+           (tab-amount (length (tab-line-tabs-window-buffers)))
+           (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                     (/ window-width tab-amount)
+                                   tab-line-tab-max-width))
+           (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                tab-line-tab-max-width)
+                               ((< window-max-tab-width tab-line-tab-min-width)
+                                tab-line-tab-min-width)
+                               (t window-max-tab-width))
+                         3)) ;; compensation for ' x ' button
+           (buffer-name (string-trim (buffer-name)))
+           (name-width (length buffer-name)))
+      (if (>= name-width tab-width)
+          (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+        (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+               (buffer-name (concat padding buffer-name)))
+          (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+
+(defun tab-line-close-tab (&optional e)
+  "Close the selected tab.
+If tab is presented in another window, close the tab by using
+`bury-buffer` function.  If tab is unique to all existing
+windows, kill the buffer with `kill-buffer` function.  Lastly, if
+no tabs left in the window, it is deleted with `delete-window`
+function."
+  (interactive "e")
+  (let* ((posnp (event-start e))
+         (window (posn-window posnp))
+         (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+    (with-selected-window window
+      (let ((tab-list (tab-line-tabs-window-buffers))
+            (buffer-list (flatten-list
+                          (seq-reduce (lambda (list window)
+                                        (select-window window t)
+                                        (cons (tab-line-tabs-window-buffers) list))
+                                      (window-list) nil))))
+        (select-window window)
+        (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+            (progn
+              (if (eq buffer (current-buffer))
+                  (bury-buffer)
+                (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                (set-window-next-buffers window (delq buffer (window-next-buffers))))
+              (unless (cdr tab-list)
+                (ignore-errors (delete-window window))))
+          (and (kill-buffer buffer)
+               (unless (cdr tab-list)
+                 (ignore-errors (delete-window window)))))))))
+
+(unless (version< emacs-version "27")
+  (use-package tab-line
+    :ensure nil
+    :hook (after-init . global-tab-line-mode)
+    :config
+
+    (defcustom tab-line-tab-min-width 10
+      "Minimum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
+
+    (defcustom tab-line-tab-max-width 30
+      "Maximum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
+
+    (setq tab-line-close-button-show t
+          tab-line-new-button-show nil
+          tab-line-separator ""
+          tab-line-tab-name-function #'my/tab-line-name-buffer
+          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                            'keymap tab-line-right-map
+                                            'mouse-face 'tab-line-highlight
+                                            'help-echo "Click to scroll right")
+          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                           'keymap tab-line-left-map
+                                           'mouse-face 'tab-line-highlight
+                                           'help-echo "Click to scroll left")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                            'keymap tab-line-tab-close-map
+                                            'mouse-face 'tab-line-close-highlight
+                                            'help-echo "Click to close tab"))
+
+    (my/set-tab-theme)
+
+    ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
+    ;;(add-to-list 'tab-line-exclude-modes mode))
+    (dolist (mode '(ediff-mode process-menu-mode))
+      (add-to-list 'tab-line-exclude-modes mode))
+    ))
+
+(global-tab-line-mode t)
+#+end_src
+** workgroup2
+#+begin_src emacs-lisp
+(use-package workgroups2
+      :init (setq wg-prefix-key (kbd "C-c w"))
+      :config
+      (workgroups-mode 1)
+      (setq wg-session-file "~/.emacs.d/var/workgroups"))
+#+end_src
+** desktop save/restore/recovery
+#+begin_src emacs-lisp
+
+    ;; Restore Opened Files
+    ;; (progn
+    ;;   (desktop-save-mode 1)
+    ;;   ;; save when quit
+    ;;   (setq desktop-save t)
+
+    ;;   ;; no ask if crashed
+    ;;   (setq desktop-load-locked-desktop t)
+    ;;   (setq desktop-restore-frames t)
+    ;;   (setq desktop-auto-save-timeout 300)
+
+    ;;   ;; save some global vars
+    ;;   (setq desktop-globals-to-save nil)
+    ;;   ;; 2023-09-16 default
+    ;;   ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
+    ;;   (setq desktop-dirname "~/.emacs.d/var/desktop/")
+    ;; )
+
+    ;; (progn
+    ;;   (require ' desktop-recover)
+    ;;   ;; optionallly:
+    ;;   (setq desktop-recover-location
+    ;;         (desktop-recover-fixdir "~/.emacs.d/var/desktop/")) 
+    ;;   ;; Brings up the interactive buffer restore menu
+    ;;   (desktop-recover-interactive)
+    ;;   ;; Note that after using this menu, your desktop will be saved
+    ;;   ;; automatically (triggered by the auto-save mechanism).
+    ;;   ;; For finer-grained control of the frequency of desktop saves,
+    ;;   ;; you can add the standard keybindings to your set-up:
+    ;;   (desktop-recover-define-global-key-bindings "\C-c%")
+    ;; )
+#+end_src
 * Gptel -AI copilot
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/site-lisp/copilot.el-main")
   (require 'copilot)
   (add-hook 'prog-mode-hook 'copilot-mode)
   ;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion-by-line)
+  (define-key copilot-completion-map (kbd "M-w") 'copilot-accept-completion-by-word)
+  (define-key copilot-completion-map (kbd "M-q") 'copilot-accept-completion-by-line)
 
   (use-package gptel
     :ensure t
@@ -98,6 +419,9 @@
 
 #+end_src
 
+#+RESULTS:
+: api.deepseek.com
+
 * Blog-Publish
 #+begin_src emacs-lisp
 
@@ -107,72 +431,20 @@
 
 #+end_src
 
-* Development Tools
-** Eglot
-** Eglot-Java
-#+begin_src emacs-lisp
-  (require 'eglot)
-
-    (require 'eglot-java)
-
-    (add-hook 'java-mode-hook #'eglot-java-mode)
-    (setq eglot-java-server-install-dir "~/codebase/src/java/eclipse.jdt.ls")
-    (setq eglot-java-eclipse-jdt-cache-directory "~/tmp/eglot-eclipse-jdt-cache")
-#+end_src
-
-** Database 
-#+begin_src emacs-lisp
-
-(require 'ejc-sql)
-(setq clomacs-httpd-default-port 8090) ; Use a port other than 8080.
-;; Require completion frontend (autocomplete or company). One of them or both.
-(require 'ejc-autocomplete)
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (auto-complete-mode t)
-            (ejc-ac-setup)))
-
-(setq ejc-use-flx t)
-(setq ejc-flx-threshold 2)
-(require 'ejc-company)
-(push 'ejc-company-backend company-backends)
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (company-mode t)))
-(setq ejc-complete-on-dot t)
-;; (company-quickhelp-mode t)
-(setq ejc-completion-system 'standard)
-
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (ejc-eldoc-setup)))
-;; Performance & output customization
-(add-hook 'ejc-sql-connected-hook
-          (lambda ()
-            (ejc-set-fetch-size 50)
-            (ejc-set-max-rows 50)
-            (ejc-set-show-too-many-rows-message t)
-            (ejc-set-column-width-limit 25)
-            (ejc-set-use-unicode t)))
-(setq ejc-result-table-impl 'ejc-result-mode)
-;; PostgreSQL example
-(ejc-create-connection
- "PostgreSQL-db-connection"
- :classpath (concat "~/.m2/repository/org.postgresql/postgresql/42.6.0/"
-                    "postgresql-42.6.0.jar")
- :subprotocol "postgresql"
- :subname "//aws06mlicdevpsql01.aws06.mlic.cloud:5432/mli_qaa01_v20"
- :user "mli_qaa01_v20"
- :password "mli_qaa01_v20")
-
-#+end_src
-
-** Tree-sitter: querying and highlighting
-#+begin_src emacs-lisp
-(require 'init-treesitter)
-#+end_src
-
 * Reading
+** Common
+*** Shrface
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'nov
+  (define-key nov-mode-map (kbd "<tab>") 'shrface-outline-cycle)
+  (define-key nov-mode-map (kbd "S-<tab>") 'shrface-outline-cycle-buffer)
+  (define-key nov-mode-map (kbd "C-t") 'shrface-toggle-bullets)
+  (define-key nov-mode-map (kbd "C-j") 'shrface-next-headline)
+  (define-key nov-mode-map (kbd "C-k") 'shrface-previous-headline)
+  (define-key nov-mode-map (kbd "M-l") 'shrface-links-counsel) ; or 'shrface-links-helm or 'shrface-links-consult
+  (define-key nov-mode-map (kbd "M-h") 'shrface-headline-consult)) ; or 'shrface-headline-helm or 'shrface-headline-consult
+#+end_src
 #+begin_src emacs-lisp
 ;;epub reading
 (use-package nov
@@ -190,7 +462,7 @@
 ;;nov-rendering
 (use-package justify-kp
   :ensure t
-  :vc (:fetcher github :repo "Fuco1/justify-kp"))
+  :vc (:url "https://github.com/Fuco1/justify-kp"))
 (setq nov-text-width t)
 
 (defun my-nov-window-configuration-change-hook ()
@@ -216,6 +488,8 @@
               nil t)))
 
 (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
+
+
 
 ;;calibre
 (use-package calibredb
@@ -244,138 +518,184 @@
 ;; )  
 #+end_src
 
-#+RESULTS:
-: ~/Dropbox/vocabulary.org
+* Development Tools
+** Eglot
+** Eglot-Java
+#+begin_src emacs-lisp
+  (require 'eglot)
 
+    (require 'eglot-java)
+
+    (add-hook 'java-mode-hook #'eglot-java-mode)
+    (setq eglot-java-server-install-dir "~/codebase/src/java/eclipse.jdt.ls")
+    (setq eglot-java-eclipse-jdt-cache-directory "~/tmp/eglot-eclipse-jdt-cache")
+#+end_src
+
+** Database 
+#+begin_src emacs-lisp
+
+;; (require 'ejc-sql)
+;; (setq clomacs-httpd-default-port 8090) ; Use a port other than 8080.
+;; ;; Require completion frontend (autocomplete or company). One of them or both.
+;; (require 'ejc-autocomplete)
+;; (add-hook 'ejc-sql-minor-mode-hook
+;;           (lambda ()
+;;             (auto-complete-mode t)
+;;             (ejc-ac-setup)))
+
+;; (setq ejc-use-flx t)
+;; (setq ejc-flx-threshold 2)
+;; (require 'ejc-company)
+;; (push 'ejc-company-backend company-backends)
+;; (add-hook 'ejc-sql-minor-mode-hook
+;;           (lambda ()
+;;             (company-mode t)))
+;; (setq ejc-complete-on-dot t)
+;; ;; (company-quickhelp-mode t)
+;; (setq ejc-completion-system 'standard)
+
+;; (add-hook 'ejc-sql-minor-mode-hook
+;;           (lambda ()
+;;             (ejc-eldoc-setup)))
+;; ;; Performance & output customization
+;; (add-hook 'ejc-sql-connected-hook
+;;           (lambda ()
+;;             (ejc-set-fetch-size 50)
+;;             (ejc-set-max-rows 50)
+;;             (ejc-set-show-too-many-rows-message t)
+;;             (ejc-set-column-width-limit 25)
+;;             (ejc-set-use-unicode t)))
+;; (setq ejc-result-table-impl 'ejc-result-mode)
+;; ;; PostgreSQL example
+;; (ejc-create-connection
+;;  "PostgreSQL-db-connection"
+;;  :classpath (concat "~/.m2/repository/org.postgresql/postgresql/42.6.0/"
+;;                     "postgresql-42.6.0.jar")
+;;  :subprotocol "postgresql"
+;;  :subname "//aws06mlicdevpsql01.aws06.mlic.cloud:5432/mli_qaa01_v20"
+;;  :user "mli_qaa01_v20"
+;;  :password "mli_qaa01_v20")
+
+#+end_src
+
+** Tree-sitter: querying and highlighting
+#+begin_src emacs-lisp
+(require 'init-treesitter)
+#+end_src
+** origami 
+https://github.com/gregsexton/origami.el
+#+begin_src emacs-lisp
+  (use-package s
+    :vc (:url "https://github.com/magnars/s.el" :branch master))  
+  (require 'dash)
+  (use-package origami :ensure t) 
+    (with-eval-after-load 'origami
+      (define-key origami-mode-map (kbd "C-c f") 'origami-recursively-toggle-node)
+      (define-key origami-mode-map (kbd "C-c F") 'origami-toggle-all-nodes))
+#+end_src
+** hideshow-org
+#+begin_src emacs-lisp
+  (use-package hideshow-org
+    :vc (:url "https://github.com/shanecelis/hideshow-org")) 
+  (global-set-key (kbd"C-c h") 'hs-org/minor-mode)   
+#+end_src
 
 * Emacs Dev Tools
 ** Rigrep
 #+begin_src emacs-lisp
 (use-package rg)
 #+end_src
-** magit
-#+begin_src emacs-lisp
-(defun my-magit-stage-all-and-commit (message)
-  (interactive (list (progn (magit-diff-unstaged) (read-string "Commit Message: "))))
-  (magit-stage-modified)
-  (magit-commit-create (list "-m" message))
-  (call-interactively #'magit-push-current-to-pushremote))
-(defvar my-magit-limit-to-directory nil "Limit magit status to a specific directory.")
-(defun my-magit-status-in-directory (directory)
-  "Displays magit status limited to DIRECTORY.
-Uses the current `default-directory', or prompts for a directory
-if called with a prefix argument. Sets `my-magit-limit-to-directory'
-so that it's still active even after you stage a change. Very experimental."
-  (interactive (list (expand-file-name
-                        (if current-prefix-arg
-                            (read-directory-name "Directory: ")
-                          default-directory))))
-    (setq my-magit-limit-to-directory directory)
-    (magit-status directory))
-(use-package magit
-  :config
-  (setq magit-diff-options '("-b")) ; ignore whitespace
-  (defadvice magit-insert-untracked-files (around sacha activate)
-    (if my-magit-limit-to-directory
-        (magit-with-section (section untracked 'untracked "Untracked files:" t)
-                            (let ((files (cl-mapcan
-                                          (lambda (f)
-                                            (when (eq (aref f 0) ??) (list f)))
-                                          (magit-git-lines
-                                           "status" "--porcelain" "--" my-magit-limit-to-directory))))
-                              (if (not files)
-                                  (setq section nil)
-                                (dolist (file files)
-                                  (setq file (magit-decode-git-path (substring file 3)))
-                                  (magit-with-section (section file file)
-                                                      (insert "\t" file "\n")))
-                                (insert "\n"))))
-      ad-do-it))
-
-  (defadvice magit-insert-unstaged-changes (around sacha activate)
-    (if my-magit-limit-to-directory
-        (let ((magit-current-diff-range (cons 'index 'working))
-              (magit-diff-options (copy-sequence magit-diff-options)))
-          (magit-git-insert-section (unstaged "Unstaged changes:")
-                                    #'magit-wash-raw-diffs
-                                    "diff-files"
-                                    "--" my-magit-limit-to-directory
-                                    ))
-      ad-do-it))
-
-  (defadvice magit-insert-staged-changes (around sacha activate)
-    "Limit to `my-magit-limit-to-directory' if specified."
-    (if my-magit-limit-to-directory
-        (let ((no-commit (not (magit-git-success "log" "-1" "HEAD"))))
-          (when (or no-commit (magit-anything-staged-p))
-            (let ((magit-current-diff-range (cons "HEAD" 'index))
-                  (base (if no-commit
-                            (magit-git-string "mktree")
-                          "HEAD"))
-                  (magit-diff-options (append '("--cached") magit-diff-options)))
-              (magit-git-insert-section (staged "Staged changes:")
-                                        (apply-partially #'magit-wash-raw-diffs t)
-                                        "diff-index" "--cached" base "--" my-magit-limit-to-directory))))
-      ad-do-it))
-  :bind (("C-x v C-d" . my-magit-status-in-directory)
-         ("C-c g" . magit-file-dispatch)
-         ("C-x g" . magit-status)
-         ("C-x v p" . magit-push)
-         ("C-x v c" . my-magit-stage-all-and-commit)))
-
-;; ;; From http://endlessparentheses.com/merging-github-pull-requests-from-emacs.html
-;; (defun endless/load-gh-pulls-mode ()
-;;   "Start `magit-gh-pulls-mode' only after a manual request."
-;;   (interactive)
-;;   (require 'magit-gh-pulls)
-;;   (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
-;;   (magit-gh-pulls-mode 1)
-;;   (magit-gh-pulls-reload))
-
-;; (use-package magit-gh-pulls)
-
-
-#+end_src
+** Magit
 ** Eshell
 #+begin_src emacs-lisp
-;; eshell
-(use-package eshell
-   :config
-   (setq eshell-scroll-to-bottom-on-input t)
-   (setq-local tab-always-indent 'complete)
-   (setq eshell-history-size 10000)
-   (setq eshell-save-history-on-exit t) ;; Enable history saving on exit
-   (setq eshell-hist-ignoredups t) ;; Ignore duplicates
-   :hook
-   (eshell-mode . my/eshell-hook))
+  ;; eshell
+  (use-package xterm-color
+    :commands (xterm-color-filter))
+  (use-package eshell
+    :after xterm-color
+    :config
+    (setq eshell-scroll-to-bottom-on-input t)
+    (define-key eshell-mode-map (kbd "<tab>") #'company-complete)
+    (define-key eshell-hist-mode-map (kbd "M-r") #'consult-history)
+    (add-hook 'eshell-mode-hook
+              (lambda ()
+                (setenv "TERM" "xterm-256color")))
+    (add-hook 'eshell-before-prompt-hook (setq xterm-color-preserve-properties t))
+    (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+    (setq eshell-output-filter-functions
+          (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
 
-(use-package capf-autosuggest
-   :hook
-   (eshell-mode . capf-autosuggest-mode))
 
-(defun my/shell-create (name)
-   "Create a custom-named eshell buffer with NAME."
-   (interactive "sName: ")
-   (eshell 'new)
-   (let ((new-buffer-name (concat "*eshell-" name "*")))
-     (rename-buffer new-buffer-name t)))
+  ;; (use-package eshell
+  ;;    :config
+  ;;    (setq eshell-scroll-to-bottom-on-input t)
+  ;;    (setq-local tab-always-indent 'complete)
+  ;;    (setq eshell-history-size 10000)
+  ;;    (setq eshell-save-history-on-exit t) ;; Enable history saving on exit
+  ;;    (setq eshell-hist-ignoredups t) ;; Ignore duplicatesq
+  ;;    :hook
+  ;;    (eshell-mode . my/eshell-hook))
 
-;; (global-set-key (kbd "/M-o s") #'my/shell-create)
+  (use-package capf-autosuggest
+     :hook
+     (eshell-mode . capf-autosuggest-mode))
 
-(use-package popper
-   :init
-   (setq popper-reference-buffers
-     '("\\*eshell.*"
-        flymaxxke-diagnostics-buffer-mode
-        help-mode
-        compilation-mode))
-   (popper-mode 1)
-   (popper-echo-mode 1)
-   :custom
-   (popper-window-height 15))
+  (defun my/shell-create (name)
+     "Create a custom-named eshell buffer with NAME."
+     (interactive "sName: ")
+     (eshell 'new)
+     (let ((new-buffer-name (concat "*eshell-" name "*")))
+       (rename-buffer new-buffer-name t)))
 
-(bind-key* (kbd "C-;") #'popper-toggle)
+  (global-set-key (kbd "C-c s") #'my/shell-create)
 
+#+end_src
+* Coding language
+** Common
+[[https://github.com/Malabarba/aggressive-indent-mode][- aggressive-indent-mode]]
+#+begin_src emacs-lisp
+;; (global-aggressive-indent-mode 1)
+;; (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+#+end_src
+** clojure
+#+begin_src emacs-lisp
+  ;; Enable desired features for all lisp modes
+  ;; (require 'clojure-ts-mode)
+;;   (require 'clojure-mode)
+;;   (require 'cljsbuild-mode)
+;;   (require 'elein)
+
+;;   (defun sanityinc/enable-check-parens-on-save ()
+;;     "Run `check-parens' when the current buffer is saved."
+;;     (add-hook 'after-save-hook #'check-parens nil t))
+
+;;   (defvar sanityinc/lispy-modes-hook
+;;     '(enable-paredit-mode
+;;       sanityinc/enable-check-parens-on-save)
+;;     "Hook run in all Lisp modes.")
+;;   (add-to-list 'sanityinc/lispy-modes-hook 'aggressive-indent-mode)
+
+;;   (defun sanityinc/lisp-setup ()
+;;     "Enable features useful in any Lisp mode."
+;;     (run-hooks 'sanityinc/lispy-modes-hook))
+
+;;   (with-eval-after-load 'clojure-mode
+;;     (dolist (m '(clojure-mode-hook clojure-ts-mode-hook))
+;;       (add-hook m 'sanityinc/lisp-setup)))
+
+;; (require 'cider)
+;; (setq nrepl-popup-stacktraces nil)
+;; (add-hook 'clojure-ts-mode-hook #'cider-mode)
+
+;;   (with-eval-after-load 'cider
+;;     (add-hook 'cider-repl-mode-hook 'subword-mode)
+;;     (add-hook 'cider-repl-mode-hook 'paredit-mode))
+
+;; (require 'flycheck-clojure)
+;; (with-eval-after-load 'clojure-mode
+;;     (with-eval-after-load 'cider
+;;       (with-eval-after-load 'flycheck
+;;         (flycheck-clojure-setup))))
 #+end_src
 
 * Misc

@@ -238,20 +238,16 @@
   (org-track-ordered-property-with-tag t)
   ;; 始终存在的的标签
   (org-tag-persistent-alist '(("read"     . ?r)
-			      ("mail"     . ?m)
 			      ("emacs"    . ?e)
 			      ("study"    . ?s)
 			      ("work"     . ?w)))
   ;; 预定义好的标签
-
   (org-tag-alist '((:startgroup)
-		   ("crypt"    . ?c)
 		   ("linux"    . ?l)
 		   ("apple"    . ?a)
 		   ("noexport" . ?n)
 		   ("ignore"   . ?i)
 		   ("toc"      . ?t)
-                   ("短评" . ?d)
 		   (:endgroup)))
 
   ;; 归档设置
@@ -286,12 +282,12 @@
   (org-capture-use-agenda-date nil)
   ;; define common template
   (org-capture-templates `(
-                           ("s" "Schedule")
-                           ("st" "Task" entry (file+headline "Task.org" "TO-DO Queque")
-                            "* TODO %U [/] \n - [ ] %?"
+                           ("t" "Task")
+                           ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
+                            "** TODO %?   %^g"
                             :empty-lines-after 1
                             :prepend t)
-                           ("sc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
+                           ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
                             "* TODO %i%?"
                             :empty-lines-after 1
                             :prepend t)
@@ -313,6 +309,9 @@
                             "* %U - :%?"
                             :empty-lines-after 1
                             :prepend f)
+                           ("w" "Web site" entry
+                            (file "")
+                            "* %a :website:\n\n%U %?\n\n%:initial")
                            ))
   )
 
@@ -348,37 +347,37 @@
 
 (customize-set-variable 'org-anki-default-deck "org-deck")
 
-(use-package org-remark
-  :bind (;; :bind keyword also implicitly defers org-remark itself.
-         ;; Keybindings before :map is set for global-map.
-         ("C-c n m" . org-remark-mark)
-         ("C-c n l" . org-remark-mark-line)
-         :map org-remark-mode-map
-         ("C-c n o" . org-remark-open)
-         ("C-c n ]" . org-remark-view-next)
-         ("C-c n [" . org-remark-view-prev)
-         ("C-c n r" . org-remark-remove)
-         ("C-c n d" . org-remark-delete))
-  ;; Alternative way to enable `org-remark-global-tracking-mode' in
-  ;; `after-init-hook'.
-  ;; :hook (after-init . org-remark-global-tracking-mode)
-  :init
-  ;; It is recommended that `org-remark-global-tracking-mode' be
-  ;; enabled when Emacs initializes. Alternatively, you can put it to
-  ;; `after-init-hook' as in the comment above
-  (org-remark-global-tracking-mode +1)
-  ;; :config
-  ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
-  ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
-  ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
-)
+;; (use-package org-remark
+;;   :bind (;; :bind keyword also implicitly defers org-remark itself.
+;;          ;; Keybindings before :map is set for global-map.
+;;          ("C-c n m" . org-remark-mark)
+;;          ("C-c n l" . org-remark-mark-line)
+;;          :map org-remark-mode-map
+;;          ("C-c n o" . org-remark-open)
+;;          ("C-c n ]" . org-remark-view-next)
+;;          ("C-c n [" . org-remark-view-prev)
+;;          ("C-c n r" . org-remark-remove)
+;;          ("C-c n d" . org-remark-delete))
+;;   ;; Alternative way to enable `org-remark-global-tracking-mode' in
+;;   ;; `after-init-hook'.
+;;   ;; :hook (after-init . org-remark-global-tracking-mode)
+;;   :init
+;;   ;; It is recommended that `org-remark-global-tracking-mode' be
+;;   ;; enabled when Emacs initializes. Alternatively, you can put it to
+;;   ;; `after-init-hook' as in the comment above
+;;   (org-remark-global-tracking-mode +1)
+;;   ;; :config
+;;   ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
+;;   ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
+;;   ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
+;; )
 
-(use-package org-zettel-ref-mode
-  :ensure t
-  :vc (:fetcher github :repo "yibie/org-zettel-ref-mode")
-  :init 
-  (setq org-zettel-ref-mode-type 'denote)
-  (setq org-zettel-ref-overview-directory "~/Dropbox/book-notes")
-)
+;; (use-package org-zettel-ref-mode
+;;   :ensure t
+;;   :vc (:url "https://github.com/yibie/org-zettel-ref-mode")
+;;   :init 
+;;   (setq org-zettel-ref-mode-type 'denote)
+;;   (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
+;; )
 
 (provide 'init-org)

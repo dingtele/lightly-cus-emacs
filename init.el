@@ -44,10 +44,10 @@
 (require 'package)
 
 (setq package-archives '(
-                         ("melpa-stable" . "http://stable.melpa.org/packages/")
+                         ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
                          ;; ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ;; ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                         ;; ("org" . "https://orgmode.org/elpa/")
+                         ;; ("org" . "https://orgmode.org/elpa/"
                          ("melpa" . "https://melpa.org/packages/")
                           ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
 ))
@@ -65,35 +65,100 @@
   (package-install 'use-package))
 (require 'use-package)
 
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-
 (setq org-image-actual-width nil)
 
 (if (eq system-type 'darwin)
     (add-to-list 'my-packages 'exec-path-from-shell))
 
-(dolist (p package-selected-packages)
-  (when (not (package-installed-p p))
-    (package-install p)))
+;; Auto install the required packages
+;; Set missing package vars
+(defvar lem-missing-packages '()
+  "List populated at startup containing packages needing installation.")
+(defvar lem-missing-vc-packages '()
+  "List populated at startup containing vc packages requiring installation.")
 
-(dolist (p package-vc-selected-packages)
-  (when (not (package-installed-p p))
-    (package-vc-install p)))
+;; Check for packages
+(defun lem-check-missing-packages ()
+  "Check for missing packages."
+  (interactive)
+  ;; Check packages
+  (message "%s" "Checking for missing packages.")
+  (dolist (p package-selected-packages)
+    (unless (package-installed-p p)
+      (add-to-list 'lem-missing-packages p 'append)))
+  ;; Check vc installed packages (Emacs 29+)
+  (when (version< "29" emacs-version)
+    (message "%s" "Checking for missing vc packages.")
+    (dolist (p package-vc-selected-packages)
+      (unless (package-installed-p (car p))
+        (add-to-list 'lem-missing-vc-packages (car p) 'append)))))
+
+;; Install packages
+(defun lem-install-missing-packages ()
+  "Install missing packages from package & package-vc lists."
+  (interactive)
+  (lem-check-missing-packages)
+  (cond ((or lem-missing-packages
+             lem-missing-vc-packages)
+         (message "Refreshing package database & installing missing packages...")
+         (package-install-selected-packages t)
+         (setq lem-missing-packages '())
+         (package-vc-install-selected-packages)
+         (setq lem-missing-vc-packages '()))
+        (t
+         (message "No missing packages."))))
+
 
 ;;clipetty
 (use-package clipetty
   :ensure t
-  :bind ("M-w" . clipetty-kill-ring-save))
+  ;; :bind ("M-w" . clipetty-kill-ring-save)
+  )
+
+;; 快速打开配置文件
+(defun open-init-file()
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
+
+(defun open-editing-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/editing.el"))
+
+(defun open-navigation-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/navigation.el"))
+
+(defun open-ui-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/ui.el"))
+
+(defun open-init-org-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/init-org.el"))
+
+(defun open-misc-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/misc.el"))
+
+(defun open-tools-file()
+  (interactive)
+  (find-file "~/.emacs.d/customizations/tools.org"))
+
+(global-set-key (kbd "<f1>") 'open-init-file)
+(global-set-key (kbd "<f2>") 'open-editing-file)
+(global-set-key (kbd "<f3>") 'open-navigation-file)
+(global-set-key (kbd "<f4>") 'open-ui-file)
+(global-set-key (kbd "<f5>") 'open-init-org-file)
+(global-set-key (kbd "<f6>") 'open-misc-file)
+(global-set-key (kbd "<f9>") 'open-tools-file)
 
 ;;load modules
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (add-to-list 'load-path "~/.emacs.d/customizations")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
-(require 'ui) ;; -> F4
 (require 'editing) ;; -> F2
+(require 'ui) ;; -> F4
 (require 'shell-integration)
 (require 'navigation) ;; -> F3
 (require 'misc)
@@ -112,16 +177,39 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(ef-trio-light))
+ '(custom-enabled-themes '(doom-tokyo-night))
+ '(org-bullets-bullet-list nil)
  '(package-selected-packages
-   '(eaf anki-helper paredit parent-mode fringe-helper editorconfig eglot-java eask tree-sitter-langs justify-kp flx-ido flx auto-complete company ejc-sql ox-hugo mct org-zettel-ref-mode yasnippet lsp-java dap-mode lsp-treemacs lsp-ivy helm-lsp lsp-ui lsp-mode rg nerd-icons-ivy-rich ibuffer-vc ibuffer-projectile ibuffer-project nerd-icons-ibuffer workgroups2 org-remark-info nerd-icons-completion consult pinyinlib org-remark buffer-name-relative spacemacs-theme haskell-mode markdown-mode popper capf-autosuggest which-key vc-use-package use-package ts-fold toc-org telega tagedit rime restclient rainbow-delimiters org-preview-html org-contrib org-bullets org-appear orderless nov no-littering memoize keycast json-navigator json-mode ivy-rich ivy-prescient immersive-translate hydra helpful gruvbox-theme groovy-mode gptel gnu-elpa-keyring-update exec-path-from-shell ewal-doom-themes evil-nerd-commenter eshell-syntax-highlighting ef-themes doom-modeline doom docker-compose-mode docker dimmer datetime counsel corfu command-log-mode clipetty calibredb bing-dict auto-package-update))
+   '(anki-helper auto-complete auto-package-update bind-key bing-dict
+                 buffer-name-relative calibredb capf-autosuggest
+                 clipetty cljsbuild-mode clojure-ts-mode
+                 command-log-mode company corfu counsel dash datetime
+                 dimmer docker docker-compose-mode doom doom-modeline
+                 eaf eask editorconfig ef-themes eglot-java ejc-sql
+                 elein embark-consult eshell-syntax-highlighting
+                 evil-nerd-commenter ewal-doom-themes
+                 exec-path-from-shell flx-ido flycheck-clojure
+                 fringe-helper ghub git-commit gnu-elpa-keyring-update
+                 gptel groovy-mode gruvbox-theme haskell-mode helm-lsp
+                 helpful hideshow-org ibuffer-project
+                 ibuffer-projectile ibuffer-vc immersive-translate
+                 ivy-prescient json-mode json-navigator justify-kp
+                 keycast lsp-ivy lsp-java lsp-ui magit magit-section
+                 marginalia mct memoize nerd-icons-completion
+                 nerd-icons-ibuffer nerd-icons-ivy-rich no-littering
+                 nov orderless org-appear org-bullets org-contrib
+                 org-noter org-preview-html org-protocol-jekyll
+                 org-remark org-roam org-roam-ui org-ros
+                 org-zettel-ref-mode ox-hugo paredit parent-mode
+                 pinyinlib pkg-info popper promise rainbow-delimiters
+                 restclient rg rime s shackle shrface spacemacs-theme
+                 tagedit telega toc-org tree-sitter-langs ts-fold
+                 vertico websocket which-key workgroups2 yasnippet
+                 zotxt))
  '(package-vc-selected-packages
-   '((justify-kp :vc-backend Git :url "https://github.com/Fuco1/justify-kp")
-     (eaf :vc-backend Git :url "https://github.com/emacs-eaf/emacs-application-framework")
-     (anki-helper :vc-backend Git :url "https://github.com/Elilif/emacs-anki-helper")
-     (org-zettel-ref-mode :vc-backend Git :url "https://github.com/yibie/org-zettel-ref-mode")
-     (buffer-name-relative :vc-backend Git :url "https://codeberg.org/ideasman42/emacs-buffer-name-relative")
-     (ts-fold :vc-backend Git :url "https://github.com/emacs-tree-sitter/ts-fold"))))
+   '((s :url "https://github.com/magnars/s.el" :branch "master")
+     (org-zettel-ref-mode :url
+                          "https://github.com/yibie/org-zettel-ref-mode"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
