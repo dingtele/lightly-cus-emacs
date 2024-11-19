@@ -70,8 +70,8 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 ;; Make frame transparency overridable
 (defvar frame-transparency '(95 . 95))
 
-(set-frame-parameter (selected-frame) 'alpha frame-transparency)
-(add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
+;; (set-frame-parameter (selected-frame) 'alpha frame-transparency)
+;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -92,7 +92,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq-default visual-fill-column-width 150)
+(setq-default visual-fill-column-width 120)
 
 ;; Color Themes
 ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
@@ -107,9 +107,9 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
 
-(setq custom-safe-themes t)
-;; (setq-default custom-enabled-themes '(ef-trio-light))
-(setq-default custom-enabled-themes '(doom-tokyo-night))
+(setq custom-safe-themes nil)
+(setq-default custom-enabled-themes '(ef-trio-light))
+;; (setq-default custom-enabled-themes '(doom-tokyo-night))
 
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()

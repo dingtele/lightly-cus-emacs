@@ -92,9 +92,9 @@ nerd-icons-ibuffer-formats
               project-relative-file))))
 
 
-;; (use-package buffer-name-relative
+;; (use-package buffer-name-relative-mode
 ;;   :ensure t
-;;   :vc (:url "https://codeberg.org/ideasman42/emacs-buffer-name-relative")
+;;   :vc (:url "https://codeberg.org/ideasman42/emacs-buffer-name-relative" :branch "main")
 ;;   :hook (after-init . buffer-name-relative-mode)
 ;;   :config
 ;;   (setq buffer-name-relative-prefix '("" . "/")))
@@ -107,7 +107,7 @@ nerd-icons-ibuffer-formats
 ;;   (setq ibuffer-sidebar-use-custom-font t)
 ;;   (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
 
-;; (defun +sidebar-toggle ()
+;; (defun +sidebar-toggle ()q
 ;;   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
 ;;   (interactive)
 ;;   (dired-sidebar-toggle-sidebar)

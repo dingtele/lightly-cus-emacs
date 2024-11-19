@@ -16,7 +16,7 @@
 
 ;; Don't use hard tabs
 (setq-default indent-tabs-mode nil)
-
+(set-variable 'tab-width 4)
 ;; When you visit a file, point goes to the last place where it
 ;; was when you previously visited the same file.
 ;; http://www.emacswiki.org/emacs/SavePlace
@@ -40,7 +40,7 @@
 ;; use 2 spaces for tabs
 (defun die-tabs ()
   (interactive)
-  (set-variable 'tab-width 2)
+  (set-variable 'tab-width 4)
   (mark-whole-buffer)
   (untabify (region-beginning) (region-end))
   (keyboard-quit))                     

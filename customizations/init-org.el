@@ -285,7 +285,6 @@
                            ("t" "Task")
                            ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
                             "** TODO %?   %^g"
-                            :empty-lines-after 1
                             :prepend t)
                            ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
                             "* TODO %i%?"
@@ -347,37 +346,31 @@
 
 (customize-set-variable 'org-anki-default-deck "org-deck")
 
-;; (use-package org-remark
-;;   :bind (;; :bind keyword also implicitly defers org-remark itself.
-;;          ;; Keybindings before :map is set for global-map.
-;;          ("C-c n m" . org-remark-mark)
-;;          ("C-c n l" . org-remark-mark-line)
-;;          :map org-remark-mode-map
-;;          ("C-c n o" . org-remark-open)
-;;          ("C-c n ]" . org-remark-view-next)
-;;          ("C-c n [" . org-remark-view-prev)
-;;          ("C-c n r" . org-remark-remove)
-;;          ("C-c n d" . org-remark-delete))
-;;   ;; Alternative way to enable `org-remark-global-tracking-mode' in
-;;   ;; `after-init-hook'.
-;;   ;; :hook (after-init . org-remark-global-tracking-mode)
-;;   :init
-;;   ;; It is recommended that `org-remark-global-tracking-mode' be
-;;   ;; enabled when Emacs initializes. Alternatively, you can put it to
-;;   ;; `after-init-hook' as in the comment above
-;;   (org-remark-global-tracking-mode +1)
-;;   ;; :config
-;;   ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
-;;   ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
-;;   ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
-;; )
+(use-package org-remark
+  :bind (;; :bind keyword also implicitly defers org-remark itself.
+         ;; Keybindings before :map is set for global-map.
+         ("C-c n m" . org-remark-mark)
+         ("C-c n l" . org-remark-mark-line)
+         :map org-remark-mode-map
+         ("C-c n o" . org-remark-open)
+         ("C-c n ]" . org-remark-view-next)
+         ("C-c n [" . org-remark-view-prev)
+         ("C-c n r" . org-remark-remove)
+         ("C-c n d" . org-remark-delete))
+  ;; Alternative way to enable `org-remark-global-tracking-mode' in
+  ;; `after-init-hook'.
+  ;; :hook (after-init . org-remark-global-tracking-mode)
+  :init
+  ;; It is recommended that `org-remark-global-tracking-mode' be
+  ;; enabled when Emacs initializes. Alternatively, you can put it to
+  ;; `after-init-hook' as in the comment above
+  (org-remark-global-tracking-mode +1)
+  ;; :config
+  ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
+  ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
+  ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
+  )
 
-;; (use-package org-zettel-ref-mode
-;;   :ensure t
-;;   :vc (:url "https://github.com/yibie/org-zettel-ref-mode")
-;;   :init 
-;;   (setq org-zettel-ref-mode-type 'denote)
-;;   (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
-;; )
+
 
 (provide 'init-org)
