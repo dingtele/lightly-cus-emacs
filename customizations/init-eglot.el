@@ -9,7 +9,7 @@
 
 ;; This is optional. It automatically runs `M-x eglot` for you whenever you are in `elixir-mode`:
 (add-hook 'elixir-mode-hook 'eglot-ensure)
-
+(add-hook 'java-mode-hook 'eglot-ensure)
 ;; Be sure to edit the path appropriately; use the `.bat` script instead for Windows:
 (add-to-list 'eglot-server-programs '(elixir-mode "/home/madcomet/codebase/src/elixir-ls-v0.24.1/language_server.sh"))
 
