@@ -46,8 +46,6 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (ding-set-font en-font-list 10 zh-font-list)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
-;; (setq font-use-system-font t)
-
 (menu-bar-mode -1)
 ;; Set up the visible bell
 (setq visible-bell t)
@@ -102,12 +100,12 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
 ;; Don't prompt to confirm theme safety. This avoids problems with
 ;; first-time startup on Emacs > 26.3.
+(setq custom-safe-themes t)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
 
-(setq custom-safe-themes nil)
 (setq-default custom-enabled-themes '(ef-trio-light))
 ;; (setq-default custom-enabled-themes '(doom-tokyo-night))
 
@@ -164,12 +162,12 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
     (defun sanityinc/display-non-graphic-p ()
       (not (display-graphic-p)))
     (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p))
-)
+  )
 
 
 ;;set the width (in characters wide) and height
 ;; (in lines high) Emacs will have whenever you start it
-;; (setq initial-frame-alist '((top . 0) (left . 0) (width . 177) (height . 53)))
+(setq initial-frame-alist '((top . 0) (left . 0) (width . 177) (height . 53)))
 
 ;; ;; These settings relate to how emacs interacts with your operating system
 ;; (setq ;; makes killing/yanking interact with the clipboard
