@@ -5,7 +5,7 @@
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
 (defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "LXGW Bright Medium" "HanaMinB"))
-(defvar en-font-list '("iosevka" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
+(defvar en-font-list '("iosevka term ss14" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 
 (defun ding-make-font-string (font-name font-size)
   (if (and (stringp font-size)
