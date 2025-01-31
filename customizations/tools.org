@@ -2,92 +2,123 @@
 ** package sources
 #+begin_src emacs-lisp
 
-(require 'package)
+  (require 'package)
 
-(setq package-archives '(
-                         ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
-                         ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                         ))
+  (custom-set-variables '(package-archives '(
+                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                           ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("melpa" . "https://melpa.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                           )))
+(add-to-list 'package-archives
+             '("gnu-devel" . "https://elpa.gnu.org/devel/") :append)
 
 #+end_src
+
+#+RESULTS:
+: ((melpa-stable . http://stable.melpa.org/packages/))
+
 ** package install
-*** package vc usage: https://tony-zorman.com/posts/use-package-vc.html
-
 #+begin_src emacs-lisp
+  (package-initialize)
 
-(package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
 
-(unless package-archive-contents
-  (package-refresh-contents))
+  ;; install use-package manager
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (require 'use-package)
 
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
+  (custom-set-variables       '(use-package-always-ensure t)
+                              ;; PERF
+                              ;; '(use-package-always-defer t)
+                              '(use-package-verbose nil)
+                              '(load-prefer-newer t))
 
-;; Auto install the required packages
-;; Set missing package vars
-(defvar lem-missing-packages '()
-  "List populated at startup containing packages needing installation.")
-(defvar lem-missing-vc-packages '()
-  "List populated at startup containing vc packages requiring installation.")
+  (use-package auto-compile
+    :defer nil
+    :config (auto-compile-on-load-mode))
 
-;; Check for packages
-(defun lem-check-missing-packages ()
-  "Check for missing packages."
-  (interactive)
-  ;; Check packages
-  (message "%s" "Checking for missing packages.")
-  (dolist (p package-selected-packages)
-    (unless (package-installed-p p)
-      (add-to-list 'lem-missing-packages p 'append)))
-  ;; Check vc installed packages (Emacs 29+)
-  (when (version< "29" emacs-version)
-    (message "%s" "Checking for missing vc packages.")
-    (dolist (p package-vc-selected-packages)
-      (unless (package-installed-p (car p))
-        (add-to-list 'lem-missing-vc-packages (car p) 'append)))))
+  ;; optimize for build-in :vc to avoid long time deep clone with all package's history
+  (defun my/vc-git-clone (fn remote directory rev)
+    (if (or (not (string-match-p "elpa" directory))
+            (null rev))
+        (funcall fn remote directory rev)
+      (cond
+       ((ignore-errors
+          ;; First try if rev is a branch/tag name
+          ;; https://stackoverflow.com/a/48748567/2163429
+          (vc-git--out-ok "clone" "--depth" "1" "--single-branch" "--branch" rev remote directory)))
+       ((vc-git--out-ok "clone" "--single-branch" remote directory)
+        (let ((default-directory directory))
+          (vc-git--out-ok "checkout" rev))))
+      directory))
 
-;; Install packages
-(defun lem-install-missing-packages ()
-  "Install missing packages from package & package-vc lists."
-  (interactive)
-  (lem-check-missing-packages)
-  (cond ((or lem-missing-packages
-             lem-missing-vc-packages)
-         (message "Refreshing package database & installing missing packages...")
-         (package-install-selected-packages t)
-         (setq lem-missing-packages '())
-         (package-vc-install-selected-packages)
-         (setq lem-missing-vc-packages '()))
-        (t
-         (message "No missing packages."))))
+  (advice-add 'vc-git-clone :around
+              'my/vc-git-clone)
+
+  ;; install the required packages
+  ;; Set missing package vars
+  (defvar lem-missing-packages '()
+    "List populated at startup containing packages needing installation.")
+  (defvar lem-missing-vc-packages '()
+    "List populated at startup containing vc packages requiring installation.")
+
+  ;; Check for packages
+  (defun lem-check-missing-packages ()
+    "Check for missing packages."
+    (interactive)
+    ;; Check packages
+    (message "%s" "Checking for missing packages.")
+    (dolist (p package-selected-packages)
+      (unless (package-installed-p p)
+        (add-to-list 'lem-missing-packages p 'append)))
+    ;; Check vc installed packages (Emacs 29+)
+    (when (version< "29" emacs-version)
+      (message "%s" "Checking for missing vc packages.")
+      (dolist (p package-vc-selected-packages)
+        (unless (package-installed-p (car p))
+          (add-to-list 'lem-missing-vc-packages (car p) 'append)))))
+
+  ;; Install packages
+  (defun lem-install-missing-packages ()
+    "Install missing packages from package & package-vc lists."
+    (interactive)
+    (lem-check-missing-packages)
+    (cond ((or lem-missing-packages
+               lem-missing-vc-packages)
+           (message "Refreshing package database & installing missing packages...")
+           (package-install-selected-packages t)
+           (setq lem-missing-packages '())
+           (package-vc-install-selected-packages)
+           (setq lem-missing-vc-packages '()))
+          (t
+           (message "No missing packages."))))
 
 #+end_src
 ** modules loading
 #+begin_src emacs-lisp
- 
-(add-to-list 'load-path "~/.emacs.d/vendor")
-(add-to-list 'load-path "~/.emacs.d/customizations")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
-(require 'editing) ;; -> F2
-(require 'ui) ;; -> F4
-(require 'shell-integration)
-(require 'navigation) ;; -> F3
-(require 'misc)
-(require 'init-site-lisp)
-(require 'init-core-overriding)
-;; Langauage-specific
-;; (require 'elisp-editing)
-(require 'init-minibuffer-completion)
+  (add-to-list 'load-path "~/.emacs.d/vendor")
+  (add-to-list 'load-path "~/.emacs.d/customizations")
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
+  (require 'editing) ;; -> F2
+  (require 'ui) ;; -> F4
+  ;; (require 'shell-integration)
+  (require 'navigation) ;; -> F3
+  (require 'misc)
+  ;; (require 'init-site-lisp)
+  ;; (require 'init-core-overriding)
+  ;; ;; Langauage-specific
+  ;; (require 'elisp-editing)
+  (require 'init-minibuffer-completion)
+(require 'init-org)
 #+end_src
-* Key Binding
+* Editing & KeyBinding
 ** shortcut
 #+begin_src emacs-lisp
 
@@ -109,10 +140,6 @@
     (interactive)
     (find-file "~/.emacs.d/customizations/ui.el"))
 
-  (defun open-init-org-file()
-    (interactive)
-    (find-file "~/.emacs.d/customizations/init-org.el"))
-
   (defun open-misc-file()
     (interactive)
     (find-file "~/.emacs.d/customizations/misc.el"))
@@ -121,19 +148,104 @@
     (interactive)
     (find-file "~/.emacs.d/customizations/tools.org"))
 
+  (defun open-task-org-file()
+    (interactive)
+    (find-file "~/Dropbox/org/Task.org"))
+
+  (defun open-org-file()
+    (interactive)
+    (find-file "~/.emacs.d/customizations/init-org.el"))
+
   (global-set-key (kbd "<f1>") 'open-init-file-and-eval)
   (global-set-key (kbd "<f2>") 'open-editing-file)
   (global-set-key (kbd "<f3>") 'open-navigation-file)
   (global-set-key (kbd "<f4>") 'open-ui-file)
-  (global-set-key (kbd "<f5>") 'open-init-org-file)
+  (global-set-key (kbd "<f10>") 'open-task-org-file)
   (global-set-key (kbd "<f6>") 'open-misc-file)
   (global-set-key (kbd "<f9>") 'open-tools-file)
+    (global-set-key (kbd "<f5>") 'open-org-file)
+
+
+  (use-package clipetty
+    :ensure t
+    :bind ("M-c" . clipetty-kill-ring-save))
+
+  (defun keyboard-quit-dwim ()
+    "Do-What-I-Mean behaviour for a general `keyboard-quit'."
+    (interactive)
+    (cond
+     ((region-active-p)
+      (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode)
+      (delete-completion-window))
+     ((> (minibuffer-depth) 0)
+      (abort-recursive-edit))
+     (t
+      (keyboard-quit))))
+
+  (define-key global-map (kbd "C-g") #'keyboard-quit-dwim)
 
 #+end_src
-** Meow
-** Hydra 
-https://github.com/abo-abo/hydra
+** Corfu - completion
+#+begin_src emacs-lisp
+   ;; completion UI - the front end
+   (use-package corfu
+     :custom
+     (setq corfu-auto t)
+     (setq corfu-quit-no-match 'separator)
+     :init
 
+     (global-corfu-mode)
+     :bind (:map corfu-map ("<tab>" . corfu-complete))
+     :config
+     (setq tab-always-indent 'complete)
+     (setq corfu-preview-current nil)
+     (setq corfu-min-width 20)
+
+     (setq corfu-popupinfo-delay '(1.25 . 0.5))
+     (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
+
+     ;; Sort by input history (no need to modify `corfu-sort-function').
+     (with-eval-after-load 'savehist
+       (corfu-history-mode 1)
+       (add-to-list 'savehist-additional-variables 'corfu-history))
+
+     )
+
+   ;; completion backend
+   (use-package cape
+     :ensure t
+     :bind (("M-/" . completion-at-point))
+     :init
+     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+     (add-to-list 'completion-at-point-functions #'cape-file)
+     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+     (add-to-list 'completion-at-point-functions #'cape-abbrev)
+     (add-to-list 'completion-at-point-functions #'cape-dict)
+     (add-to-list 'completion-at-point-functions #'cape-line)
+
+     )
+
+  ;;  ;; child frram beautify
+  ;;   ( use-package nova
+  ;;    :ensure t
+  ;;    :vc (:url https://github.com/thisisran/nova)
+  ;;    :config
+  ;;      (require 'nova)
+  ;;  (require 'nova-vertico)
+  ;;  (require 'nova-corfu)
+  ;;  (require 'nova-corfu-popupinfo)
+  ;; ;; (require 'nova-eldoc)
+
+  ;;    (nova-vertico-mode 1)
+  ;;    (nova-corfu-mode 1)
+  ;;    (nova-corfu-popupinfo-mode 1)
+  ;;  ;;  (nova-eldoc 1)
+  ;;   )
+#+end_src
+** Hydra
+
+https://github.com/abo-abo/hydra
 #+begin_src emacs-lisp
 ;;design a transient key binding
 (use-package hydra
@@ -145,536 +257,10 @@ https://github.com/abo-abo/hydra
   ("k" move-line-down "down")
   ("f" nil "finished" :exit t))
 ;; hercules arrives with any other key binding
-
 #+end_src
-* Org Mode
-** Org Common
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook 'toc-org-mode)
-  (use-package org-appear
-    :ensure t
-    :hook (org-mode . org-appear-mode)
-    :config
-    (setq org-appear-autolinks t)
-    (setq org-appear-autosubmarkers t)
-    (setq org-appear-autoentities t)
-    (setq org-appear-autokeywords t)
-    (setq org-appear-inside-latex t)
-    )
-  (use-package org
-    :ensure nil
-    :mode ("\\.org\\'" . org-mode)
-    :hook 
-    ((org-mode . visual-line-mode) 
-     (org-mode . my/org-prettify-symbols) 
-     )
-    :commands (org-find-exact-headline-in-buffer 
-               org-set-tags
-               )
-    :custom-face
-    ;; 设置Org mode标题以及每级标题行的大小
-    (org-document-title ((t (:height 1.75 :weight bold))))
-    (org-level-1 ((t (:height 1.2 :weight bold))))
-    (org-level-2 ((t (:height 1.15 :weight bold))))
-    (org-level-3 ((t (:height 1.1 :weight bold))))
-    (org-level-4 ((t (:height 1.05 :weight bold))))
-    (org-level-5 ((t (:height 1.0 :weight bold))))
-    (org-level-6 ((t (:height 1.0 :weight bold))))
-    (org-level-7 ((t (:height 1.0 :weight bold))))
-    (org-level-8 ((t (:height 1.0 :weight bold))))
-    (org-level-9 ((t (:height 1.0 :weight bold))))
-    ;; 设置代码块用上下边线包裹
-    (org-block-begin-line ((t (:underline t :background unspecified))))
-    (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
-    :config
-    (setq org-startup-with-inline-images t)
-    ;; ;; 设置标题行之间总是有空格；列表之间根据情况自动加空格
-    ;; (setq org-blank-before-new-entry '((heading . t)
-    ;;                                    (plain-list-item . auto)))
-    ;; 在org mode里美化字符串
-    ;; ================================
-    (defun my/org-prettify-symbols ()
-      (setq prettify-symbols-alist
-     	  (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
-     		  '(
-     		    ;; ("[ ]"              . 9744)         ; ☐
-     		    ;; ("[X]"              . 9745)         ; ☑
-     		    ;; ("[-]"              . 8863)         ; ⊟
-     		    ("#+begin_src"      . 9998)         ; ✎
-     		    ("#+end_src"        . 9633)         ; □
-     		    ("#+begin_example"  . 129083)       ; 🠻
-     		    ("#+end_example"    . 129081)       ; 🠹
-     		    ("#+results:"       . 9776)         ; ☰
-     		    ("#+attr_latex:"    . "🄛")
-     		    ("#+attr_html:"     . "🄗")
-     		    ("#+attr_org:"      . "🄞")
-     		    ("#+name:"          . "🄝")         ; 127261
-     		    ("#+caption:"       . "🄒")         ; 127250
-     		    ("#+date:"          . "📅")         ; 128197
-     		    ("#+author:"        . "💁")         ; 128100
-     		    ("#+setupfile:"     . 128221)       ; 📝
-     		    ("#+email:"         . 128231)       ; 📧
-     		    ("#+startup:"       . 10034)        ; ✲
-     		    ("#+options:"       . 9965)         ; ⛭
-     		    ("#+title:"         . 10162)        ; ➲
-     		    ("#+subtitle:"      . 11146)        ; ⮊
-     		    ("#+downloaded://///:"    . 8650)         ; ⇊
-     		    ("#+language:"      . 128441)       ; 🖹
-     		    ("#+begin_quote"    . 187)          ; »
-     		    ("#+end_quote"      . 171)          ; «
-                      ("#+begin_results"  . 8943)         ; ⋯
-                      ("#+end_results"    . 8943)         ; ⋯
-     		    )))
-      (setq prettify-symbols-unprettify-at-point t)
-      (prettify-symbols-mode 1))
-    (setq
-     ;; Edit settings
-     org-auto-align-tags nil
-     org-tags-column 0
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     org-insert-heading-respect-content t
 
-     ;; Org styling, hide markup etc.
-     org-hide-emphasis-markers t
-     org-pretty-entities t
-
-     ;; Agenda styling
-     org-agenda-tags-column 0
-     org-agenda-block-separator ?─
-     org-agenda-time-grid
-     '((daily today require-timed)
-       (800 1000 1200 1400 1600 1800 2000)
-       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-     org-agenda-current-time-string
-     "◀── now ─────────────────────────────────────────────────")
-
-    ;; Ellipsis styling
-    (setq org-ellipsis "…")
-    (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
-    :custom
-    ;; 设置Org mode的目录
-    (org-directory "~/Dropbox/org")
-    ;; 设置笔记的默认存储位置
-    (org-default-notes-file (expand-file-name "capture.org" org-directory))
-    ;; 启用一些子模块
-    (org-modules '(ol-bibtex ol-gnus ol-info ol-eww org-habit org-protocol))
-
-    ;; TOOD的关键词设置，可以设置不同的组
-    (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
-     		       (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
-
-    ;; 当标题行状态变化时标签同步发生的变化
-    ;; Moving a task to CANCELLED adds a CANCELLED tag
-    ;; Moving a task to WAIT adds a WAIT tag
-    ;; Moving a task to HOLD adds WAIT and HOLD tags
-    ;; Moving a task to a done state removes WAIT and HOLD tags
-    ;; Moving a task to TODO removes WAIT, CANCELLED, and HOLD tags
-    ;; Moving a task to DONE removes WAIT, CANCELLED, and HOLD tags
-    (org-todo-state-tags-triggers
-     (quote (("CANCELLED" ("CANCELLED" . t))
-     	   ("WAIT" ("WAIT" . t))
-     	   ("HOLD" ("WAIT") ("HOLD" . t))
-     	   (done ("WAIT") ("HOLD"))
-     	   ("TODO" ("WAIT") ("CANCELLED") ("HOLD"))
-     	   ("DONE" ("WAIT") ("CANCELLED") ("HOLD")))))
-
-    ;; 使用专家模式选择标题栏状态
-    (org-use-fast-todo-selection 'expert)
-    ;; 父子标题栏状态有依赖
-    (org-enforce-todo-dependencies t)
-    ;; 标题栏和任务复选框有依赖
-    (org-enforce-todo-checkbox-dependencies t)
-    ;; 优先级样式设置
-    (org-priority-faces '((?A :foreground "red")
-             		(?B :foreground "orange")
-             		(?C :foreground "yellow")))
-    ;; ;; 标题行全局属性设置
-    ;; (org-global-properties '(("EFFORT_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
-    ;;       					   ("APPT_WARNTIME_ALL" . "0 5 10 15 20 25 30 45 60")
-    ;;       					   ("RISK_ALL" . "Low Medium High")
-    ;;       					   ("STYLE_ALL" . "habit")))
-    ;; Org columns的默认格式
-    ;; (org-columns-default-format "%25ITEM %TODO %SCHEDULED %DEADLINE %3PRIORITY %TAGS %CLOCKSUM %EFFORT{:}")
-    ;; 当状态从DONE改成其他状态时，移除 CLOSED: [timestamp]
-    (org-closed-keep-when-no-todo t)
-    ;; DONE时加上时间戳
-    (org-log-done 'time)
-    ;; 重复执行时加上时间戳
-    (org-log-repeat 'time)
-    ;; Deadline修改时加上一条记录
-    (org-log-redeadline 'note)
-    ;; Schedule修改时加上一条记录
-    (org-log-reschedule 'note)
-    ;; 以抽屉的方式记录
-    (org-log-into-drawer t)
-    ;; 紧接着标题行或者计划/截止时间戳后加上记录抽屉
-    (org-log-state-notes-insert-after-drawers nil)
-
-    ;;TODO org-refile 使用缓存 
-
-    ;; 设置标签的默认位置，默认是第77列右对齐
-    (org-tags-column -77)
-    ;; 自动对齐标签
-    (org-auto-align-tags t)
-    ;; 标签不继承
-    (org-use-tag-inheritance nil)
-    ;; 在日程视图的标签不继承
-    (org-agenda-use-tag-inheritance nil)
-    ;; 标签快速选择
-    (org-use-fast-tag-selection t)
-    ;; 标签选择不需要回车确认
-    (org-fast-tag-selection-single-key t)
-    ;; 定义了有序属性的标题行也加上 OREDERD 标签
-    (org-track-ordered-property-with-tag t)
-    ;; 始终存在的的标签
-    (org-tag-persistent-alist '(("read"     . ?r)
-     			      ("emacs"    . ?e)
-     			      ("study"    . ?s)
-     			      ("work"     . ?w)))
-    ;; 预定义好的标签
-    (org-tag-alist '((:startgroup)
-     		   ("linux"    . ?l)
-     		   ("apple"    . ?a)
-     		   ("noexport" . ?n)
-     		   ("ignore"   . ?i)
-     		   ("toc"      . ?t)
-     		   (:endgroup)))
-
-    ;; 归档设置
-    (org-archive-location "%s_archive::datetree/")
-    )
-
-#+end_src
-** org-babel
-#+begin_src emacs-lisp
-;;config babel languages
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)))
-  (push '("conf-unix" . conf-unix) org-src-lang-modes));; what is this?
-
-;; structure templates
-(with-eval-after-load 'org
-  ;; This is needed as of Org 9.2
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python"))
-  (global-set-key (kbd "C-< s") 'tempo-template-org-src-emacs-lisp))
-#+end_src
-** org-capture
-#+begin_src elisp
-
-  (global-set-key (kbd "C-c c") 'org-capture)
-  (setq org-default-notes-file "~/org/inbox.org")
-
-  (use-package org-capture
-    :ensure nil
-    :bind ("\e\e c" . (lambda () (interactive) (org-capture)))
-    :hook ((org-capture-mode . (lambda ()
-                                 (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
-           (org-capture-mode . delete-other-windows))
-    :custom
-    (org-capture-use-agenda-date nil)
-    ;; define common template
-    (org-capture-templates `(
-                             ("t" "Task")
-                             ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
-                              "** TODO %?   %^g"
-                              :prepend t)
-                             ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
-                              "* TODO %i%?"
-                              :empty-lines-after 1
-                              :prepend t)
-                             ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
-                              "* %? %^g\n%i\n"
-                              :empty-lines-after 1)
-                             ;; For EWW
-                             ;; ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
-                             ;;  "* %:description\n\n%a%?"
-                             ;;  :empty-lines 1
-                             ;;  :immediate-finish t)
-                             ;; ("j" "Journal")
-                             ;; ("jt" "Today's TODO" entry (file+olp+datetree "Journal.org" "Today's TODO")
-                             ;;  "* TODO %U [/] \n - [ ] %?"
-                             ;;  :empty-lines 1
-                             ;;  :jump-to-captured t
-                             ;;  :prepend f)
-                             ("j" "diary" entry (file+olp+datetree "Journal.org")
-                              "* %U - :%?"
-                              :empty-lines-after 1
-                              :prepend f)
-                             ("w" "Web site" entry
-                              (file "")
-                              "* %a :website:\n\n%U %?\n\n%:initial")
-                             ))
-    )
-
-#+end_src
-** org-zettle-ref
-#+begin_src emacs-lisp
-
-    (use-package org-zettel-ref-mode
-      :ensure nil
-      :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
-      ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
-      :init 
-      (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
-      :config
-      (setq org-zettel-ref-mode-type 'denote)
-      ;; (setq org-zettel-ref-mode-type 'org-roam)  
-      ;; (setq org-zettel-ref-mode-type 'normal)  
-      (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
-      (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/temp_convert/")
-      (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted_org")
-      (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
-      (setq org-zettel-ref-python-environment 'venv)  ; 或 'system, 'venv
-  (setq org-zettel-ref-python-env-name "venv")  ; 如果使用 Conda 或 venv
-      (setq org-zettel-ref-debug t))
-#+end_src
-** org-calendar
-#+begin_src emacs-lisp
-  (use-package calendar
-    :ensure nil
-    :hook (calendar-today-visible . calendar-mark-today)
-    :custom
-    ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
-    (calendar-chinese-all-holidays-flag nil)
-    ;; 是否显示节日
-    (calendar-mark-holidays-flag t)
-    ;; 是否显示Emacs的日记，我们使用org的日记
-    (calendar-mark-diary-entries-flag nil)
-    ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
-    (calendar-time-zone-style 'numeric)
-    ;; 日期显示方式：year/month/day
-    (calendar-date-style 'iso)
-    ;; 中文天干地支设置
-    (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
-    (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
-    ;; 设置中文月份
-    (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
-    ;; 设置星期标题显示
-    (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
-    ;; 周一作为一周第一天
-    (calendar-week-start-day 1)
-    )
-
-  ;; 时间解析增加中文拼音
-  (use-package parse-time
-    :ensure nil
-    :defer t
-    :config
-    (setq parse-time-months
-          (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
-                    ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
-                    ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
-                    ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
-                    ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
-                    ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
-                    ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
-                    ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
-                  parse-time-months))
-
-    (setq parse-time-weekdays
-          (append '(("zri" . 0) ("zqi" . 0)
-                    ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
-                    ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
-                    ("zr" . 0) ("zq" . 0)
-                    ("zy" . 1) ("ze" . 2) ("zs" . 3)
-                    ("zsi" . 4) ("zw" . 5) ("zl" . 6))
-                  parse-time-weekdays)))
-
-  ;; 中国节日设置
-  (use-package cal-china-x
-    :ensure t
-    :commands cal-china-x-setup
-    :hook (after-init . cal-china-x-setup)
-    :config
-    ;; 重要节日设置
-    (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-    ;; 所有节日设置
-    (setq cal-china-x-general-holidays
-          '(;;公历节日
-            (holiday-fixed 1 1 "元旦")
-            (holiday-fixed 2 14 "情人节")
-            (holiday-fixed 3 8 "妇女节")
-            (holiday-fixed 3 14 "白色情人节")
-            (holiday-fixed 4 1 "愚人节")
-            (holiday-fixed 5 1 "劳动节")
-            (holiday-fixed 5 4 "青年节")
-            (holiday-float 5 0 2 "母亲节")
-            (holiday-fixed 6 1 "儿童节")
-            (holiday-float 6 0 3 "父亲节")
-            (holiday-fixed 9 10 "教师节")
-            (holiday-fixed 10 1 "国庆节")
-            (holiday-fixed 10 2 "国庆节")
-            (holiday-fixed 10 3 "国庆节")
-            (holiday-fixed 10 24 "程序员节")
-            (holiday-fixed 11 11 "双11购物节")
-            (holiday-fixed 12 25 "圣诞节")
-            ;; 农历节日
-            (holiday-lunar 12 30 "春节" 0)
-            (holiday-lunar 1 1 "春节" 0)
-            (holiday-lunar 1 2 "春节" 0)
-            (holiday-lunar 1 15 "元宵节" 0)
-            (holiday-solar-term "清明" "清明节")
-            (holiday-solar-term "小寒" "小寒")
-            (holiday-solar-term "大寒" "大寒")
-            (holiday-solar-term "立春" "立春")
-            (holiday-solar-term "雨水" "雨水")
-            (holiday-solar-term "惊蛰" "惊蛰")
-            (holiday-solar-term "春分" "春分")
-            (holiday-solar-term "谷雨" "谷雨")
-            (holiday-solar-term "立夏" "立夏")
-            (holiday-solar-term "小满" "小满")
-            (holiday-solar-term "芒种" "芒种")
-            (holiday-solar-term "夏至" "夏至")
-            (holiday-solar-term "小暑" "小暑")
-            (holiday-solar-term "大暑" "大暑")
-            (holiday-solar-term "立秋" "立秋")
-            (holiday-solar-term "处暑" "处暑")
-            (holiday-solar-term "白露" "白露")
-            (holiday-solar-term "秋分" "秋分")
-            (holiday-solar-term "寒露" "寒露")
-            (holiday-solar-term "霜降" "霜降")
-            (holiday-solar-term "立冬" "立冬")
-            (holiday-solar-term "小雪" "小雪")
-            (holiday-solar-term "大雪" "大雪")
-            (holiday-solar-term "冬至" "冬至")
-            (holiday-lunar 5 5 "端午节" 0)
-            (holiday-lunar 8 15 "中秋节" 0)
-            (holiday-lunar 7 7 "七夕情人节" 0)
-            (holiday-lunar 12 8 "腊八节" 0)
-            (holiday-lunar 9 9 "重阳节" 0)))
-    ;; 设置日历的节日，通用节日已经包含了所有节日
-    (setq calendar-holidays (append cal-china-x-general-holidays)))
-
-#+end_src
-** Org-roam
-*** org-roam
-#+begin_src emacs-lisp
-(use-package org-roam
-  :ensure t
-  :custom
-  (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
-
-#+end_src
-*** org-roam-ui
-org-roam-ui requires org-roam, websocket, simple-httpd, f and Emacs >= 27 for fast JSON parsing.
-** org-modern
-#+begin_src emacs-lisp
-(require 'org-modern)
-;; Option 1: Per buffer
-(add-hook 'org-mode-hook #'org-modern-mode)
-(add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-
-(setq
- ;; Edit settings
- org-auto-align-tags nil
- org-tags-column 0
- org-catch-invisible-edits 'show-and-error
- org-special-ctrl-a/e t
- org-insert-heading-respect-content t
-
- ;; Org styling, hide markup etc.
- org-hide-emphasis-markers t
- org-pretty-entities t
-
- ;; Agenda styling
- org-agenda-tags-column 0
- org-agenda-block-separator ?─
- org-agenda-time-grid
- '((daily today require-timed)
-   (800 1000 1200 1400 1600 1800 2000)
-   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
- org-agenda-current-time-string
- "◀── now ─────────────────────────────────────────────────")
-
-;; Ellipsis styling
-(setq org-ellipsis "…")
-(set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
-
-(use-package org-modern
-  :ensure t
-  :hook (after-init . (lambda ()
-                        (setq org-modern-hide-stars 'leading)
-                        (global-org-modern-mode t)))
-  :config
-  ;; 标题行型号字符
-  (setq org-modern-star ["◉" "○" "✸" "✳" "◈" "◇" "✿" "❀" "✜"])
-  ;; 额外的行间距，0.1表示10%，1表示1px
-  (setq-default line-spacing 0.1)
-  ;; tag边框宽度，还可以设置为 `auto' 即自动计算
-  (setq org-modern-label-border 1)
-  ;; 设置表格竖线宽度，默认为3
-  (setq org-modern-table-vertical 2)
-  ;; 设置表格横线为0，默认为0.1
-  (setq org-modern-table-horizontal 0)
-  ;; 复选框美化
-  (setq org-modern-checkbox
-        '((?X . #("▢✓" 0 2 (composition ((2)))))
-          (?- . #("▢–" 0 2 (composition ((2)))))
-          (?\s . #("▢" 0 1 (composition ((1)))))))
-  ;; 列表符号美化
-  (setq org-modern-list
-        '((?- . "•")
-          (?+ . "◦")
-          (?* . "▹")))
-  ;; 代码块左边加上一条竖边线（需要Org mode顶头，如果启用了 `visual-fill-column-mode' 会很难看）
-  (setq org-modern-block-fringe t)
-  ;; 代码块类型美化，我们使用了 `prettify-symbols-mode'
-  (setq org-modern-block-name nil)
-  ;; #+关键字美化，我们使用了 `prettify-symbols-mode'
-  (setq org-modern-keyword nil)
-  )
-
-#+end_src
-** org-remark
-#+begin_src emacs-lisp
-(use-package org-remark
-  :bind (;; :bind keyword also implicitly defers org-remark itself.
-         ;; Keybindings before :map is set for global-map.
-         ("C-c n m" . org-remark-mark)
-         ("C-c n l" . org-remark-mark-line)
-         :map org-remark-mode-map
-         ("C-c n o" . org-remark-open)
-         ("C-c n ]" . org-remark-view-next)
-         ("C-c n [" . org-remark-view-prev)
-         ("C-c n r" . org-remark-remove)
-         ("C-c n d" . org-remark-delete))
-  ;; Alternative way to enable `org-remark-global-tracking-mode' in
-  ;; `after-init-hook'.
-  ;; :hook (after-init . org-remark-global-tracking-mode)
-  :init
-  ;; It is recommended that `org-remark-global-tracking-mode' be
-  ;; enabled when Emacs initializes. Alternatively, you can put it to
-  ;; `after-init-hook' as in the comment above
-  (org-remark-global-tracking-mode +1)
-  ;; :config
-  ;; (use-package org-remark-info :after info :config (org-remark-info-mode +1))
-  ;; (use-package org-remark-eww  :after eww  :config (org-remark-eww-mode +1))
-  ;; (use-package org-remark-nov  :after nov  :config (org-remark-nov-mode +1))
-  )
-#+end_src
 * Desktop, window  and layouts
-** shackle 
+** shackle
 https://depp.brause.cc/shackle/
 
 #+begin_src emacs-lisp
@@ -695,9 +281,9 @@ https://depp.brause.cc/shackle/
                 ("\\*Async Shell.*\\*"                      :regexp t :ignore t                          )
                 (occur-mode                    :select nil                                   :align t     :size 0.3)
                 ("*Help*"                      :select t   :inhibit-window-quit nil :other t   :align right)
-                (helpful-mode                  :select nil                                   :align right :size 0.3)
+                (helpful-mode                  :select t                                      :align right)
                 ("*Completions*"                                                  :size 0.3  :align t    )
-                ("*Messages*"                  :select nil :inhibit-window-quit nil :align right :size 0.3 :popup t)
+                ("*Messages*"                  :select nil :inhibit-window-quit nil :align below :size 0.3)
                 ("\\*[Wo]*Man.*\\*"  :regexp t :select t   :inhibit-window-quit t :other t               )
                 ("\\*poporg.*\\*"    :regexp t :select t                          :other t               )
                 ("\\`\\*helm.*?\\*\\'" :regexp t                                  :size 0.3  :align t    )
@@ -705,8 +291,12 @@ https://depp.brause.cc/shackle/
                 ("*info*"                      :select t   :inhibit-window-quit t                         :same t)
                 (magit-status-mode             :select t   :inhibit-window-quit t                         :same t)
                 (magit-log-mode                :select t   :inhibit-window-quit t                         :same t)
-  	      ("*Capture*" :select t :inhibit-window-quit nil :size 0.3 :align right)
-                (org-capture-mode :select t :inhibit-window-quit nil :align right :size 0.4)
+  	      ;; ("*Capture*" :select t :inhibit-window-quit nil :size 0.3 :align right)
+                ;; (org-capture-mode :select t :inhibit-window-quit nil :align right :size 0.4)
+                ("*Packages*" :select t :inhibit-window-quit nil :same t)
+                (pdf-outline-buffer-mode :select t :align below)
+                (eshell-mode :select t :align below :size 0.3)
+                ("*eshell*" :select t :align below :size 0.3)
                 ))
 
         (shackle-mode 1)))
@@ -783,50 +373,75 @@ https://depp.brause.cc/shackle/
 ** popper
 https://github.com/karthink/popper
 #+begin_src emacs-lisp
-  (use-package popper
-    :ensure t
-    :bind (("C-`"   . popper-toggle)
-         ("M-`"   . popper-cycle)
-         ("C-M-`" . popper-toggle-type))
-    :init
-    (setq popper-reference-buffers
-          '("\\*Messages\\*"
-            "\\*Async Shell Command\\*"
-            help-mode
-            helpful-mode
-            occur-mode
-            pass-view-mode
-            "^\\*eshell.*\\*$" eshell-mode ;; eshell as a popup
-            "^\\*shell.*\\*$"  shell-mode  ;; shell as a popup
-            ("\\*corfu\\*" . hide)
-            (compilation-mode . hide)
-            ibuffer-mode
-            debugger-mode
-            ;; derived from `fundamental-mode' and fewer than 10 lines will be considered a popup
-            (lambda (buf) (with-current-buffer buf
-                            (and (derived-mode-p 'fundamental-mode)
-                                 (< (count-lines (point-min) (point-max))
-                                    10))))
-            )
-          )
-    (popper-mode +1)
-    (popper-echo-mode +1)
-    :config
-    ;; group by project.el, projectile, directory or perspective
-    (setq popper-group-function nil)
+      (use-package popper
+        :ensure t
+        :bind (("C-`"   . popper-toggle)
+             ("M-`"   . popper-cycle)
+             ("C-M-`" . popper-toggle-type))
+        :init
+        (setq popper-reference-buffers
+              '("\\*Messages\\*"
+                "\\*Async Shell Command\\*"
+                help-mode
+                helpful-mode
+                occur-mode
+                pass-view-mode
+                eshell-mode
+                ;; "^\\*eshell.*\\*$" eshell-mode ;; eshell as a popup
+                ;; "^\\*shell.*\\*$"  shell-mode  ;; shell as a popup
+                ;; ("\\*corfu\\*" . hide)
+                (compilation-mode . hide)
+                ibuffer-mode
+                debugger-mode
+                ;; "CAPTURE-Task.org"
+                ;; derived from `fundamental-mode' and fewer than 10 lines will be considered a popup
+                (lambda (buf) (with-current-buffer buf
+                                (and (derived-mode-p 'fundamental-mode)
+                                     (< (count-lines (point-min) (point-max))
+                                        10))))
+                )
+              )
+        (popper-mode +1)
+        (popper-echo-mode +1)
+        :config
+        ;; group by project.el, projectile, directory or perspective
+        (setq popper-group-function nil)
 
-    ;; pop in child frame or not
-    (setq popper-display-function #'display-buffer-in-child-frame)
+        ;; pop in child frame or not
+        (setq popper-display-function #'display-buffer-in-child-frame)
 
-    ;; use `shackle.el' to control popup
-    (setq popper-display-control nil)
-    )
+        ;; use `shackle.el' to control popup
+        (setq popper-display-control nil)
+        )
 
+#+end_src
+
+** tab-bar
+#+begin_src emacs-lisp
+;; (tab-bar-mode 1)
+(setq tab-bar-new-button-show nil)
+(setq tab-bar-close-button-show nil)
+(setq tab-bar-show 1)
+(setq tab-bar-tab-hints t) ;; show number
+(setq tab-bar-auto-width nil) ;; 取消自动 padding 大小(29.2 引入)
+(setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right tab-bar-format-global))
+(defun my/update-tab-bar-after-theme-change (&rest _args)
+  "Update tab bar face attributes after a theme change."
+  (set-face-attribute 'tab-bar-tab nil
+                      :inherit 'doom-modeline-panel
+                      :foreground 'unspecified
+                      :background 'unspecified)
+
+  (set-face-attribute 'tab-bar nil
+                      :foreground (face-attribute 'default :foreground)))
+
+(advice-add 'load-theme :after #'my/update-tab-bar-after-theme-change)
+(my/update-tab-bar-after-theme-change)
 #+end_src
 ** tab-line
 https://www.reddit.com/r/emacs/comments/1c3oqqh/modern_tabs_in_emacs/
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 ;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
 ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
 
@@ -931,7 +546,7 @@ function."
 (unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
-    :hook (after-init . global-tab-line-mode)
+    ;; :hook (after-init . global-tab-line-mode)
     :config
 
     (defcustom tab-line-tab-min-width 10
@@ -969,7 +584,7 @@ function."
       (add-to-list 'tab-line-exclude-modes mode))
     ))
 
-(global-tab-line-mode t)
+;; (global-tab-line-mode t)
 #+end_src
 ** workgroup2
 #+begin_src emacs-lisp
@@ -1004,7 +619,7 @@ function."
     ;;   (require ' desktop-recover)
     ;;   ;; optionallly:
     ;;   (setq desktop-recover-location
-    ;;         (desktop-recover-fixdir "~/.emacs.d/var/desktop/")) 
+    ;;         (desktop-recover-fixdir "~/.emacs.d/var/desktop/"))
     ;;   ;; Brings up the interactive buffer restore menu
     ;;   (desktop-recover-interactive)
     ;;   ;; Note that after using this menu, your desktop will be saved
@@ -1016,12 +631,12 @@ function."
 #+end_src
 * Gptel -AI copilot
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/copilot.el-main")
-  (require 'copilot)
-  (add-hook 'prog-mode-hook 'copilot-mode)
-  ;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "M-w") 'copilot-accept-completion-by-word)
-  (define-key copilot-completion-map (kbd "M-q") 'copilot-accept-completion-by-line)
+  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/copilot.el-main")
+  ;; (require 'copilot)
+  ;; (add-hook 'prog-mode-hook 'copilot-mode)
+  ;; ;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  ;; (define-key copilot-completion-map (kbd "M-w") 'copilot-accept-completion-by-word)
+  ;; (define-key copilot-completion-map (kbd "M-q") 'copilot-accept-completion-by-line)
 
   (use-package gptel
     :ensure t
@@ -1055,15 +670,21 @@ function."
 
     )
 
-  (use-package immersive-translate
-    :ensure t
-    :config
-    (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
-    (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
-    )
-  (setq immersive-translate-backend 'DeepSeek
-        immersive-translate-chatgpt-host "api.deepseek.com")
-
+  ;; (use-package immersive-translate
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
+  ;;   (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
+  ;;   )
+  ;; (setq immersive-translate-backend 'DeepSeek
+  ;;       immersive-translate-chatgpt-host "api.deepseek.com")
+(require 'go-translate)
+;; (setq gt-langs '(en fr))
+(setq gt-preset-translators
+      `((ts-1 . ,(gt-translator
+                  :taker (gt-taker :langs '(en zh) :text 'buffer)
+                  :engines (list (gt-google-engine))
+                  :render (gt-overlay-render)))))
 #+end_src
 
 #+RESULTS:
@@ -1080,7 +701,11 @@ function."
 
 * Reading
 ** Common
-*** Shrface
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/pos-tag-highlight")
+  (require 'pos-tag-highlight)
+#+end_src
+** Shrface
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'nov
@@ -1092,161 +717,236 @@ function."
   (define-key nov-mode-map (kbd "M-l") 'shrface-links-counsel) ; or 'shrface-links-helm or 'shrface-links-consult
   (define-key nov-mode-map (kbd "M-h") 'shrface-headline-consult)) ; or 'shrface-headline-helm or 'shrface-headline-consult
 #+end_src
-*** readers
+** readers
 #+begin_src emacs-lisp
-  ;;epub reading
-  (use-package nov
-    :ensure t
-    :mode ("\\.epub\\'" . nov-mode)
-    :bind (:map nov-mode-map
-                ("j" . scroll-up-line)
-                ("k" . scroll-down-line)))
+       ;;epub reading
+    (use-package eww
+    :hook (eww-mode . my-nov-font-setup))
 
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  (setq nov-text-width 80)
-  ;; (setq nov-text-width t)
-  (setq visual-fill-column-center-text t)
-  (add-hook 'nov-mode-hook 'visual-line-mode)
-  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
+    (use-package nov
+         :ensure t
+         :mode ("\\.epub\\'" . nov-mode)
+         :bind (:map nov-mode-map
+                     ("j" . scroll-up-line)
+                     ("k" . scroll-down-line)))
 
-  (defun my-nov-font-setup ()
-    (face-remap-add-relative 'variable-pitch :family "LXGW WenKai Mono Regular"
-                             :height 1.0))
-  (add-hook 'nov-mode-hook 'my-nov-font-setup)
+       (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+       (setq nov-text-width 80)
+       ;; (setq nov-text-width t)
+       (setq visual-fill-column-center-text t)
+       (add-hook 'nov-mode-hook 'visual-line-mode)
+       (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
-  ;;nov-rendering
-  (use-package justify-kp
-    :ensure t
-    :vc (:url "https://github.com/Fuco1/justify-kp"))
-  (setq nov-text-width t)
+       (add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-  (defun my-nov-window-configuration-change-hook ()
-    (my-nov-post-html-render-hook)
-    (remove-hook 'window-configuration-change-hook
-                 'my-nov-window-configuration-change-hook
-                 t))
-  (defun my-nov-post-html-render-hook ()
-    (if (get-buffer-window)
-        (let ((max-width (pj-line-width))
-              buffer-read-only)
-          (save-excursion
-            (goto-char (point-min))
-            (while (not (eobp))
-              (when (not (looking-at "^[[:space:]]*$"))
-                (goto-char (line-end-position))
-                (when (> (shr-pixel-column) max-width)
-                  (goto-char (line-beginning-position))
-                  (pj-justify)))
-              (forward-line 1))))
-      (add-hook 'window-configuration-change-hook
-                'my-nov-window-configuration-change-hook
-                nil t)))
+       ;;Nov-rendering
+       (add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
+       (require 'justify-kp)
+       (use-package justify-kp
+         :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release))
 
-  (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
+       (setq nov-text-width t)
 
-  (require 'pdf-tools)
-  (pdf-tools-install)  ; Standard activation command
-  (pdf-loader-install) ; On demand loading, leads to faster startup time
+       (defun my-nov-window-configuration-change-hook ()
+         (my-nov-post-html-render-hook)
+         (remove-hook 'window-configuration-change-hook
+                      'my-nov-window-configuration-change-hook
+                      t))
+       (defun my-nov-post-html-render-hook ()
+         (if (get-buffer-window)
+             (let ((max-width (pj-line-width))
+                   buffer-read-only)
+               (save-excursion
+                 (goto-char (point-min))
+                 (while (not (eobp))
+                   (when (not (looking-at "^[[:space:]]*$"))
+                     (goto-char (line-end-position))
+                     (when (> (shr-pixel-column) max-width)
+                       (goto-char (line-beginning-position))
+                       (pj-justify)))
+                   (forward-line 1))))
+           (add-hook 'window-configuration-change-hook
+                     'my-nov-window-configuration-change-hook
+                     nil t)))
 
-  ;;calibre
-  (use-package calibredb
-    :ensure t
-    :commands calibredb
-    :bind ("\e\e b" . calibredb)
-    :config
-    (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
-    (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-    (setq calibredb-library-alist '(("~/Books/books")
-                                    ))
-    )
+       (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
 
-  ;; bing-dict
-  (use-package bing-dict :ensure t)
-  (global-set-key (kbd "C-c d") 'bing-dict-brief)
-  (setq bing-dict-vocabulary-save t)
-  (setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
+       (require 'pdf-tools)
+       (pdf-tools-install)  ; Standard activation command
+       (pdf-loader-install) ; On demand loading, leads to faster startup time
 
-  ;; google-translate
-  ;; (use-package google-translate
-  ;;   :defines (google-translate-translation-directions-alist)
-  ;;   :bind (("C-c g" . google-translate-smooth-translate))
-  ;;   :config
-  ;;   (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
-  ;; )  
+       ;; == Markdown ==
+       (use-package markdown-mode
+         :ensure t
+  ;;       :defer t
+         :init
+         (add-hook 'markdown-mode-hook 'variable-pitch-mode)
+         (add-hook 'markdown-mode-hook 'my-nov-font-setup)
+
+         :mode (("\\.text\\'" . markdown-mode)
+                ("\\.markdown\\'" . markdown-mode)
+                ("\\.md\\'" . markdown-mode))
+         :config
+         (markdown-display-inline-images)
+
+        )
+
+       (use-package flyspell
+         :defer t
+         :diminish (flyspell-mode . " φ"))
+
+       ;;calibre
+       (use-package calibredb
+         :ensure t
+         :commands calibredb
+         :bind ("\e\e b" . calibredb)
+         :config
+         (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
+         (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+         (setq calibredb-library-alist '(("~/Books/books")
+                                         ))
+         )
+
+       ;; bing-dict
+       (use-package bing-dict :ensure t)
+       (global-set-key (kbd "C-c d") 'bing-dict-brief)
+       (setq bing-dict-vocabulary-save t)
+       (setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
+
+  (defun capture-sentence-at-point ()
+  "Capture the sentence where the word at point is located."
+  (interactive)
+  (let* ((word (thing-at-point 'word))  ; Get the word at point
+         (sentence (save-excursion
+                     (let ((sentence-start (progn
+                                              (backward-sentence)  ; Move to the beginning of the sentence
+                                              (point)))
+                           (sentence-end (progn
+                                           (forward-sentence)  ; Move to the end of the sentence
+                                           (point))))
+  		     (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
+                       (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
+    (if word
+        (message "The word is: %s\nThe sentence is: %s" word sentence)
+      (message "No word found at point."))))
+
+       ;; google-translate
+       ;; (use-package google-translate
+       ;;   :defines (google-translate-translation-directions-alist)
+       ;;   :bind (("C-c g" . google-translate-smooth-translate))
+       ;;   :config
+       ;;   (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
+       ;; )
 #+end_src
 
 * Development Tools
 ** Eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure t
+    :hook (python-ts-mode . eglot-ensure)
+    :config
+    (add-to-list 'eglot-server-programs '( python-mode . ("pyright")))
+    (defun my/eglot-capf ()
+      "Set custom completion-at-point functions for Eglot."
+      (setq-local completion-at-point-functions '(eglot-completion-at-point)))
+
+    (add-hook 'eglot-managed-mode-hook #'my/eglot-capf)
+    )
+
+  ;; (use-package eglot
+  ;;   :hook (eglot-managed-mode . my-eglot-mode-hook)
+  ;;   :config
+  ;;   (setq eglot-events-buffer-size 0)
+  ;;   (setq eglot-events-buffer-config '(:size 0 :format full))
+  ;;   (setq eglot-extend-to-xref t)
+  ;;   (setq eglot-autoshutdown t)
+  ;;   (setq eglot-prefer-plaintext t)
+  ;;   (setq eglot-ignored-server-capabilities '(:documentHighlightProvider
+  ;;                                             :documentOnTypeFormattingProvider))
+  ;;   (setq jsonrpc-default-request-timeout 15)
+  ;;   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename-with-current)
+  ;;   (define-key eglot-mode-map (kbd "C-c o") 'eglot-code-action-override)
+  ;;   (define-key eglot-mode-map (kbd "C-c i") 'eglot-code-action-organize-imports)
+  ;;   (define-key eglot-mode-map (kbd "C-c h") 'eldoc-box-help-at-point)
+  ;;   (define-key eglot-mode-map (kbd "C-c w r") 'eglot-restart-workspace)
+  ;;   (define-key eglot-mode-map (kbd "C-c v") 'eglot-find-implementation)
+  ;;   (define-key eglot-mode-map (kbd "C-c f") 'eglot-code-actions-current-line)
+  ;;   (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions))
+
+#+end_src
 ** Eglot-Java
 #+begin_src emacs-lisp
   (require 'eglot)
 
     (require 'eglot-java)
-
     (add-hook 'java-mode-hook #'eglot-java-mode)
     (setq eglot-java-server-install-dir "~/codebase/src/java/eclipse.jdt.ls")
     (setq eglot-java-eclipse-jdt-cache-directory "~/tmp/eglot-eclipse-jdt-cache")
 #+end_src
 
-** Database 
+** Database
 #+begin_src emacs-lisp
 
-(require 'ejc-sql)
-(setq clomacs-httpd-default-port 8090) ; Use a port other than 8080.
-;; Require completion frontend (autocomplete or company). One of them or both.
-(require 'ejc-autocomplete)
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (auto-complete-mode t)
-            (ejc-ac-setup)))
+  ;; (require 'ejc-sql)
+  ;; (setq clomacs-httpd-default-port 8090) ; Use a port other than 8080.
+  ;; ;; Require completion frontend (autocomplete or company). One of them or both.
+  ;; (require 'ejc-autocomplete)
+  ;; (add-hook 'ejc-sql-minor-mode-hook
+  ;;           (lambda ()
+  ;;             (auto-complete-mode t)
+  ;;             (ejc-ac-setup)))
 
-(setq ejc-use-flx t)
-(setq ejc-flx-threshold 2)
-(require 'ejc-company)
-(push 'ejc-company-backend company-backends)
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (company-mode t)))
-(setq ejc-complete-on-dot t)
-;; (company-quickhelp-mode t)
-(setq ejc-completion-system 'standard)
+  ;; (setq ejc-use-flx t)
+  ;; (setq ejc-flx-threshold 2)
+  ;; (require 'ejc-company)
+  ;; (push 'ejc-company-backend company-backends)
+  ;; (add-hook 'ejc-sql-minor-mode-hook
+  ;;           (lambda ()
+  ;;             (company-mode t)))
+  ;; (setq ejc-complete-on-dot t)
+  ;; ;; (company-quickhelp-mode t)
+  ;; (setq ejc-completion-system 'standard)
 
-(add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (ejc-eldoc-setup)))
-;; Performance & output customization
-(add-hook 'ejc-sql-connected-hook
-          (lambda ()
-            (ejc-set-fetch-size 50)
-            (ejc-set-max-rows 50)
-            (ejc-set-show-too-many-rows-message t)
-            (ejc-set-column-width-limit 25)
-            (ejc-set-use-unicode t)))
-(setq ejc-result-table-impl 'ejc-result-mode)
-;; PostgreSQL example
-(ejc-create-connection
- "PostgreSQL-db-connection"
- :classpath (concat "~/.m2/repository/org.postgresql/postgresql/42.6.0/"
-                    "postgresql-42.6.0.jar")
- :subprotocol "postgresql"
- :subname "//localhost:5432/postgres"
- :user "postgres"
- :password "postgres")
+  ;; (add-hook 'ejc-sql-minor-mode-hook
+  ;;           (lambda ()
+  ;;             (ejc-eldoc-setup)))
+  ;; ;; Performance & output customization
+  ;; (add-hook 'ejc-sql-connected-hook
+  ;;           (lambda ()
+  ;;             (ejc-set-fetch-size 50)
+  ;;             (ejc-set-max-rows 50)
+  ;;             (ejc-set-show-too-many-rows-message t)
+  ;;             (ejc-set-column-width-limit 25)
+  ;;             (ejc-set-use-unicode t)))
+  ;; (setq ejc-result-table-impl 'ejc-result-mode)
+  ;; ;; PostgreSQL example
+  ;; (ejc-create-connection
+  ;;  "PostgreSQL-db-connection"
+  ;;  :classpath (concat "~/.m2/repository/org.postgresql/postgresql/42.6.0/"
+  ;;                     "postgresql-42.6.0.jar")
+  ;;  :subprotocol "postgresql"
+  ;;  :subname "//localhost:5432/postgres"
+  ;;  :user "postgres"
+  ;;  :password "postgres")
 
 #+end_src
 
 ** Tree-sitter: querying and highlighting
 #+begin_src emacs-lisp
   (require 'treesit)
+  (require 'treesit-auto)
+  (global-treesit-auto-mode t)
+  (setq treesit-auto-install 'prompt)
   (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
 #+end_src
-** origami 
+** origami
 https://github.com/gregsexton/origami.el
 #+begin_src emacs-lisp
   (use-package s
-    :vc (:url "https://github.com/magnars/s.el" :branch master))  
+    :vc (:url "https://github.com/magnars/s.el" :branch master))
   (require 'dash)
-  (use-package origami :ensure t) 
+  (use-package origami :ensure t)
     (with-eval-after-load 'origami
       (define-key origami-mode-map (kbd "C-c f") 'origami-recursively-toggle-node)
       (define-key origami-mode-map (kbd "C-c F") 'origami-toggle-all-nodes))
@@ -1254,8 +954,8 @@ https://github.com/gregsexton/origami.el
 ** hideshow-org
 #+begin_src emacs-lisp
   (use-package hideshow-org
-    :vc (:url "https://github.com/shanecelis/hideshow-org")) 
-  (global-set-key (kbd"C-c h") 'hs-org/minor-mode)   
+    :vc (:url "https://github.com/shanecelis/hideshow-org"))
+  (global-set-key (kbd"C-c h") 'hs-org/minor-mode)
 #+end_src
 
 * Emacs Dev Tools
@@ -1319,6 +1019,7 @@ https://github.com/gregsexton/origami.el
 #+begin_src emacs-lisp
 (global-aggressive-indent-mode 1)
 (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+(global-set-key "\C-h\C-f" 'find-function-at-point)
 #+end_src
 ** clojure
 #+begin_src emacs-lisp
@@ -1329,7 +1030,7 @@ https://github.com/gregsexton/origami.el
   (require 'clojure-mode)
   (setq clojure-indent-style 'always-indent
           clojure-indent-keyword-style 'always-indent
-          clojure-enable-indent-specs nil
+          clojure-enable-indent-specs nil)
 
   (require 'cljsbuild-mode)
   (require 'elein)
@@ -1367,53 +1068,72 @@ https://github.com/gregsexton/origami.el
     ;;         (flycheck-clojure-setup))))
 
 #+end_src
+** elisp
+#+begin_src emacs-lisp
 
+#+end_src
+** python
+#+begin_src emacs-lisp
+(setq tab-always-indent 'complete)
+  (setq python-indent-offset 4)
+
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (when (eq major-mode 'compilation-mode)
+    (let ((inhibit-read-only t))
+      (ansi-color-apply-on-region compilation-filter-start (point-max)))))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+#+end_src
 * Misc
-** Clearing
 #+begin_src emacs-lisp
-;; 将原本放在 .emacs.d 目录下的一些配置信息或动态信息，转移到 etc 或 var 子目录里，让配置目录更加简洁清爽
-(use-package no-littering
-  :ensure t)
-#+end_src
-(provide 'tools)
+  (auth-source-pass-enable)
 
-* Entertainment
-** EAF
-#+begin_src emacs-lisp
-;; (add-to-list 'load-path "~/codebase/src/emacs-application-framework/")
-;; (require 'eaf)
+  (custom-set-variables '(confirm-kill-processes nil))
 
-;; (require 'eaf-browser)
-;; (require 'eaf-pdf-viewer)
-;; (require 'eaf-music-player)
-;; (require 'eaf-video-player)
-;; (require 'eaf-js-video-player)
-;; (require 'eaf-image-viewer)
-;; (require 'eaf-rss-reader)
-;; (require 'eaf-terminal)
-;; (require 'eaf-markdown-previewer)
-;; (require 'eaf-org-previewer)
-;; (require 'eaf-camera)
-;; (require 'eaf-git)
-;; (require 'eaf-file-manager)
-;; (require 'eaf-mindmap)
-;; (require 'eaf-system-monitor)
-;; (require 'eaf-file-browser)
-;; (require 'eaf-file-sender)
-;; (require 'eaf-airshare)
-;; (require 'eaf-jupyter)
-;; (require 'eaf-2048)
-;; (require 'eaf-markmap)
-;; (require 'eaf-map)
-;; (require 'eaf-demo)
-;; (require 'eaf-vue-demo)
-;; (require 'eaf-vue-tailwindcss)
-;; (require 'eaf-pyqterminal)
+  (set-language-environment "UTF-8")
+  (prefer-coding-system       'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8)
 
-#+end_src
-** NetEase cloud music
-#+begin_src emacs-lisp
-(require 'netease-cloud-music)
-(require 'netease-cloud-music-ui)       ;If you want to use the default TUI, you should add this line in your configuration.
-(require 'netease-cloud-music-comment)  ;If you want comment feature
+  (require 'cl-lib)
+
+  (use-package async)
+
+  (add-hook 'before-save-hook 'time-stamp)
+
+  (custom-set-variables '(kill-whole-line t))
+
+  (custom-set-variables '(mouse-yank-at-point t))
+
+  (setq completion-ignore-case t)
+  (custom-set-variables
+   '(read-buffer-completion-ignore-case t)
+   '(read-file-name-completion-ignore-case t))
+
+  (custom-set-variables '(show-trailing-whitespace nil))
+
+  (use-package imenu-anywhere
+    :bind
+    ("M-i" . imenu-anywhere))
+
+  (use-package smooth-scrolling
+    :config
+    (smooth-scrolling-mode 1))
+
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+  (custom-set-variables '(ad-redefinition-action (quote accept)))
+
+  (bind-key "M-g" 'goto-line)
+
+  (bind-key "M-`" 'other-frame)
+
+   ;; 将原本放在 .emacs.d 目录下的一些配置信息或动态信息，转移到 etc 或 var 子目录里，让配置目录更加简洁清爽
+   (use-package no-littering
+     :ensure t)
+
+   (provide 'tool)
 #+end_src

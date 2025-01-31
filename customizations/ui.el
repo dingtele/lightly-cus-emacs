@@ -4,8 +4,8 @@
       nil
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
-(defvar zh-font-list '("LXGW WenKai Mono Regular" "TsangerJinKai 02 W04" "LXGW Bright Medium" "HanaMinB"))
-(defvar en-font-list '("iosevka term ss14" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
+(defvar zh-font-list '("LXGW Bright GB" "TsangerJinKai02 W04" "LXGW Bright Medium" "HanaMinB"))
+(defvar en-font-list '("Iosevka Fixed SS14" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 
 (defun ding-make-font-string (font-name font-size)
   (if (and (stringp font-size)
@@ -42,11 +42,20 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))))
-
-(ding-set-font en-font-list 10 zh-font-list)
+;;;;;;  SIZE HERE!!! ;;;;;;
+(ding-set-font en-font-list 14 zh-font-list)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
+;;;;;; set for reading mode ;;;;;;
+(defun my-nov-font-setup ()
+  (face-remap-add-relative 'variable-pitch
+                           ;;                           :family "LXGW WenKai Mono Regular"
+                           :family "LXGW Bright GB"
+                           :height 1.4)
+  )
+
 (menu-bar-mode -1)
+
 ;; Set up the visible bell
 (setq visible-bell t)
 ;; Go straight to scratch buffer on startup
@@ -72,6 +81,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 ;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(undecorated . t))
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -106,7 +116,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (add-to-list 'load-path "~/.emacs.d/themes")
 (require 'ef-themes)
 
-(setq-default custom-enabled-themes '(ef-trio-light))
+(setq-default custom-enabled-themes '(doom-one-light))
 ;; (setq-default custom-enabled-themes '(doom-tokyo-night))
 
 ;; Ensure that themes will be applied even if they have not been customized
@@ -133,7 +143,7 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   "Activate a dark color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(ef-winter doom-palenight))
+  (setq custom-enabled-themes '(doom-one ef-winter doom-palenight))
   (reapply-themes))
 
 (use-package nerd-icons
@@ -206,5 +216,39 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
+
+(use-package hl-todo
+  :ensure t
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO"   . "#FF0000")
+          ("PERF" . "#4EEE85")
+          ("FIXME"  . "#FF0000")
+          ("DEBUG"  . "#A020F0")
+          ("GOTCHA" . "#FF4500")
+          ("STUB"   . "#1E90FF")))
+  (global-hl-todo-mode))
+
+(use-package paren
+  :custom-face (show-paren-match ((t (:foreground "purple" :underline t :weight bold))))
+  :config
+  (setq show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t
+        show-paren-context-when-offscreen t
+        show-paren-delay 0.2)
+  )
+
+(defun exec/lsp-mode-string()
+  (concat
+   (propertize " test "
+               'face '(:foreground "white" :background "brown"))
+   (propertize
+    (format (if (derived-mode-p 'emacs-lisp-mode)
+                " on  "" off "))
+    'face '(:foreground "white" :background "gray40"))))
+
+(add-to-list 'header-line-format '(:eval (exec/lsp-mode-string)) t)
+
+(setq-default header-line-format  '("" keycast-header-line (:eval (exec/lsp-mode-string))))
 
 (provide 'ui)

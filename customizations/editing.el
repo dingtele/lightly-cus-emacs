@@ -1,7 +1,8 @@
 ;; Customizations relating to editing a buffer.
 
 ;; auto completion of function name
-(global-set-key (kbd "M-/") 'hippie-expand)
+(bind-key "M-/" 'hippie-expand)
+;; (global-set-key "\M- " 'hippie-expand)
 (setq hippie-expand-try-functions-list  
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
@@ -9,7 +10,6 @@
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
 ;; Highlights matching parenthesis(highlight paren or expression)
-(show-paren-mode 1)
 
 ;; Highlight current line
 (global-hl-line-mode 1)
@@ -20,10 +20,13 @@
 ;; When you visit a file, point goes to the last place where it
 ;; was when you previously visited the same file.
 ;; http://www.emacswiki.org/emacs/SavePlace
-(require 'saveplace)
-(save-place-mode 1)
-;; keep track of saved places in ~/.emacs.d/places
-(setq save-place-file (concat user-emacs-directory "places"))
+(use-package saveplace
+  :defer nil
+  :config
+  (save-place-mode)
+  ;; keep track of saved places in ~/.emacs.d/places
+  (setq save-place-file (concat user-emacs-directory "places")))
+
 
 ;; Emacs can automatically create backup files. This tells Emacs to
 ;; put all backups in ~/.emacs.d/backups. More info:
@@ -86,9 +89,7 @@
 (global-set-key (kbd "M-o") 'other-window)
 (windmove-default-keybindings)
 
-(use-package clipetty
-  :ensure t
-  :bind ("M-w" . clipetty-kill-ring-save))
+
 
 ;;key-bindings
 (defun select-current-line ()
@@ -182,8 +183,6 @@
     (buffer-substring-no-properties (region-beginning) (region-end))))
 
 (global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
-
-
 
 
 (provide 'editing)

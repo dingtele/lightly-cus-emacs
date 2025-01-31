@@ -16,24 +16,7 @@
 ;; (setq recentf-max-menu-items 40)
 
 ;; projectile everywhere!
-;(projectile-global-mode)
-
-(use-package corfu
-  :ensure t
-  :init
-  (progn
-    (setq corfu-auto t)
-    (setq corfu-cycle t)
-    (setq corfu-quit-at-boundary t)
-    (setq corfu-quit-no-match t)
-    (setq corfu-preview-current nil)
-    (setq corfu-min-width 80)
-    (setq corfu-max-width 100)
-    (setq corfu-auto-delay 0.2)
-    (setq corfu-auto-prefix 1)
-    (setq corfu-on-exact-match nil)
-    (global-corfu-mode)
-    ))
+                                        ;(projectile-global-mode)
 
 (use-package ibuffer
   :ensure nil
@@ -45,18 +28,18 @@
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :config
   ;; Whether display the icons.
-(setq nerd-icons-ibuffer-icon t)
-(setq nerd-icons-ibuffer-color-icon t)
-(setq nerd-icons-ibuffer-icon-size 1.0)
-(setq  nerd-icons-ibuffer-human-readable-size t)
-;; A list of ways to display buffer lines with `nerd-icons'.
-;; See `ibuffer-formats' for details.
-nerd-icons-ibuffer-formats
+  (setq nerd-icons-ibuffer-icon t)
+  (setq nerd-icons-ibuffer-color-icon t)
+  (setq nerd-icons-ibuffer-icon-size 1.0)
+  (setq  nerd-icons-ibuffer-human-readable-size t)
+  ;; A list of ways to display buffer lines with `nerd-icons'.
+  ;; See `ibuffer-formats' for details.
+  ;; nerd-icons-ibuffer-formats
 
-;; Slow Rendering
-;; If you experience a slow down in performance when rendering multiple icons simultaneously,
-;; you can try setting the following variable
-(setq inhibit-compacting-font-caches t))
+  ;; Slow Rendering
+  ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+  ;; you can try setting the following variable
+  (setq inhibit-compacting-font-caches t))
 
 (use-package ibuffer-project
   :hook (ibuffer . (lambda ()
