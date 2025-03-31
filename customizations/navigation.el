@@ -23,23 +23,23 @@
   :bind ("C-x C-b" . ibuffer)
   :init (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold))))
 
-(use-package nerd-icons-ibuffer
-  :ensure t
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
-  :config
-  ;; Whether display the icons.
-  (setq nerd-icons-ibuffer-icon t)
-  (setq nerd-icons-ibuffer-color-icon t)
-  (setq nerd-icons-ibuffer-icon-size 1.0)
-  (setq  nerd-icons-ibuffer-human-readable-size t)
-  ;; A list of ways to display buffer lines with `nerd-icons'.
-  ;; See `ibuffer-formats' for details.
-  ;; nerd-icons-ibuffer-formats
+ (use-package nerd-icons-ibuffer
+   :ensure t
+   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+   :config
+   ;; Whether display the icons.
+   (setq nerd-icons-ibuffer-icon t)
+   (setq nerd-icons-ibuffer-color-icon t)
+   (setq nerd-icons-ibuffer-icon-size 1.0)
+   (setq  nerd-icons-ibuffer-human-readable-size t)
+   ;; A list of ways to display buffer lines with `nerd-icons'.
+   ;; See `ibuffer-formats' for details.
+   ;; nerd-icons-ibuffer-formats
 
-  ;; Slow Rendering
-  ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
-  ;; you can try setting the following variable
-  (setq inhibit-compacting-font-caches t))
+   ;; Slow Rendering
+   ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+   ;; you can try setting the following variable
+   (setq inhibit-compacting-font-caches t))
 
 (use-package ibuffer-project
   :hook (ibuffer . (lambda ()
@@ -55,24 +55,24 @@
         (format "%s %s" type root)
       (format "%s" root)))
   (progn
-        (advice-add #'ibuffer-project-group-name :override #'my-ibuffer-project-group-name)
-        (setq ibuffer-project-root-functions
-              `((ibuffer-project-project-root . ,(nerd-icons-octicon "nf-oct-repo" :height 1.2 :face ibuffer-filter-group-name-face))
-                (file-remote-p . ,(nerd-icons-codicon "nf-cod-radio_tower" :height 1.2 :face ibuffer-filter-group-name-face)))))
-    (progn
-      (advice-remove #'ibuffer-project-group-name #'my-ibuffer-project-group-name)
-      (setq ibuffer-project-root-functions
-            '((ibuffer-project-project-root . "Project")
-              (file-remote-p . "Remote"))))
-    (setq ibuffer-formats
-      '((mark modified read-only " "
-              (name 18 18 :left :elide)
-              " "
-              (size 9 -1 :right)
-              " "
-              (mode 16 16 :left :elide)
-              " "
-              project-relative-file))))
+    (advice-add #'ibuffer-project-group-name :override #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          `((ibuffer-project-project-root . ,(nerd-icons-octicon "nf-oct-repo" :height 1.2 :face ibuffer-filter-group-name-face))
+            (file-remote-p . ,(nerd-icons-codicon "nf-cod-radio_tower" :height 1.2 :face ibuffer-filter-group-name-face)))))
+  (progn
+    (advice-remove #'ibuffer-project-group-name #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          '((ibuffer-project-project-root . "Project")
+            (file-remote-p . "Remote"))))
+  (setq ibuffer-formats
+        '((mark modified read-only " "
+                (name 18 18 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                project-relative-file))))
 
 
 ;; (use-package buffer-name-relative-mode
@@ -81,7 +81,7 @@
 ;;   :hook (after-init . buffer-name-relative-mode)
 ;;   :config
 ;;   (setq buffer-name-relative-prefix '("" . "/")))
- 
+
 ;; (use-package ibuffer-sidebar
 ;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"
 ;;   :ensure nil
@@ -95,5 +95,53 @@
 ;;   (interactive)
 ;;   (dired-sidebar-toggle-sidebar)
 ;;   (ibuffer-sidebar-toggle-sidebar))
+
+(defun zz/goto-match-paren (arg)
+  "Go to the matching paren/bracket, otherwise (or if ARG is not
+    nil) insert %.  vi style of % jumping to matching brace."
+  (interactive "p")
+  (if (not (memq last-command '(set-mark
+                                cua-set-mark
+                                zz/goto-match-paren
+                                down-list
+                                up-list
+                                end-of-defun
+                                beginning-of-defun
+                                backward-sexp
+                                forward-sexp
+                                backward-up-list
+                                forward-paragraph
+                                backward-paragraph
+                                end-of-buffer
+                                beginning-of-buffer
+                                backward-word
+                                forward-word
+                                mwheel-scroll
+                                backward-word
+                                forward-word
+                                mouse-start-secondary
+                                mouse-yank-secondary
+                                mouse-secondary-save-then-kill
+                                move-end-of-line
+                                move-beginning-of-line
+                                backward-char
+                                forward-char
+                                scroll-up
+                                scroll-down
+                                scroll-left
+                                scroll-right
+                                mouse-set-point
+                                next-buffer
+                                previous-buffer
+                                previous-line
+                                next-line
+                                back-to-indentation
+                                )))
+      (self-insert-command (or arg 1))
+    (cond ((looking-at "\\s\(") (sp-forward-sexp) (backward-char 1))
+          ((looking-at "\\s\)") (forward-char 1) (sp-backward-sexp))
+          (t (self-insert-command (or arg 1))))))
+
+(bind-key "%" 'zz/goto-match-paren)
 
 (provide 'navigation)

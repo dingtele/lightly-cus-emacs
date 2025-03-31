@@ -1,18 +1,14 @@
 ;; Customizations relating to editing a buffer.
 
 ;; auto completion of function name
-(bind-key "M-/" 'hippie-expand)
+(bind-key "C-<tab>" 'hippie-expand)
 ;; (global-set-key "\M- " 'hippie-expand)
-(setq hippie-expand-try-functions-list  
+(setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-;; Highlights matching parenthesis(highlight paren or expression)
-
-;; Highlight current line
-(global-hl-line-mode 1)
 
 ;; Don't use hard tabs
 (setq-default indent-tabs-mode nil)
@@ -46,7 +42,7 @@
   (set-variable 'tab-width 4)
   (mark-whole-buffer)
   (untabify (region-beginning) (region-end))
-  (keyboard-quit))                     
+  (keyboard-quit))
 
 ;; fix weird os x kill error
 (defun ns-get-pasteboard ()
@@ -159,23 +155,23 @@
          (pos-end pos-start))
     ;; Move backward until we find the start of the sentence
     (skip-syntax-backward "-")
-    
+
     ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
     (when (eq (char-before) nil)
       (setq pos-start (point-min)))
-    
+
     ;; Move forward until we find the end of the sentence
     (skip-syntax-forward "w")
-    
+
     ;; Mark the beginning of the sentence area
     (set-mark-command nil)
-    
+
     ;; Save the current buffer position and mark as the end position
     (setq pos-end (point))
-    
+
     ;; Go back to the start of the sentence
     (goto-char pos-start)
-    
+
     ;; Select the marked area
     (exchange-point-and-mark)
 
