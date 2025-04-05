@@ -123,27 +123,203 @@
 ** modules loading
 #+begin_src emacs-lisp
 
-    (add-to-list 'load-path "~/.emacs.d/vendor")
-    (add-to-list 'load-path "~/.emacs.d/customizations")
-    (add-to-list 'load-path "~/.emacs.d/site-lisp/")
+   (add-to-list 'load-path "~/.emacs.d/vendor")
+   (add-to-list 'load-path "~/.emacs.d/customizations")
+   (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 
-;;  (require 'init-const)
-;;  (require 'init-custom)
-;; (require 'init-funcs)
-    (require 'editing) ;; F2
-    (require 'ui) ;; F4
-    ;; (require 'shell-integration)
-    (require 'navigation) ;;  F3
-    (require 'misc)
-    ;; (require 'init-site-lisp)
-    (require 'init-core-overriding)
-    ;; ;; Langauage-specific
-    ;; (require 'elisp-editing)
-    (require 'init-minibuffer-completion)
-   (require 'init-org)
+   (require 'ui) ;; F4
+   ;; (require 'shell-integration)
+   (require 'misc)
+   ;; (require 'init-site-lisp)
+   (require 'init-core-overriding)
+   ;; ;; Langauage-specific
+   ;; (require 'elisp-editing)
+   (require 'init-minibuffer-completion)
+  (require 'init-org)
 #+end_src
 * Editing & KeyBinding
 #+begin_src emacs-lisp
+;; auto completion of function name
+(bind-key "C-<tab>" 'hippie-expand)
+;; (global-set-key "\M- " 'hippie-expand)
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
+
+;; Don't use hard tabs
+(setq-default indent-tabs-mode nil)
+(set-variable 'tab-width 4)
+;; When you visit a file, point goes to the last place where it
+;; was when you previously visited the same file.
+;; http://www.emacswiki.org/emacs/SavePlace
+(use-package saveplace
+  :defer nil
+  :config
+  (save-place-mode)
+  ;; keep track of saved places in ~/.emacs.d/places
+  (setq save-place-file (concat user-emacs-directory "places")))
+
+
+;; Emacs can automatically create backup files. This tells Emacs to
+;; put all backups in ~/.emacs.d/backups. More info:
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Backup-Files.html
+(setq backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                               "backups"))))
+
+(use-package evil-nerd-commenter
+  :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+
+(delete-selection-mode t)
+
+;; use 2 spaces for tabs
+(defun die-tabs ()
+  (interactive)
+  (set-variable 'tab-width 4)
+  (mark-whole-buffer)
+  (untabify (region-beginning) (region-end))
+  (keyboard-quit))
+
+;; fix weird os x kill error
+(defun ns-get-pasteboard ()
+  "Returns the value of the pasteboard, or nil for unsupported formats."
+  (condition-case nil
+      (ns-get-selection-internal 'CLIPBOARD)
+    (quit nil)))
+
+(setq electric-indent-mode nil)
+
+(defun previous-multilines ()
+  "scroll down multiple lines"
+  (interactive)
+  (scroll-down (/ (window-body-height) 3)))
+
+(defun next-multilines ()
+  "scroll up multiple lines"
+  (interactive)
+  (scroll-up (/ (window-body-height) 3)))
+
+(global-set-key "\M-n" 'next-multilines) ;;custom
+(global-set-key "\M-p" 'previous-multilines) ;;custom
+;; Move line up
+(defun move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (previous-line 2))
+
+;; Move line down
+(defun move-line-down ()
+  (interactive)
+  (next-line 1)
+  (transpose-lines 1)
+  (previous-line 1))
+
+;; Assign the custom keybindings
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
+
+(global-set-key (kbd "M-o") 'other-window)
+(windmove-default-keybindings)
+
+
+
+;;key-bindings
+(defun select-current-line ()
+  "Select the line at the current cursor position."
+  (interactive)
+  (let ((line-begin (line-beginning-position))
+        (line-end (line-end-position)))
+    (goto-char line-begin)
+    (set-mark line-end)))
+
+(global-set-key (kbd "C-c C-s") 'select-current-line)
+;; (defun find-file()
+;;   (kbd "C-x C-f"))
+;; (global-set-key (kbd "C-f") 'find-file)
+(global-set-key (kbd "C-x g") 'magit-status)
+;; Shift lines up and down withM-up and M-down. When paredit is enabled,
+;; it will use those keybindings. For this reason, you might prefer to
+;; use M-S-up and M-S-down, which will work even in lisp modes.
+
+
+;; (eval(define-key dired-mode-map "c" 'find-file)
+
+(defun add-space-between-chinese-and-english ()
+  "在中英文之间自动添加空格check。"
+  (let ((current-char (char-before))
+        (prev-char (char-before (1- (point)))))
+    (when (and current-char prev-char
+               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
+                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
+      (save-excursion
+        (goto-char (1- (point)))
+        (insert " "))))
+  )
+(add-hook 'after-init-hook #'add-space-between-chinese-and-english)
+
+(defun is-chinese-character (char)
+  "判断字符是否为中文字符。"
+  (and char (or (and (>= char #x4e00) (<= char #x9fff))
+                (and (>= char #x3400) (<= char #x4dbf))
+                (and (>= char #x20000) (<= char #x2a6df))
+                (and (>= char #x2a700) (<= char #x2b73f))
+                (and (>= char #x2b740) (<= char #x2b81f))
+                (and (>= char #x2b820) (<= char #x2ceaf)))))
+
+(defun is-halfwidth-character (char)
+  "判断字符是否为半角字符，包括英文字母、数字和标点符号。"
+  (and char (or (and (>= char ?a) (<= char ?z))
+                (and (>= char ?A) (<= char ?Z))
+                (and (>= char ?0) (<= char ?9))
+                )))
+
+(defun delayed-add-space-between-chinese-and-english ()
+  "延迟执行，在中英文之间自动添加空格。"
+  (run-with-idle-timer 0 nil 'add-space-between-chinese-and-english))
+
+(define-minor-mode auto-space-mode
+  "在中英文之间自动添加空格的模式。"
+  :lighter " Auto-Space"
+  :global t
+  (if auto-space-mode️
+      (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)
+    (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)))
+
+(defun get-sentence-around-word ()
+  "Capture the sentence around the current word."
+  (interactive)
+  (let* ((pos-start (point))
+         (pos-end pos-start))
+    ;; Move backward until we find the start of the sentence
+    (skip-syntax-backward "-")
+
+    ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
+    (when (eq (char-before) nil)
+      (setq pos-start (point-min)))
+
+    ;; Move forward until we find the end of the sentence
+    (skip-syntax-forward "w")
+
+    ;; Mark the beginning of the sentence area
+    (set-mark-command nil)
+
+    ;; Save the current buffer position and mark as the end position
+    (setq pos-end (point))
+
+    ;; Go back to the start of the sentence
+    (goto-char pos-start)
+
+    ;; Select the marked area
+    (exchange-point-and-mark)
+
+    ;; Return the text within the sentence area
+    (buffer-substring-no-properties (region-beginning) (region-end))))
+
+(global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
+
     ;; (require 'evil)
     ;; (evil-mode nil)
     (defun meow-setup ()
@@ -415,6 +591,87 @@ https://github.com/abo-abo/hydra
   ("k" move-line-down "down")
   ("f" nil "finished" :exit t))
 ;; hercules arrives with any other key binding
+#+end_src
+* Ibuffer
+#+begin_src emacs-lisp
+(use-package ibuffer
+  :ensure nil
+  :bind ("C-x C-b" . ibuffer)
+  :init (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold))))
+
+ (use-package nerd-icons-ibuffer
+   :ensure t
+   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+   :config
+   ;; Whether display the icons.
+   (setq nerd-icons-ibuffer-icon t)
+   (setq nerd-icons-ibuffer-color-icon t)
+   (setq nerd-icons-ibuffer-icon-size 1.0)
+   (setq  nerd-icons-ibuffer-human-readable-size t)
+   ;; A list of ways to display buffer lines with `nerd-icons'.
+   ;; See `ibuffer-formats' for details.
+   ;; nerd-icons-ibuffer-formats
+
+   ;; Slow Rendering
+   ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+   ;; you can try setting the following variable
+   (setq inhibit-compacting-font-caches t))
+
+(use-package ibuffer-project
+  :hook (ibuffer . (lambda ()
+                     "Group ibuffer's list by project."
+                     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+                     (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                       (ibuffer-do-sort-by-project-file-relative))))
+  :init (setq ibuffer-project-use-cache t)
+  :config
+  (defun my-ibuffer-project-group-name (root type)
+    "Return group name for project ROOT and TYPE."
+    (if (and (stringp type) (> (length type) 0))
+        (format "%s %s" type root)
+      (format "%s" root)))
+  (progn
+    (advice-add #'ibuffer-project-group-name :override #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          `((ibuffer-project-project-root . ,(nerd-icons-octicon "nf-oct-repo" :height 1.2 :face ibuffer-filter-group-name-face))
+            (file-remote-p . ,(nerd-icons-codicon "nf-cod-radio_tower" :height 1.2 :face ibuffer-filter-group-name-face)))))
+  (progn
+    (advice-remove #'ibuffer-project-group-name #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          '((ibuffer-project-project-root . "Project")
+            (file-remote-p . "Remote"))))
+  (setq ibuffer-formats
+        '((mark modified read-only " "
+                (name 18 18 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                project-relative-file))))
+
+
+;; (use-package buffer-name-relative-mode
+;;   :ensure t
+;;   :vc (:url "https://codeberg.org/ideasman42/emacs-buffer-name-relative" :branch "main")
+;;   :hook (after-init . buffer-name-relative-mode)
+;;   :config
+;;   (setq buffer-name-relative-prefix '("" . "/")))
+
+;; (use-package ibuffer-sidebar
+;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"
+;;   :ensure nil
+;;   :commands (ibuffer-sidebar-toggle-sidebar)
+;;   :config
+;;   (setq ibuffer-sidebar-use-custom-font t)
+;;   (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
+
+;; (defun +sidebar-toggle ()q
+;;   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
+;;   (interactive)
+;;   (dired-sidebar-toggle-sidebar)
+;;   (ibuffer-sidebar-toggle-sidebar))
+
 #+end_src
 * Org-mode
 ** org-cap
@@ -1464,111 +1721,110 @@ https://github.com/karthink/popper
 https://www.reddit.com/r/emacs/comments/1c3oqqh/modern_tabs_in_emacs/
 
 #+begin_src emacs-lisp
-;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
-;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+  ;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+  ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
 
-(defun my/set-tab-theme ()
-  (let ((bg (face-attribute 'mode-line :background))
-        (fg (face-attribute 'default :foreground))
-	(hg (face-attribute 'default :background))
-        (base (face-attribute 'mode-line :background))
-        (box-width (/ (line-pixel-height) 4)))
-    (set-face-attribute 'tab-line nil
-			:background base
-			:foreground fg
-			:height 0.8
-			:inherit nil
-			:box (list :line-width -1 :color base)
-			)
-    (set-face-attribute 'tab-line-tab nil
-			:foreground fg
-			:background bg
-			:weight 'normal
-			:inherit nil
-			:box (list :line-width box-width :color bg))
-    (set-face-attribute 'tab-line-tab-inactive nil
-			:foreground fg
-			:background base
-			:weight 'normal
-			:inherit nil
-			:box (list :line-width box-width :color base))
-    (set-face-attribute 'tab-line-highlight nil
-			:foreground fg
-			:background hg
-			:weight 'normal
-			:inherit nil
-			:box (list :line-width box-width :color hg))
-    (set-face-attribute 'tab-line-tab-current nil
-			:foreground fg
-			:background hg
-			:weight 'normal
-			:inherit nil
-			:box (list :line-width box-width :color hg))))
+  (defun my/set-tab-theme ()
+    (let ((bg (face-attribute 'mode-line :background))
+          (fg (face-attribute 'default :foreground))
+    	(hg (face-attribute 'default :background))
+          (base (face-attribute 'mode-line :background))
+          (box-width (/ (line-pixel-height) 4)))
+      (set-face-attribute 'tab-line nil
+    			:background base
+    			:foreground fg
+    			:height 0.8
+    			:inherit nil
+    			:box (list :line-width -1 :color base)
+    			)
+      (set-face-attribute 'tab-line-tab nil
+    			:foreground fg
+    			:background bg
+    			:weight 'normal
+    			:inherit nil
+    			:box (list :line-width box-width :color bg))
+      (set-face-attribute 'tab-line-tab-inactive nil
+    			:foreground fg
+    			:background base
+    			:weight 'normal
+    			:inherit nil
+    			:box (list :line-width box-width :color base))
+      (set-face-attribute 'tab-line-highlight nil
+    			:foreground fg
+    			:background hg
+    			:weight 'normal
+    			:inherit nil
+    			:box (list :line-width box-width :color hg))
+      (set-face-attribute 'tab-line-tab-current nil
+    			:foreground fg
+    			:background hg
+    			:weight 'normal
+    			:inherit nil
+    			:box (list :line-width box-width :color hg))))
 
-(defun my/tab-line-name-buffer (buffer &rest _buffers)
-  "Create name for tab with padding and truncation.
-If buffer name is shorter than `tab-line-tab-max-width' it gets
-centered with spaces, otherwise it is truncated, to preserve
-equal width for all tabs.  This function also tries to fit as
-many tabs in window as possible, so if there are no room for tabs
-with maximum width, it calculates new width for each tab and
-truncates text if needed.  Minimal width can be set with
-`tab-line-tab-min-width' variable."
-  (with-current-buffer buffer
-    (let* ((window-width (window-width (get-buffer-window)))
-           (tab-amount (length (tab-line-tabs-window-buffers)))
-           (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
-                                     (/ window-width tab-amount)
-                                   tab-line-tab-max-width))
-           (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
-                                tab-line-tab-max-width)
-                               ((< window-max-tab-width tab-line-tab-min-width)
-                                tab-line-tab-min-width)
-                               (t window-max-tab-width))
-                         3)) ;; compensation for ' x ' button
-           (buffer-name (string-trim (buffer-name)))
-           (name-width (length buffer-name)))
-      (if (>= name-width tab-width)
-          (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
-        (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
-               (buffer-name (concat padding buffer-name)))
-          (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+  (defun my/tab-line-name-buffer (buffer &rest _buffers)
+    "Create name for tab with padding and truncation.
+    If buffer name is shorter than `tab-line-tab-max-width' it gets
+    centered with spaces, otherwise it is truncated, to preserve
+    equal width for all tabs.  This function also tries to fit as
+    many tabs in window as possible, so if there are no room for tabs
+    with maximum width, it calculates new width for each tab and
+    truncates text if needed.  Minimal width can be set with
+    `tab-line-tab-min-width' variable."
+    (with-current-buffer buffer
+      (let* ((window-width (window-width (get-buffer-window)))
+             (tab-amount (length (tab-line-tabs-window-buffers)))
+             (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                       (/ window-width tab-amount)
+                                     tab-line-tab-max-width))
+             (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                  tab-line-tab-max-width)
+                                 ((< window-max-tab-width tab-line-tab-min-width)
+                                  tab-line-tab-min-width)
+                                 (t window-max-tab-width))
+                           3)) ;; compensation for ' x ' button
+             (buffer-name (string-trim (buffer-name)))
+             (name-width (length buffer-name)))
+        (if (>= name-width tab-width)
+            (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+          (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                 (buffer-name (concat padding buffer-name)))
+            (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
 
-(defun tab-line-close-tab (&optional e)
-  "Close the selected tab.
-If tab is presented in another window, close the tab by using
-`bury-buffer` function.  If tab is unique to all existing
-windows, kill the buffer with `kill-buffer` function.  Lastly, if
-no tabs left in the window, it is deleted with `delete-window`
-function."
-  (interactive "e")
-  (let* ((posnp (event-start e))
-         (window (posn-window posnp))
-         (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-    (with-selected-window window
-      (let ((tab-list (tab-line-tabs-window-buffers))
-            (buffer-list (flatten-list
-                          (seq-reduce (lambda (list window)
-                                        (select-window window t)
-                                        (cons (tab-line-tabs-window-buffers) list))
-                                      (window-list) nil))))
-        (select-window window)
-        (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-            (progn
-              (if (eq buffer (current-buffer))
-                  (bury-buffer)
-                (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                (set-window-next-buffers window (delq buffer (window-next-buffers))))
-              (unless (cdr tab-list)
-                (ignore-errors (delete-window window))))
-          (and (kill-buffer buffer)
-               (unless (cdr tab-list)
-                 (ignore-errors (delete-window window)))))))))
+  (defun tab-line-close-tab (&optional e)
+    "Close the selected tab.
+    If tab is presented in another window, close the tab by using
+    `bury-buffer` function.  If tab is unique to all existing
+    windows, kill the buffer with `kill-buffer` function.  Lastly, if
+    no tabs left in the window, it is deleted with `delete-window`
+    function."
+    (interactive "e")
+    (let* ((posnp (event-start e))
+           (window (posn-window posnp))
+           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+      (with-selected-window window
+        (let ((tab-list (tab-line-tabs-window-buffers))
+              (buffer-list (flatten-list
+                            (seq-reduce (lambda (list window)
+                                          (select-window window t)
+                                          (cons (tab-line-tabs-window-buffers) list))
+                                        (window-list) nil))))
+          (select-window window)
+          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+              (progn
+                (if (eq buffer (current-buffer))
+                    (bury-buffer)
+                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                (unless (cdr tab-list)
+                  (ignore-errors (delete-window window))))
+            (and (kill-buffer buffer)
+                 (unless (cdr tab-list)
+                   (ignore-errors (delete-window window)))))))))
 
-(unless (version< emacs-version "27")
   (use-package tab-line
     :ensure nil
-    ;; :hook (after-init . global-tab-line-mode)
+    :hook (after-init . global-tab-line-mode)
     :config
 
     (defcustom tab-line-tab-min-width 10
@@ -1604,9 +1860,12 @@ function."
     ;;(add-to-list 'tab-line-exclude-modes mode))
     (dolist (mode '(ediff-mode process-menu-mode))
       (add-to-list 'tab-line-exclude-modes mode))
-    ))
 
-;; (global-tab-line-mode t)
+    (use-package sort-tab
+      :vc (:url "https://github.com/manateelazycat/sort-tab"))
+    )
+
+  ;; (global-tab-line-mode t)
 #+end_src
 
 ** persp-mode
@@ -1631,27 +1890,41 @@ function."
 ** desktop save/restore/recovery
 #+begin_src emacs-lisp
 
-    ;; Restore Opened Files
-    ;; (progn
-    ;;   (desktop-save-mode 1)
-    ;;   ;; save when quit
-    ;;   (setq desktop-save t)
+  (use-package auto-save
+    :vc (:url "https://github.com/manateelazycat/auto-save")
+    :config
+    (auto-save-enable)
+    (setq auto-save-silent t)   ; quietly save
+    (setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
+  ;;; custom predicates if you don't want auto save.
+  ;;; disable auto save mode when current filetype is an gpg file.
+    (setq auto-save-disable-predicates
+          '((lambda ()
+              (string-suffix-p
+               "gpg"
+               (file-name-extension (buffer-name)) t)))))
 
-    ;;   ;; no ask if crashed
-    ;;   (setq desktop-load-locked-desktop t)
-    ;;   (setq desktop-restore-frames t)
-    ;;   (setq desktop-auto-save-timeout 300)
+  ;; Restore Opened Files
+  (progn
+    (desktop-save-mode 1)
+    ;; save when quit
+    (setq desktop-save t)
 
-    ;;   ;; save some global vars
-    ;;   (setq desktop-globals-to-save nil)
-    ;;   ;; 2023-09-16 default
-    ;;   ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
-    ;;   (setq desktop-dirname "~/.emacs.d/var/desktop/")
-    ;; )
+    ;; no ask if crashed
+    (setq desktop-load-locked-desktop t)
+    (setq desktop-restore-frames t)
+    (setq desktop-auto-save-timeout 300)
 
-    ;; (progn
-    ;;   (require ' desktop-recover)
-    ;;   ;; optionallly:
+    ;; save some global vars
+    (setq desktop-globals-to-save nil)
+    ;; 2023-09-16 default
+    ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
+    (setq desktop-dirname "~/.emacs.d/var/desktop/")
+    )
+
+  (progn
+    (require ' desktop-recover)
+    ;; optionallly:
     ;;   (setq desktop-recover-location
     ;;         (desktop-recover-fixdir "~/.emacs.d/var/desktop/"))
     ;;   ;; Brings up the interactive buffer restore menu
@@ -1993,16 +2266,12 @@ function."
 
 #+end_src
 
-**
-Tree-sitter: querying and highlighting
+** Tree-sitter: querying and highlighting
 #+begin_src emacs-lisp
-  (require 'treesit)
-  (require 'treesit-auto)
-(treesit-auto-mode t)
-  (global-treesit-auto-mode t)
-  (setq treesit-auto-install 'prompt)
-  (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
-(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+    (global-treesit-auto-mode t)
+    (setq treesit-auto-install 'prompt)
+    (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
+  (add-hookg 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
 #+end_src
 ** origami
@@ -2025,15 +2294,12 @@ https://github.com/gregsexton/origami.el
 ** lsp-bridge
 #+begin_src emacs-lisp
   (use-package lsp-brigde
-    :vc (:url "https://github.com/manateelazycat/lsp-bridge"))
+    :vc (:url "https://github.com/manateelazycat/lsp-bridge")
+    :config
+    (global-lsp-bridge-mode))
 
-(require 'yasnippet)
-(yas-global-mode 1)
-
-(require 'lsp-bridge)
-;; (global-lsp-bridge-mode)
-
-
+  (require 'yasnippet)
+  (yas-global-mode 1)
 
 #+end_src
 
@@ -2214,6 +2480,186 @@ https://github.com/gregsexton/origami.el
 #+end_src
 ** elisp
 #+begin_src emacs-lisp
+;; Emacs lisp mode
+(use-package elisp-mode
+  :ensure nil
+  :bind (:map emacs-lisp-mode-map
+         ("C-c C-x" . ielm)
+         ("C-c C-c" . eval-defun)
+         ("C-c C-b" . eval-buffer))
+  :config
+  ;; Syntax highlighting of known Elisp symbols
+  (use-package highlight-defined
+    :hook ((emacs-lisp-mode inferior-emacs-lisp-mode) . highlight-defined-mode))
+
+  (with-no-warnings
+    ;; Align indent keywords
+    ;; @see https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned
+    (defun my-lisp-indent-function (indent-point state)
+      "This function is the normal value of the variable `lisp-indent-function'.
+The function `calculate-lisp-indent' calls this to determine
+if the arguments of a Lisp function call should be indented specially.
+
+INDENT-POINT is the position at which the line being indented begins.
+Point is located at the point to indent under (for default indentation);
+STATE is the `parse-partial-sexp' state for that position.
+
+If the current line is in a call to a Lisp function that has a non-nil
+property `lisp-indent-function' (or the deprecated `lisp-indent-hook'),
+it specifies how to indent.  The property value can be:
+
+ `defun', meaning indent `defun'-style
+  \(this is also the case if there is no property and the function
+  has a name that begins with \"def\", and three or more arguments);
+
+ an integer N, meaning indent the first N arguments specially
+  (like ordinary function arguments), and then indent any further
+  arguments like a body;
+
+ a function to call that returns the indentation (or nil).
+  `lisp-indent-function' calls this function with the same two arguments
+  that it itself received.
+
+This function returns either the indentation to use, or nil if the
+Lisp function does not specify a special indentation."
+      (let ((normal-indent (current-column))
+            (orig-point (point)))
+        (goto-char (1+ (elt state 1)))
+        (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
+        (cond
+         ;; car of form doesn't seem to be a symbol, or is a keyword
+         ((and (elt state 2)
+               (or (not (looking-at "\\sw\\|\\s_"))
+                   (looking-at ":")))
+          (if (not (> (save-excursion (forward-line 1) (point))
+                      calculate-lisp-indent-last-sexp))
+              (progn (goto-char calculate-lisp-indent-last-sexp)
+                     (beginning-of-line)
+                     (parse-partial-sexp (point)
+                                         calculate-lisp-indent-last-sexp 0 t)))
+          ;; Indent under the list or under the first sexp on the same
+          ;; line as calculate-lisp-indent-last-sexp.  Note that first
+          ;; thing on that line has to be complete sexp since we are
+          ;; inside the innermost containing sexp.
+          (backward-prefix-chars)
+          (current-column))
+         ((and (save-excursion
+                 (goto-char indent-point)
+                 (skip-syntax-forward " ")
+                 (not (looking-at ":")))
+               (save-excursion
+                 (goto-char orig-point)
+                 (looking-at ":")))
+          (save-excursion
+            (goto-char (+ 2 (elt state 1)))
+            (current-column)))
+         (t
+          (let ((function (buffer-substring (point)
+                                            (progn (forward-sexp 1) (point))))
+                method)
+            (setq method (or (function-get (intern-soft function)
+                                           'lisp-indent-function)
+                             (get (intern-soft function) 'lisp-indent-hook)))
+            (cond ((or (eq method 'defun)
+                       (and (null method)
+                            (length> function 3)
+                            (string-match "\\`def" function)))
+                   (lisp-indent-defform state indent-point))
+                  ((integerp method)
+                   (lisp-indent-specform method state
+                                         indent-point normal-indent))
+                  (method
+                   (funcall method indent-point state))))))))
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda () (setq-local lisp-indent-function #'my-lisp-indent-function)))
+
+    ;; Add remove buttons for advices
+    (add-hook 'help-mode-hook 'cursor-sensor-mode)
+
+    (defun function-advices (function)
+      "Return FUNCTION's advices."
+      (let ((flist (indirect-function function)) advices)
+        (while (advice--p flist)
+          (setq advices `(,@advices ,(advice--car flist)))
+          (setq flist (advice--cdr flist)))
+        advices))
+
+    (defun add-remove-advice-button (advice function)
+      (when (and (functionp advice) (functionp function))
+        (let ((inhibit-read-only t)
+              (msg (format "Remove advice `%s'" advice)))
+          (insert "\t")
+          (insert-button
+           "Remove"
+           'face 'custom-button
+           'cursor-sensor-functions `((lambda (&rest _) ,msg))
+           'help-echo msg
+           'action (lambda (_)
+                     (when (yes-or-no-p msg)
+                       (message "%s from function `%s'" msg function)
+                       (advice-remove function advice)
+                       (if (eq major-mode 'helpful-mode)
+                           (helpful-update)
+                         (revert-buffer nil t))))
+           'follow-link t))))
+
+    (defun add-button-to-remove-advice (buffer-or-name function)
+      "Add a button to remove advice."
+      (with-current-buffer buffer-or-name
+        (save-excursion
+          (goto-char (point-min))
+          (let ((ad-list (function-advices function)))
+            (while (re-search-forward "^\\(?:This function has \\)?:[-a-z]+ advice: \\(.+\\)$" nil t)
+              (let ((advice (car ad-list)))
+                (add-remove-advice-button advice function)
+                (setq ad-list (delq advice ad-list))))))))
+
+    (define-advice describe-function-1 (:after (function) advice-remove-button)
+      (add-button-to-remove-advice (help-buffer) function))
+    (with-eval-after-load 'helpful
+      (define-advice helpful-update (:after () advice-remove-button)
+        (when helpful--callable-p
+          (add-button-to-remove-advice (current-buffer) helpful--sym))))
+
+    ;; Remove hooks
+    (defun remove-hook-at-point ()
+      "Remove the hook at the point in the *Help* buffer."
+      (interactive)
+      (unless (memq major-mode '(help-mode helpful-mode))
+        (error "Only for help-mode or helpful-mode"))
+
+      (let ((orig-point (point)))
+        (save-excursion
+          (when-let*
+              ((hook (progn (goto-char (point-min)) (symbol-at-point)))
+               (func (when (and
+                            (or (re-search-forward (format "^Value:?[\s|\n]") nil t)
+                                (goto-char orig-point))
+                            (sexp-at-point))
+                       (end-of-sexp)
+                       (backward-char 1)
+                       (catch 'break
+                         (while t
+                           (condition-case _err
+                               (backward-sexp)
+                             (scan-error (throw 'break nil)))
+                           (let ((bounds (bounds-of-thing-at-point 'sexp)))
+                             (when (<= (car bounds) orig-point (cdr bounds))
+                               (throw 'break (sexp-at-point)))))))))
+            (when (yes-or-no-p (format "Remove %s from %s? " func hook))
+              (remove-hook hook func)
+              (if (eq major-mode 'helpful-mode)
+                  (helpful-update)
+                (revert-buffer nil t)))))))
+    (bind-key "r" #'remove-hook-at-point help-mode-map)))
+
+;; Interactive macro expander
+(use-package macrostep
+  :bind (:map emacs-lisp-mode-map
+         ("C-c e" . macrostep-expand)
+         :map lisp-interaction-mode-map
+         ("C-c e" . macrostep-expand)))
+
 
 #+end_src
 ** python

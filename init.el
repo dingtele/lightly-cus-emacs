@@ -96,7 +96,7 @@
      default))
  '(deft-extensions '("org"))
  '(kill-whole-line t)
- '(load-prefer-newer t t)
+ '(load-prefer-newer t)
  '(mouse-yank-at-point t)
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
@@ -106,7 +106,7 @@
      ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
  '(package-selected-packages
    '(a aggressive-indent all-the-icons-nerd-fonts auctex auto-compile
-       auto-complete auto-package-update bing-dict
+       auto-complete auto-package-update auto-save bing-dict
        buffer-name-relative bug-hunter burly cal-china-x calibredb
        cape capf-autosuggest cdlatex clipetty cljsbuild-mode
        clojure-ts-mode colorful-mode consult-todo counsel
@@ -117,25 +117,28 @@
        evil-smartparens ewal-doom-themes exec-path-from-shell flx-ido
        flycheck-clojure gcmh ghub gnu-elpa-keyring-update go-translate
        gptel groovy-mode gruvbox-theme haskell-mode helm-lsp helpful
-       hideshow-org ibuffer-project ibuffer-projectile ibuffer-vc
-       iedit imenu-anywhere inf-clojure ivy-prescient json-mode
-       json-navigator justify-kp keycast lsp-ivy lsp-java lsp-ui magit
-       marginalia mct memoize meow nano-theme nerd-icons-completion
-       nerd-icons-corfu nerd-icons-ibuffer nerd-icons-ivy-rich
-       netease-cloud-music no-littering nov nova ob-rust orderless
-       org-alert org-anki org-appear org-block-capf org-bullets
-       org-contrib org-journal org-make-toc org-modern org-node
-       org-noter org-preview-html org-protocol-jekyll org-remark
-       org-roam org-roam-ui org-ros org-sidebar org-zettel-ref-mode
-       origami ox-hugo paredit parent-mode pdf-tools pinyinlib
-       pkg-info popper rainbow-delimiters rainbow-identifiers
+       hideshow-org highlight-defined ibuffer-project
+       ibuffer-projectile ibuffer-vc iedit imenu-anywhere inf-clojure
+       ivy-prescient json-mode json-navigator justify-kp keycast
+       lsp-ivy lsp-java lsp-ui magit marginalia mct memoize meow
+       nano-theme nerd-icons-completion nerd-icons-corfu
+       nerd-icons-ibuffer nerd-icons-ivy-rich netease-cloud-music
+       no-littering nov nova ob-rust orderless org-alert org-anki
+       org-appear org-block-capf org-bullets org-contrib org-journal
+       org-make-toc org-modern org-node org-noter org-preview-html
+       org-protocol-jekyll org-remark org-roam org-roam-ui org-ros
+       org-sidebar org-zettel-ref-mode origami ox-hugo paredit
+       parent-mode pdf-tools pinyinlib pkg-info popper
+       rainbow-delimiters rainbow-identifiers
        region-occurrences-highlighter rg rime rust-mode setup shackle
-       shrface smartparens smooth-scrolling spacemacs-theme svg-lib
-       svg-tag-mode tabspaces tagedit telega toc-org
+       shrface smartparens smooth-scrolling sort-tab spacemacs-theme
+       svg-lib svg-tag-mode tabspaces tagedit telega toc-org
        transient-posframe tree-sitter-langs treesit-auto
        vertico-posframe workgroups2 xterm-color zeft zotxt))
  '(package-vc-selected-packages
-   '((zeft :url "https://github.com/casouri/zeft")
+   '((sort-tab :url "https://github.com/manateelazycat/sort-tab")
+     (auto-save :url "https://github.com/manateelazycat/auto-save")
+     (zeft :url "https://github.com/casouri/zeft")
      (org-supertag :url "https://github.com/yibie/org-supertag")
      (lsp-brigde :url "https://github.com/manateelazycat/lsp-bridge")))
  '(read-buffer-completion-ignore-case t)

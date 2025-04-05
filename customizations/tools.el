@@ -125,131 +125,313 @@
     (require 'init-minibuffer-completion)
    (require 'init-org)
 
-;; (require 'evil)
-  ;; (evil-mode nil)
-  (defun meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev)
-     '("<escape>" . ignore))
-    (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
-     '("a" . meow-append)
-     '("A" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change)
-     '("d" . meow-delete)
-     '("D" . meow-backward-delete)
-     '("e" . meow-next-word)
-     '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("h" . meow-left)
-     '("H" . meow-left-expand)
-     '("i" . meow-insert)
-     '("I" . meow-open-above)
-     '("j" . meow-next)
-     '("J" . meow-next-expand)
-     '("k" . meow-prev)
-     '("K" . meow-prev-expand)
-     '("l" . meow-right)
-     '("L" . meow-right-expand)
-     '("m" . meow-join)
-     '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
-     '("p" . meow-yank)
-     '("q" . meow-quit)
-     '("Q" . meow-goto-line)
-     '("r" . meow-replace)
-     '("R" . meow-swap-grab)
-     '("s" . meow-kill)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-visit)
-     '("w" . meow-mark-word)
-     '("W" . meow-mark-symbol)
-     '("x" . meow-line)
-     '("X" . meow-goto-line)
-     '("y" . meow-save)
-     '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("<escape>" . ignore)))
+;; auto completion of function name
+(bind-key "C-<tab>" 'hippie-expand)
+;; (global-set-key "\M- " 'hippie-expand)
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
 
-  (require 'meow)
-  (meow-setup)
-  (meow-global-mode 1)
-
-
-(use-package browse-url
-  :ensure nil
-  :defines dired-mode-map
-  :bind (("C-c C-z ." . browse-url-at-point)
-         ("C-c C-z b" . browse-url-of-buffer)
-         ("C-c C-z r" . browse-url-of-region)
-         ("C-c C-z u" . browse-url)
-         ("C-c C-z e" . browse-url-emacs)
-         ("C-c C-z v" . browse-url-of-file))
-  :init
-  (with-eval-after-load 'dired
-    (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
-
-;; Click to browse URL or to send to e-mail address
-(use-package goto-addr
-  :ensure nil
-  :hook ((text-mode . goto-address-mode)
-         (prog-mode . goto-address-prog-mode)))
-
-;; Edit multiple regions in the same way simultaneously
-(use-package iedit
-  :defines desktop-minor-mode-table
-  :bind (("C-;" . iedit-mode)
-         ("C-x r RET" . iedit-rectangle-mode)
-         :map isearch-mode-map ("C-;" . iedit-mode-from-isearch)
-         :map esc-map ("C-;" . iedit-execute-last-modification)
-         :map help-map ("C-;" . iedit-mode-toggle-on-function))
+;; Don't use hard tabs
+(setq-default indent-tabs-mode nil)
+(set-variable 'tab-width 4)
+;; When you visit a file, point goes to the last place where it
+;; was when you previously visited the same file.
+;; http://www.emacswiki.org/emacs/SavePlace
+(use-package saveplace
+  :defer nil
   :config
-  ;; Avoid restoring `iedit-mode'
-  (with-eval-after-load 'desktop
-    (add-to-list 'desktop-minor-mode-table
-                 '(iedit-mode nil))))
+  (save-place-mode)
+  ;; keep track of saved places in ~/.emacs.d/places
+  (setq save-place-file (concat user-emacs-directory "places")))
+
+
+;; Emacs can automatically create backup files. This tells Emacs to
+;; put all backups in ~/.emacs.d/backups. More info:
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Backup-Files.html
+(setq backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                               "backups"))))
+(setq auto-save-default nil)
+
+(use-package evil-nerd-commenter
+  :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+
+(delete-selection-mode t)
+
+;; use 2 spaces for tabs
+(defun die-tabs ()
+  (interactive)
+  (set-variable 'tab-width 4)
+  (mark-whole-buffer)
+  (untabify (region-beginning) (region-end))
+  (keyboard-quit))
+
+;; fix weird os x kill error
+(defun ns-get-pasteboard ()
+  "Returns the value of the pasteboard, or nil for unsupported formats."
+  (condition-case nil
+      (ns-get-selection-internal 'CLIPBOARD)
+    (quit nil)))
+
+(setq electric-indent-mode nil)
+
+(defun previous-multilines ()
+  "scroll down multiple lines"
+  (interactive)
+  (scroll-down (/ (window-body-height) 3)))
+
+(defun next-multilines ()
+  "scroll up multiple lines"
+  (interactive)
+  (scroll-up (/ (window-body-height) 3)))
+
+(global-set-key "\M-n" 'next-multilines) ;;custom
+(global-set-key "\M-p" 'previous-multilines) ;;custom
+;; Move line up
+(defun move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (previous-line 2))
+
+;; Move line down
+(defun move-line-down ()
+  (interactive)
+  (next-line 1)
+  (transpose-lines 1)
+  (previous-line 1))
+
+;; Assign the custom keybindings
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
+
+(global-set-key (kbd "M-o") 'other-window)
+(windmove-default-keybindings)
+
+
+
+;;key-bindings
+(defun select-current-line ()
+  "Select the line at the current cursor position."
+  (interactive)
+  (let ((line-begin (line-beginning-position))
+        (line-end (line-end-position)))
+    (goto-char line-begin)
+    (set-mark line-end)))
+
+(global-set-key (kbd "C-c C-s") 'select-current-line)
+;; (defun find-file()
+;;   (kbd "C-x C-f"))
+;; (global-set-key (kbd "C-f") 'find-file)
+(global-set-key (kbd "C-x g") 'magit-status)
+;; Shift lines up and down withM-up and M-down. When paredit is enabled,
+;; it will use those keybindings. For this reason, you might prefer to
+;; use M-S-up and M-S-down, which will work even in lisp modes.
+
+
+;; (eval(define-key dired-mode-map "c" 'find-file)
+
+(defun add-space-between-chinese-and-english ()
+  "在中英文之间自动添加空格check。"
+  (let ((current-char (char-before))
+        (prev-char (char-before (1- (point)))))
+    (when (and current-char prev-char
+               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
+                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
+      (save-excursion
+        (goto-char (1- (point)))
+        (insert " "))))
+  )
+(add-hook 'after-init-hook #'add-space-between-chinese-and-english)
+
+(defun is-chinese-character (char)
+  "判断字符是否为中文字符。"
+  (and char (or (and (>= char #x4e00) (<= char #x9fff))
+                (and (>= char #x3400) (<= char #x4dbf))
+                (and (>= char #x20000) (<= char #x2a6df))
+                (and (>= char #x2a700) (<= char #x2b73f))
+                (and (>= char #x2b740) (<= char #x2b81f))
+                (and (>= char #x2b820) (<= char #x2ceaf)))))
+
+(defun is-halfwidth-character (char)
+  "判断字符是否为半角字符，包括英文字母、数字和标点符号。"
+  (and char (or (and (>= char ?a) (<= char ?z))
+                (and (>= char ?A) (<= char ?Z))
+                (and (>= char ?0) (<= char ?9))
+                )))
+
+(defun delayed-add-space-between-chinese-and-english ()
+  "延迟执行，在中英文之间自动添加空格。"
+  (run-with-idle-timer 0 nil 'add-space-between-chinese-and-english))
+
+(define-minor-mode auto-space-mode
+  "在中英文之间自动添加空格的模式。"
+  :lighter " Auto-Space"
+  :global t
+  (if auto-space-mode️
+      (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)
+    (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)))
+
+(defun get-sentence-around-word ()
+  "Capture the sentence around the current word."
+  (interactive)
+  (let* ((pos-start (point))
+         (pos-end pos-start))
+    ;; Move backward until we find the start of the sentence
+    (skip-syntax-backward "-")
+
+    ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
+    (when (eq (char-before) nil)
+      (setq pos-start (point-min)))
+
+    ;; Move forward until we find the end of the sentence
+    (skip-syntax-forward "w")
+
+    ;; Mark the beginning of the sentence area
+    (set-mark-command nil)
+
+    ;; Save the current buffer position and mark as the end position
+    (setq pos-end (point))
+
+    ;; Go back to the start of the sentence
+    (goto-char pos-start)
+
+    ;; Select the marked area
+    (exchange-point-and-mark)
+
+    ;; Return the text within the sentence area
+    (buffer-substring-no-properties (region-beginning) (region-end))))
+
+(global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
+
+    ;; (require 'evil)
+    ;; (evil-mode nil)
+    (defun meow-setup ()
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      (meow-motion-overwrite-define-key
+       '("j" . meow-next)
+       '("k" . meow-prev)
+       '("<escape>" . ignore))
+      (meow-leader-define-key
+       ;; SPC j/k will run the original command in MOTION state.
+       '("j" . "H-j")
+       '("k" . "H-k")
+       ;; Use SPC (0-9) for digit arguments.
+       '("1" . meow-digit-argument)
+       '("2" . meow-digit-argument)
+       '("3" . meow-digit-argument)
+       '("4" . meow-digit-argument)
+       '("5" . meow-digit-argument)
+       '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument)
+       '("8" . meow-digit-argument)
+       '("9" . meow-digit-argument)
+       '("0" . meow-digit-argument)
+       '("/" . meow-keypad-describe-key)
+       '("?" . meow-cheatsheet))
+      (meow-normal-define-key
+       '("0" . meow-expand-0)
+       '("9" . meow-expand-9)
+       '("8" . meow-expand-8)
+       '("7" . meow-expand-7)
+       '("6" . meow-expand-6)
+       '("5" . meow-expand-5)
+       '("4" . meow-expand-4)
+       '("3" . meow-expand-3)
+       '("2" . meow-expand-2)
+       '("1" . meow-expand-1)
+       '("-" . negative-argument)
+       '(";" . meow-reverse)
+       '("," . meow-inner-of-thing)
+       '("." . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
+       '("a" . meow-append)
+       '("A" . meow-open-below)
+       '("b" . meow-back-word)
+       '("B" . meow-back-symbol)
+       '("c" . meow-change)
+       '("d" . meow-delete)
+       '("D" . meow-backward-delete)
+       '("e" . meow-next-word)
+       '("E" . meow-next-symbol)
+       '("f" . meow-find)
+       '("g" . meow-cancel-selection)
+       '("G" . meow-grab)
+       '("h" . meow-left)
+       '("H" . meow-left-expand)
+       '("i" . meow-insert)
+       '("I" . meow-open-above)
+       '("j" . meow-next)
+       '("J" . meow-next-expand)
+       '("k" . meow-prev)
+       '("K" . meow-prev-expand)
+       '("l" . meow-right)
+       '("L" . meow-right-expand)
+       '("m" . meow-join)
+       '("n" . meow-search)
+       '("o" . meow-block)
+       '("O" . meow-to-block)
+       '("p" . meow-yank)
+       '("q" . meow-quit)
+       '("Q" . meow-goto-line)
+       '("r" . meow-replace)
+       '("R" . meow-swap-grab)
+       '("s" . meow-kill)
+       '("t" . meow-till)
+       '("u" . meow-undo)
+       '("U" . meow-undo-in-selection)
+       '("v" . meow-visit)
+       '("w" . meow-mark-word)
+       '("W" . meow-mark-symbol)
+       '("x" . meow-line)
+       '("X" . meow-goto-line)
+       '("y" . meow-save)
+       '("Y" . meow-sync-grab)
+       '("z" . meow-pop-selection)
+       '("'" . repeat)
+       '("<escape>" . ignore)))
+
+    (require 'meow)
+    (meow-setup)
+    (meow-global-mode 1)
+
+
+  (use-package browse-url
+    :ensure nil
+    :defines dired-mode-map
+    :bind (("C-c C-z ." . browse-url-at-point)
+           ("C-c C-z b" . browse-url-of-buffer)
+           ("C-c C-z r" . browse-url-of-region)
+           ("C-c C-z u" . browse-url)
+           ("C-c C-z e" . browse-url-emacs)
+           ("C-c C-z v" . browse-url-of-file))
+    :init
+    (with-eval-after-load 'dired
+      (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
+
+  ;; Click to browse URL or to send to e-mail address
+  (use-package goto-addr
+    :ensure nil
+    :hook ((text-mode . goto-address-mode)
+           (prog-mode . goto-address-prog-mode)))
+
+  ;; Edit multiple regions in the same way simultaneously
+  (use-package iedit
+    :defines desktop-minor-mode-table
+    :bind (("C-;" . iedit-mode)
+           ("C-x r RET" . iedit-rectangle-mode)
+           :map isearch-mode-map ("C-;" . iedit-mode-from-isearch)
+           :map esc-map ("C-;" . iedit-execute-last-modification)
+           :map help-map ("C-;" . iedit-mode-toggle-on-function))
+    :config
+    ;; Avoid restoring `iedit-mode'
+    (with-eval-after-load 'desktop
+      (add-to-list 'desktop-minor-mode-table
+                   '(iedit-mode nil))))
 
 ;; 快速打开配置文件
 (defun open-init-file-and-eval()
@@ -381,6 +563,84 @@
   ("k" move-line-down "down")
   ("f" nil "finished" :exit t))
 ;; hercules arrives with any other key binding
+
+(use-package ibuffer
+  :ensure nil
+  :bind ("C-x C-b" . ibuffer)
+  :init (setq ibuffer-filter-group-name-face '(:inherit (font-lock-string-face bold))))
+
+ (use-package nerd-icons-ibuffer
+   :ensure t
+   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+   :config
+   ;; Whether display the icons.
+   (setq nerd-icons-ibuffer-icon t)
+   (setq nerd-icons-ibuffer-color-icon t)
+   (setq nerd-icons-ibuffer-icon-size 1.0)
+   (setq  nerd-icons-ibuffer-human-readable-size t)
+   ;; A list of ways to display buffer lines with `nerd-icons'.
+   ;; See `ibuffer-formats' for details.
+   ;; nerd-icons-ibuffer-formats
+
+   ;; Slow Rendering
+   ;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+   ;; you can try setting the following variable
+   (setq inhibit-compacting-font-caches t))
+
+(use-package ibuffer-project
+  :hook (ibuffer . (lambda ()
+                     "Group ibuffer's list by project."
+                     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+                     (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                       (ibuffer-do-sort-by-project-file-relative))))
+  :init (setq ibuffer-project-use-cache t)
+  :config
+  (defun my-ibuffer-project-group-name (root type)
+    "Return group name for project ROOT and TYPE."
+    (if (and (stringp type) (> (length type) 0))
+        (format "%s %s" type root)
+      (format "%s" root)))
+  (progn
+    (advice-add #'ibuffer-project-group-name :override #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          `((ibuffer-project-project-root . ,(nerd-icons-octicon "nf-oct-repo" :height 1.2 :face ibuffer-filter-group-name-face))
+            (file-remote-p . ,(nerd-icons-codicon "nf-cod-radio_tower" :height 1.2 :face ibuffer-filter-group-name-face)))))
+  (progn
+    (advice-remove #'ibuffer-project-group-name #'my-ibuffer-project-group-name)
+    (setq ibuffer-project-root-functions
+          '((ibuffer-project-project-root . "Project")
+            (file-remote-p . "Remote"))))
+  (setq ibuffer-formats
+        '((mark modified read-only " "
+                (name 18 18 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                project-relative-file))))
+
+
+;; (use-package buffer-name-relative-mode
+;;   :ensure t
+;;   :vc (:url "https://codeberg.org/ideasman42/emacs-buffer-name-relative" :branch "main")
+;;   :hook (after-init . buffer-name-relative-mode)
+;;   :config
+;;   (setq buffer-name-relative-prefix '("" . "/")))
+
+;; (use-package ibuffer-sidebar
+;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"
+;;   :ensure nil
+;;   :commands (ibuffer-sidebar-toggle-sidebar)
+;;   :config
+;;   (setq ibuffer-sidebar-use-custom-font t)
+;;   (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
+
+;; (defun +sidebar-toggle ()q
+;;   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
+;;   (interactive)
+;;   (dired-sidebar-toggle-sidebar)
+;;   (ibuffer-sidebar-toggle-sidebar))
 
 (global-set-key (kbd "C-c c") 'org-capture)
   (setq org-default-notes-file "~/org/inbox.org")
@@ -1955,8 +2215,6 @@ function."
   (package-refresh-contents)
   (package-install 'inf-clojure))
 (add-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
-
-
 
 (setq tab-always-indent 'complete)
   (setq python-indent-offset 4)
