@@ -50,7 +50,7 @@
    ;; (org-mode . org-indent-mode)
    (org-mode . toc-org-mode)
    ;; (org-mode . variable-pitch-mode)
-   (org-mode . my-nov-font-setup)
+   ;; (org-mode . my-nov-font-setup)
    ;; (org-mode . (lambda () (add-hook 'after-save-hook 'org-babel-tangle :append :local)))
    ;; (org-mode . (lambda () (add-hook 'after-save-hook
    ;;                                  'zz/org-babel-tangle-current-buffer-async
@@ -63,15 +63,20 @@
   ;; :defer t
   :bind
   (:map org-mode-map
-        ("C-c l" . org-store-link)
-        ("A-h" . org-mark-element)
-        ("C-a" . org-beginning-of-line)
-        ("C-e" . org-end-of-line)
-        ("C-k" . org-kill-line))
+   ("C-c l" . org-store-link)
+   ("A-h" . org-mark-element)
+   ("C-a" . org-beginning-of-line)
+   ("C-e" . org-end-of-line)
+   ("C-k" . org-kill-line)
+   ("C-x <up>" . org-move-subtree-up)
+   ("C-x <down>" . org-move-subtree-down)
+   ("C-x f" . org-fold-show-subtree)
+   ("C-x i" . org-insert-subheading)
+   )
   :commands (org-find-exact-headline-in-buffer
-	     org-set-tags) ;;TODO
+	         org-set-tags) ;;TODO
   :custom-face
-  ;; 设置Org mode标题以及每级标题行的大小
+  ;; 设置 Org mode 标题以及每级标题行的大小
   (org-document-title ((t (:height 1.75 :weight bold))))
   (org-level-1 ((t (:height 1.2 :weight bold))))
   (org-level-2 ((t (:height 1.15 :weight bold))))
@@ -122,7 +127,7 @@
   ;; ;; 设置标题行之间总是有空格；列表之间根据情况自动加空格
   ;; (setq org-blank-before-new-entry '((heading . t)
   ;;                                    (plain-list-item . auto)))
-  ;; 在org mode里美化字符串
+  ;; 在 org mode 里美化字符串
   ;; ================================
   (defun my/org-prettify-symbols ()
     (setq prettify-symbols-alist
@@ -192,7 +197,7 @@
   ;; (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
 
   :custom
-  ;; 设置Org mode的目录
+  ;; 设置 Org mode 的目录
   (org-directory "~/Dropbox/org")
   (org-log-done t)
   (org-startup-indented t)
@@ -213,16 +218,16 @@
 
   (org-src-tab-acts-natively t)
 
-  ;; 一些Org mode自带的美化设置
+  ;; 一些 Org mode 自带的美化设置
   ;; 标题行美化
   ;; (org-fontify-whole-heading-line t)
   ;; 设置标题行折叠符号
   ;; (org-ellipsis " ▾")
   ;; 在活动区域内的所有标题栏执行某些命令
   (org-loop-over-headlines-in-active-region t)
-  ;; TODO标签美化
+  ;; TODO 标签美化
   (org-fontify-todo-headline t)
-  ;; DONE标签美化
+  ;; DONE 标签美化
   (org-fontify-done-headline t)
   ;; 引用块美化
   (org-fontify-quote-and-verse-blocks t)
@@ -230,13 +235,13 @@
   (org-hide-macro-markers t)
   ;; ;; 隐藏强调标签
   (org-hide-emphasis-markers t)
-  ;; 高亮latex语法 TODO 有性能问题
+  ;; 高亮 latex 语法 TODO 有性能问题
   ;; (org-highlight-latex-and-related '(latex native script entities))
-  ;; ;; ;; 以UTF-8显示
+  ;; ;; ;; 以 UTF-8 显示
   ;; 显示上下标：x_{2}
   (org-pretty-entities t)
   (org-pretty-entities-include-sub-superscripts t)
-  ;; 是否隐藏标题栏的前置星号，这里我们通过org-modern来隐藏
+  ;; 是否隐藏标题栏的前置星号，这里我们通过 org-modern 来隐藏
   (org-hide-leading-stars t)
   ;; 当启用缩进模式时自动隐藏前置星号
   (org-indent-mode-turns-on-hiding-stars t)
@@ -246,51 +251,45 @@
   (org-adapt-indentation t)
   ;; 自动显示图片
   (org-startup-with-inline-images t)
-  ;; 默认以Overview的模式展示标题行
+  ;; 默认以 Overview 的模式展示标题行
   (org-startup-folded 'overview)
   ;; 允许字母列表
   (org-list-allow-alphabetical t)
   ;; 列表的下一级设置
   (org-list-demote-modify-bullet '(
-                       		   ("-"  . "+")
+                       		       ("-"  . "+")
                                    ("+"  . "1.")
-                       		   ("1." . "a.")
-                       		   ))
+                       		       ("1." . "a.")
+                       		       ))
   ;; 编辑时检查是否在折叠的不可见区域
   (org-fold-catch-invisible-edits 'smart)
   ;; 在当前位置插入新标题行还是在当前标题行后插入，这里设置为当前位置
   (org-insert-heading-respect-content nil)
-  ;; 设置图片的最大宽度，如果有imagemagick支持将会改变图片实际宽度
+  ;; 设置图片的最大宽度，如果有 imagemagick 支持将会改变图片实际宽度
   ;; 四种设置方法：(1080), 1080, t, nil
   (org-image-actual-width nil)
-  ;; imenu的最大深度，默认为2
+  ;; imenu 的最大深度，默认为 2
   (org-imenu-depth 4)
   ;; 回车要不要触发链接，这里设置不触发
   (org-return-follows-link nil)
   ;; 上标^下标_是否需要特殊字符包裹，这里设置需要用大括号包裹
   (org-use-sub-superscripts '{})
-  ;; 复制粘贴标题行的时候删除id
+  ;; 复制粘贴标题行的时候删除 id
   (org-clone-delete-id t)
   ;; 粘贴时调整标题行的级别
   (org-yank-adjusted-subtrees t)
 
   ;; == Custom State Keywords ==
-  ;; TOOD的关键词设置，可以设置不同的组
+  ;; TOOD 的关键词设置，可以设置不同的组
   ;; 待办-暂停-进行中-稍后-完成-取消
   (org-todo-keywords '(
                        (sequence "TODO(t)" "|" "DONE(d)")
-                       ;; (sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
-                       ;; (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")
                        ))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
-        '(
-          ("TODO" :foreground "red" :weight bold)
-          ("HOLD" :foreground "#5C888B" :weight bold)
-          ("WIP" :foreground "blue" :weight bold)
+        '(("TODO" :foreground "red" :weight bold)
           ("DONE" :foreground "forest green" :weight bold)
-          ("WAIT" :foreground "orange" :weight bold)
-          ("CANCELLED" :foreground "forest green" :weight bold)))
+          ))
   ;; 当标题行状态变化时标签同步发生的变化
   ;; Moving a task to CANCELLED adds a CANCELLED tag
   ;; Moving a task to WAIT adds a WAIT tag
@@ -311,31 +310,31 @@
   ;; Allow setting single tags without the menu
   ;; (setq org-fast-tag-selection-single-key 'expert)
   ;; Include the todo keywords
-  ;; (setq org-fast-tag-selection-include-todo t)
+  (setq org-fast-tag-selection-include-todo t)
   ;; 父子标题栏状态有依赖
   (org-enforce-todo-dependencies t)
   ;; 标题栏和任务复选框有依赖
   (org-enforce-todo-checkbox-dependencies t)
   ;; 优先级样式设置
-  ;; (org-priority-faces '((?A :foreground "red")
-  ;;                  	(?B :foreground "orange")
-  ;;                  	(?C :foreground "yellow")))
+  (org-priority-faces '((?A :foreground "red")
+                   	    (?B :foreground "orange")
+                   	    (?C :foreground "yellow")))
   ;; ;; 标题行全局属性设置
-  ;; (org-global-properties '(("EFFORT_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
-  ;;       					   ("APPT_WARNTIME_ALL" . "0 5 10 15 20 25 30 45 60")
-  ;;       					   ("RISK_ALL" . "Low Medium High")
-  ;;       					   ("STYLE_ALL" . "habit")))
-  ;; Org columns的默认格式
+  (setq org-global-properties '(("EFFORT_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
+        			            ("APPT_WARNTIME_ALL" . "0 5 10 15 20 25 30 45 60")
+        			            ("RISK_ALL" . "Low Medium High")
+        			            ("STYLE_ALL" . "habit")))
+  ;; Org columns 的默认格式
   ;; (org-columns-default-format "%25ITEM %TODO %SCHEDULED %DEADLINE %3PRIORITY %TAGS %CLOCKSUM %EFFORT{:}")
-  ;; 当状态从DONE改成其他状态时，移除 CLOSED: [timestamp]
+  ;; 当状态从 DONE 改成其他状态时，移除 CLOSED: [timestamp]
   (org-closed-keep-when-no-todo t)
-  ;; DONE时加上时间戳
+  ;; DONE 时加上时间戳
   (org-log-done 'time)
   ;; 重复执行时加上时间戳
   (org-log-repeat 'time)
-  ;; Deadline修改时加上一条记录
+  ;; Deadline 修改时加上一条记录
   (org-log-redeadline 'note)
-  ;; Schedule修改时加上一条记录
+  ;; Schedule 修改时加上一条记录
   (org-log-reschedule 'note)
   ;; 以抽屉的方式记录
   (org-log-into-drawer t)
@@ -344,7 +343,7 @@
 
   ;;TODO org-refile 使用缓存
 
-  ;; 设置标签的默认位置，默认是第77列右对齐
+  ;; 设置标签的默认位置，默认是第 77 列右对齐
   (org-tags-column -77)
   ;; 自动对齐标签
   (org-auto-align-tags t)
@@ -360,9 +359,9 @@
   (org-track-ordered-property-with-tag t)
   ;; 始终存在的的标签
   (org-tag-persistent-alist '(("read"     . ?r)
-			      ("emacs"    . ?e)
-			      ("study"    . ?s)
-			      ("work"     . ?w)))
+			                  ("emacs"    . ?e)
+			                  ("study"    . ?s)
+			                  ("work"     . ?w)))
   ;; 预定义好的标签
   (org-tag-alist '((:startgroup)
                    ("linux"    . ?l)
@@ -435,13 +434,13 @@
 ;;   :config
 ;;   ;; 标题行型号字符
 ;;   ;; (setq org-modern-star ["◉" "○" "✸" "✳" "◈" "◇" "✿" "❀" "✜"])
-;;   ;; 额外的行间距，0.1表示10%，1表示1px
+;;   ;; 额外的行间距，0.1 表示 10%，1表示 1px
 ;;   (setq-default line-spacing 0.1)
-;;   ;; tag边框宽度，还可以设置为 `auto' 即自动计算
+;;   ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
 ;;   (setq org-modern-label-border 1)
-;;   ;; 设置表格竖线宽度，默认为3
+;;   ;; 设置表格竖线宽度，默认为 3
 ;;   (setq org-modern-table-vertical 2)
-;;   ;; 设置表格横线为0，默认为0.1
+;;   ;; 设置表格横线为 0，默认为 0.1
 ;;   (setq org-modern-table-horizontal 0)
 ;;   ;; 复选框美化
 ;;   (setq org-modern-checkbox
@@ -454,7 +453,7 @@
 ;;           (?+ . "◦")
 ;;           ;; (?* . "▹")
 ;; ))
-;;   ;; 代码块左边加上一条竖边线（需要Org mode顶头，如果启用了 `visual-fill-column-mode' 会很难看）
+;;   ;; 代码块左边加上一条竖边线（需要 Org mode 顶头，如果启用了 `visual-fill-column-mode' 会很难看）
 ;;   (setq org-modern-block-fringe t)
 ;;   ;; 代码块类型美化，我们使用了 `prettify-symbols-mode'
 ;;   (setq org-modern-block-name nil)
