@@ -59,7 +59,37 @@
   "Set the package ARCHIVES (ELPA).
 
 REFRESH is non-nil, will refresh archive contents.
-ASYNC specifies whether to perform the downloads in the background.
+ASYNC specifies whether to perform the downloads in the background.;; A comprehensive visual interface to diff & patch
+(use-package ediff
+  :ensure nil
+  :hook(;; show org ediffs unfolded
+        (ediff-prepare-buffer . outline-show-all)
+        ;; reStore window layout when done
+        (ediff-quit . winner-undo))
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally
+        ediff-merge-split-window-function 'split-window-horizontally));; A comprehensive visual interface to diff & patch
+(use-package ediff
+  :ensure nil
+  :hook(;; show org ediffs unfolded
+        (ediff-prepare-buffer . outline-show-all)
+        ;; reStore window layout when done
+        (ediff-quit . winner-undo))
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally
+        ediff-merge-split-window-function 'split-window-horizontally));; A comprehensive visual interface to diff & patch
+(use-package ediff
+  :ensure nil
+  :hook(;; show org ediffs unfolded
+        (ediff-prepare-buffer . outline-show-all)
+        ;; reStore window layout when done
+        (ediff-quit . winner-undo))
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally
+        ediff-merge-split-window-function 'split-window-horizontally))
 Save to option `custom-file' if NO-SAVE is nil."
   (interactive
    (list
@@ -67,7 +97,7 @@ Save to option `custom-file' if NO-SAVE is nil."
      (completing-read "Select package archives: "
                       (mapcar #'car centaur-package-archives-alist)))))
   ;; Set option
-  (custom-set-variables '(centaur-package-archives archives))
+  (custom-set-variables '(centaur-archives-package archives))
 
   ;; Refresh if need
   (and refresh (package-refresh-contents async))
@@ -111,7 +141,87 @@ Return the fastest package archive."
     ;; Return the fastest
     fastest))
 
-(package-initialize)
+;; Required by `use-package'
+(use-package diminish :ensure t)
+
+;; Update GPG keyring for GNU ELPA
+(use-package gnu-elpa-keyring-update)
+
+;; Update packages
+(unless (fboundp 'package-upgrade-all)
+  (use-package auto-package-update
+    :init
+    (setq auto-package-update-delete-old-versions t
+          auto-package-update-hide-results t)
+    (defalias 'package-upgrade-all #'auto-package-update-now)))
+
+  (use-package auto-compile
+    :defer nil
+    :config (auto-compile-on-load-mode))
+
+  ;; optimize for build-in :vc to avoid long time deep clone with all package's history
+  (defun my/vc-git-clone (fn remote directory rev)
+    (if (or (not (string-match-p "elpa" directory))
+            (null rev))
+        (funcall fn remote directory rev)
+      (cond
+       ((ignore-errors
+          ;; First try if rev is a branch/tag name
+          ;; https://stackoverflow.com/a/48748567/2163429
+          (vc-git--out-ok "clone" "--depth" "1" "--single-branch" "--branch" rev remote directory)))
+       ((vc-git--out-ok "clone" "--single-branch" remote directory)
+        (let ((default-directory directory))
+          (vc-git--out-ok "checkout" rev))))
+      directory))
+
+  (advice-add 'vc-git-clone :around
+              'my/vc-git-clone)
+
+  ;; install the required packages
+  ;; Set missing package vars
+  (defvar lem-missing-packages '()
+    "List populated at startup containing packages needing installation.")
+  (defvar lem-missing-vc-packages '()
+    "List populated at startup containing vc packages requiring installation.")
+
+  ;; Check for packages
+  (defun lem-check-missing-packages ()
+    "Check for missing packages."
+    (interactive)
+    ;; Check packages
+    (message "%s" "Checking for missing packages.")
+    (dolist (p package-selected-packages)
+      (unless (package-installed-p p)
+        (add-to-list 'lem-missing-packages p 'append)))
+    ;; Check vc installed packages (Emacs 29+)
+    (when (version< "29" emacs-version)
+      (message "%s" "Checking for missing vc packages.")
+      (dolist (p package-vc-selected-packages)
+        (unless (package-installed-p (car p))
+          (add-to-list 'lem-missing-vc-packages (car p) 'append)))))
+
+  ;; Install packages
+  (defun lem-install-missing-packages ()
+    "Install missing packages from package & package-vc lists."
+    (interactive)
+    (lem-check-missing-packages)
+    (cond ((or lem-missing-packages
+               lem-missing-vc-packages)
+           (message "Refreshing package database & installing missing packages...")
+           (package-install-selected-packages t)
+           (setq lem-missing-packages '())
+           (package-vc-install-selected-packages)
+           (setq lem-missing-vc-packages '()))
+          (t
+           (message "No missing packages."))))
+
+;; (require 'shell-integration)
+ ;; (require 'init-site-lisp)
+ (require 'init-core-overriding)
+ ;; ;; Langauage-specific
+ ;; (require 'elisp-editing)
+ ;; (require 'init-minibuffer-completion)
+(require 'init-org)
 
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
@@ -121,7 +231,7 @@ Return the fastest package archive."
    ;; '(mac-option-modifier 'alt)
    ;; '(mac-right-option-modifier 'super)
    )
-   (bind-keys ([(super l)] . goto-line))
+  (bind-keys ([(super l)] . goto-line))
   ;; Make mouse wheel / trackpad scrolling less jerky
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
   (dolist (multiple '("" "double-" "triple-"))
@@ -133,205 +243,44 @@ Return the fastest package archive."
     (exec-path-from-shell-initialize))
   )
 
-(unless package-archive-contents
-  (package-refresh-contents))
+;; Frame
+(when (display-graphic-p)
+  ;; Frame fullscreen
+  (add-hook 'window-setup-hook #'fix-fullscreen-cocoa)
+  ;; Frame transparence
+  (use-package transwin
+    :bind (("C-M-9" . transwin-inc)
+           ("C-M-8" . transwin-dec)
+           ("C-M-7" . transwin-toggle))
+    :init
+    (when *IS-LINUX*
+      (setq transwin-parameter-alpha 'alpha-background))))
 
-;; install use-package manager
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
-
-(custom-set-variables
- ;; '(use-package-always-ensure t)
- ;; PERF
- ;; '(use-package-always-defer t)
- '(use-package-verbose nil)
- '(load-prefer-newer t))
-
-(use-package auto-compile
-  :defer nil
-  :config (auto-compile-on-load-mode))
-
-;; optimize for build-in :vc to avoid long time deep clone with all package's history
-(defun my/vc-git-clone (fn remote directory rev)
-  (if (or (not (string-match-p "elpa" directory))
-          (null rev))
-      (funcall fn remote directory rev)
-    (cond
-     ((ignore-errors
-        ;; First try if rev is a branch/tag name
-        ;; https://stackoverflow.com/a/48748567/2163429
-        (vc-git--out-ok "clone" "--depth" "1" "--single-branch" "--branch" rev remote directory)))
-     ((vc-git--out-ok "clone" "--single-branch" remote directory)
-      (let ((default-directory directory))
-        (vc-git--out-ok "checkout" rev))))
-    directory))
-
-(advice-add 'vc-git-clone :around
-            'my/vc-git-clone)
-
-;; install the required packages
-;; Set missing package vars
-(defvar lem-missing-packages '()
-  "List populated at startup containing packages needing installation.")
-(defvar lem-missing-vc-packages '()
-  "List populated at startup containing vc packages requiring installation.")
-
-;; Check for packages
-(defun lem-check-missing-packages ()
-  "Check for missing packages."
-  (interactive)
-  ;; Check packages
-  (message "%s" "Checking for missing packages.")
-  (dolist (p package-selected-packages)
-    (unless (package-installed-p p)
-      (add-to-list 'lem-missing-packages p 'append)))
-  ;; Check vc installed packages (Emacs 29+)
-  (when (version< "29" emacs-version)
-    (message "%s" "Checking for missing vc packages.")
-    (dolist (p package-vc-selected-packages)
-      (unless (package-installed-p (car p))
-        (add-to-list 'lem-missing-vc-packages (car p) 'append)))))
-
-;; Install packages
-(defun lem-install-missing-packages ()
-  "Install missing packages from package & package-vc lists."
-  (interactive)
-  (lem-check-missing-packages)
-  (cond ((or lem-missing-packages
-             lem-missing-vc-packages)
-         (message "Refreshing package database & installing missing packages...")
-         (package-install-selected-packages t)
-         (setq lem-missing-packages '())
-         (package-vc-install-selected-packages)
-         (setq lem-missing-vc-packages '()))
-        (t
-         (message "No missing packages."))))
-
-(add-to-list 'load-path "~/.emacs.d/vendor")
- (add-to-list 'load-path "~/.emacs.d/customizations")
- (add-to-list 'load-path "~/.emacs.d/site-lisp/")
-
- (require 'ui) ;; F4
- ;; (require 'shell-integration)
- (require 'misc)
- ;; (require 'init-site-lisp)
- (require 'init-core-overriding)
- ;; ;; Langauage-specific
- ;; (require 'elisp-editing)
- ;; (require 'init-minibuffer-completion)
-(require 'init-org)
-
-(use-package rime
-  :commands (toggle-input-method)
-  :hook
-  ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
-                                    (set-input-method "rime"))))
-   (meow-insert-exit . (lambda() (set-input-method nil))))
-  :bind
-  (:map rime-mode-map
-   ("C-j" . rime-inline-ascii)
-   :map rime-mode-map
-   ("C-l" . rime-force-enable))
-  :custom
-  (default-input-method 'rime)
-  (rime-show-candidate 'posframe)
-  (rime-posframe-style 'vertical)
-  (rime-posframe-properties
-   (list :background-color "#333333"
-         :foreground-color "#dcdccc"
-         :internal-border-width 5))
-  (rime-disable-predicates
-   '(rime-predicate-prog-in-code-p
-
-     rime-predicate-auto-english-p
-
-     rime-predicate-punctuation-after-ascii-p
-     rime-predicate-punctuation-line-begin-p
-     my/rime-predicate-punctuation-next-char-is-paired-p
-     rime-predicate-tex-math-or-command-p
-     rime-predicate-org-latex-mode-p
-     rime-predicate-current-uppercase-letter-p
-     (lambda () (button-at (point)))
-     meow-normal-mode-p
-     meow-motion-mode-p
-     meow-keypad-mode-p
-     ;; +rime--punctuation-line-begin-p
-     ;; +rime--english-prober
-     ;; If the cursor is after a alphabet character.
-     rime-predicate-after-alphabet-char-p
-     ;; If input a punctuation after
-     ;; a Chinese charactor with whitespace.
-     rime-predicate-punctuation-after-space-cc-p
-     rime-predicate-special-ascii-line-begin-p
-     ))
-  (rime-inline-predicates
-   ;; If cursor is after a whitespace
-   ;; which follow a non-ascii character.
-   '(rime-predicate-space-after-cc-p
-     ;; If the current charactor entered is a uppercase letter.
-     rime-predicate-current-uppercase-letter-p))
-
-  (rime-user-data-dir "~/.emacs.d/Rime")
-  (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
-
-  (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
-
+;; PERF
+;; Garbage Collector Magic Hack
+(use-package gcmh
+  :diminish
+  :hook (emacs-startup . gcmh-mode)
   :init
-  (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
-    (if (not (eq (point) (point-max)))
-        (and (rime-predicate-current-input-punctuation-p)
-             (not (string-match-p
-                   (rx (any "\"\(\[\{"))
-                   (buffer-substring (point) (1- (point)))
-                   )
-                  )
-             (string-match-p
-              (rx (any "\}\]\)\""))
-              (buffer-substring (point) (1+ (point)))))
-      nil))
-
-  (defun rime-predicate-special-ascii-line-begin-p ()
-    "If '/' or '#' at the beginning of the line."
-    (and (> (point) (save-excursion (back-to-indentation) (point)))
-         (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-           (string-match-p "^[\/#]" string))))
-
-  )
+  (setq gcmh-idle-delay 'auto
+        gcmh-auto-idle-delay-factor 10
+        gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 
-(use-package pangu-spacing
-  :hook (after-init . (global-pangu-spacing-mode))
-  :custom
-  (pangu-spacing-real-insert-separtor t))
+;; A comprehensive visual interface to diff & patch
+(use-package ediff
+  :ensure nil
+  :hook(;; show org ediffs unfolded
+        (ediff-prepare-buffer . outline-show-all)
+        ;; reStore window layout when done
+        (ediff-quit . winner-undo))
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally
+        ediff-merge-split-window-function 'split-window-horizontally))
 
-(defun get-sentence-around-word ()
-  "Capture the sentence around the current word."
-  (interactive)
-  (let* ((pos-start (point))
-         (pos-end pos-start))
-    ;; Move backward until we find the start of the sentence
-    (skip-syntax-backward "-")
-    ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
-    (when (eq (char-before) nil)
-      (setq pos-start (point-min)))
-    ;; Move forward until we find the end of the sentence
-    (skip-syntax-forward "w")
-    ;; Mark the beginning of the sentence area
-    (set-mark-command nil)
-    ;; Save the current buffer position and mark as the end position
-    (setq pos-end (point))
-    ;; Go back to the start of the sentence
-    (goto-char pos-start)
-    ;; Select the marked area
-    (exchange-point-and-mark)
-    ;; Return the text within the sentence area
-    (buffer-substring-no-properties (region-beginning) (region-end))))
 
-(global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
-
-(use-package vundo
+   (use-package vundo
       :bind ("C-x u" . vundo)
       :config (setq vundo-glyph-alist vundo-unicode-symbols))
 
@@ -357,6 +306,21 @@ Return the fastest package archive."
     :config
     (save-place-mode)
     (setq save-place-file (concat user-emacs-directory "places")))
+
+;; History
+(use-package recentf
+  :bind (("C-x C-r" . recentf-open-files))
+  :hook (after-init . recentf-mode)
+  :init (setq recentf-max-saved-items 300
+              recentf-exclude
+              '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
+                "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                (lambda (file) (file-in-directory-p file package-user-dir))))
+  :config
+  (push (expand-file-name recentf-save-file) recentf-exclude)
+  (add-to-list 'recentf-filename-handlers #'abbreviate-file-name))
 
   ;; Emacs can automatically create backup files. This tells Emacs to
   ;; put all backups in ~/.emacs.d/backups. More info:
@@ -549,27 +513,120 @@ Return the fastest package archive."
                     (diminish (cdr pair)))
                   beginend-modes))
 
+(use-package rime
+  :commands (toggle-input-method)
+  :hook
+  ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
+                                    (set-input-method "rime"))))
+   (meow-insert-exit . (lambda() (set-input-method nil))))
+  :bind
+  (:map rime-mode-map
+   ("C-j" . rime-inline-ascii)
+   :map rime-mode-map
+   ("C-l" . rime-force-enable))
+  :custom
+  (default-input-method 'rime)
+  (rime-show-candidate 'posframe)
+  (rime-posframe-style 'vertical)
+  (rime-posframe-properties 
+   (list :background-color "#333333"
+         :foreground-color "#dcdccc"
+         :internal-border-width 5))
+  (rime-disable-predicates
+   '(rime-predicate-prog-in-code-p
+
+     rime-predicate-auto-english-p
+
+     rime-predicate-punctuation-after-ascii-p
+     rime-predicate-punctuation-line-begin-p
+     my/rime-predicate-punctuation-next-char-is-paired-p
+     rime-predicate-tex-math-or-command-p
+     rime-predicate-org-latex-mode-p
+     rime-predicate-current-uppercase-letter-p
+     (lambda () (button-at (point)))
+     meow-normal-mode-p
+     meow-motion-mode-p
+     meow-keypad-mode-p
+     ;; +rime--punctuation-line-begin-p
+     ;; +rime--english-prober
+     ;; If the cursor is after a alphabet character.
+     rime-predicate-after-alphabet-char-p
+     ;; If input a punctuation after
+     ;; a Chinese charactor with whitespace.
+     rime-predicate-punctuation-after-space-cc-p
+     rime-predicate-special-ascii-line-begin-p
+     ))
+  (rime-inline-predicates
+   ;; If cursor is after a whitespace
+   ;; which follow a non-ascii character.
+   '(rime-predicate-space-after-cc-p
+     ;; If the current charactor entered is a uppercase letter.
+     rime-predicate-current-uppercase-letter-p))
+
+  (rime-user-data-dir "~/.emacs.d/rime/")
+  (rime-librime-root "~/.emacs.d/librime/dist")
+  (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+
+  (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+
+  :init
+  (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
+    (if (not (eq (point) (point-max)))
+        (and (rime-predicate-current-input-punctuation-p)
+             (not (string-match-p
+                   (rx (any "\"\(\[\{"))
+                   (buffer-substring (point) (1- (point)))
+                   )
+                  )
+             (string-match-p
+              (rx (any "\}\]\)\""))
+              (buffer-substring (point) (1+ (point)))))
+      nil))
+
+  (defun rime-predicate-special-ascii-line-begin-p ()
+    "If '/' or '#' at the beginning of the line."
+    (and (> (point) (save-excursion (back-to-indentation) (point)))
+         (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+           (string-match-p "^[\/#]" string))))
+
+  )
+
+
+(use-package pangu-spacing
+  :hook (after-init . (global-pangu-spacing-mode))
+  :custom
+  (pangu-spacing-real-insert-separtor t))
+
+(defun get-sentence-around-word ()
+  "Capture the sentence around the current word."
+  (interactive)
+  (let* ((pos-start (point))
+         (pos-end pos-start))
+    ;; Move backward until we find the start of the sentence
+    (skip-syntax-backward "-")
+    ;; If at the beginning of a buffer, set the start position to the beginning of the buffer
+    (when (eq (char-before) nil)
+      (setq pos-start (point-min)))
+    ;; Move forward until we find the end of the sentence
+    (skip-syntax-forward "w")
+    ;; Mark the beginning of the sentence area
+    (set-mark-command nil)
+    ;; Save the current buffer position and mark as the end position
+    (setq pos-end (point))
+    ;; Go back to the start of the sentence
+    (goto-char pos-start)
+    ;; Select the marked area
+    (exchange-point-and-mark)
+    ;; Return the text within the sentence area
+    (buffer-substring-no-properties (region-beginning) (region-end))))
+
+(global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
+
 ;; 快速打开配置文件
 (defun open-init-file-and-eval()
   (interactive)
   (find-file "~/.emacs.d/init.el")
   (eval-buffer))
-
-(defun open-editing-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/editing.el"))
-
-(defun open-navigation-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/navigation.el"))
-
-(defun open-ui-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/ui.el"))
-
-(defun open-misc-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/misc.el"))
 
 (defun open-tools-file()
   (interactive)
@@ -584,11 +641,7 @@ Return the fastest package archive."
   (find-file "~/.emacs.d/customizations/init-org.el"))
 
 (global-set-key (kbd "<f1>") 'open-init-file-and-eval)
-(global-set-key (kbd "<f2>") 'open-editing-file)
-(global-set-key (kbd "<f3>") 'open-navigation-file)
-(global-set-key (kbd "<f4>") 'open-ui-file)
 (global-set-key (kbd "<f10>") 'open-task-org-file)
-(global-set-key (kbd "<f6>") 'open-misc-file)
 (global-set-key (kbd "<f9>") 'open-tools-file)
   (global-set-key (kbd "<f5>") 'open-org-file)
 
@@ -623,6 +676,100 @@ Return the fastest package archive."
   ("k" move-line-down "down")
   ("f" nil "finished" :exit t))
 ;; hercules arrives with any other key binding
+
+;; Directory operations
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map
+         ("C-c C-p" . wdired-change-to-wdired-mode))
+  :config
+  ;; Guess a default target directory
+  (setq dired-dwim-target t)
+
+  ;; Always delete and copy recursively
+  (setq dired-recursive-deletes 'always
+        dired-recursive-copies 'always)
+
+  ;; Show directory first
+  (setq dired-listing-switches "-alh --group-directories-first")
+
+  (when *IS-MAC*
+    (if (executable-find "gls")
+        (progn
+          ;; Use GNU ls as `gls' from `coreutils' if available.
+          (setq insert-directory-program "gls")
+          ;; Using `insert-directory-program'
+          (setq ls-lisp-use-insert-directory-program t))
+      (progn
+        ;; Suppress the warning: `ls does not support --dired'.
+        (setq dired-use-ls-dired nil)
+        (setq dired-listing-switches "-alh"))))
+
+  ;; Quick sort dired buffers via hydra
+  (use-package dired-quick-sort
+    :bind (:map dired-mode-map
+           ("S" . hydra-dired-quick-sort/body)))
+
+  ;; Show git info in dired
+  (use-package dired-git-info
+    :bind (:map dired-mode-map
+           (")" . dired-git-info-mode)))
+
+  ;; Allow rsync from dired buffers
+  (use-package dired-rsync
+    :bind (:map dired-mode-map
+           ("C-c C-r" . dired-rsync)))
+
+  ;; Colorful dired
+  (use-package diredfl
+    :hook (dired-mode . diredfl-mode))
+
+  ;; Shows icons
+  (use-package nerd-icons-dired
+    :diminish
+    :custom-face
+    (nerd-icons-dired-dir-face ((t (:inherit nerd-icons-dsilver :foreground unspecified))))
+    :hook (dired-mode . nerd-icons-dired-mode)
+    :config
+    ;; WORKAROUND: display transparent background of icons
+    ;; @see https://github.com/rainstormstudio/nerd-icons-dired/issues/1#issuecomment-2628680359
+    (defun my-nerd-icons-dired--add-overlay (pos string)
+      "Add overlay to display STRING at POS."
+      (let ((ov (make-overlay (1- pos) pos)))
+        (overlay-put ov 'nerd-icons-dired-overlay t)
+        (overlay-put ov 'after-string
+                     (propertize "_" 'display string))))
+    (advice-add #'nerd-icons-dired--add-overlay :override #'my-nerd-icons-dired--add-overlay))
+
+  ;; Extra Dired functionality
+  (use-package dired-aux :ensure nil)
+  (use-package dired-x
+    :ensure nil
+    :demand t
+    :config
+    (let ((cmd (cond (*IS-MAC* "open")
+                     (*IS-LINUX* "xdg-open")
+                     (t ""))))
+      (setq dired-guess-shell-alist-user
+            `(("\\.pdf\\'" ,cmd)
+              ("\\.docx\\'" ,cmd)
+              ("\\.\\(?:djvu\\|eps\\)\\'" ,cmd)
+              ("\\.\\(?:jpg\\|jpeg\\|png\\|gif\\|xpm\\)\\'" ,cmd)
+              ("\\.\\(?:xcf\\)\\'" ,cmd)
+              ("\\.csv\\'" ,cmd)
+              ("\\.tex\\'" ,cmd)
+              ("\\.\\(?:mp4\\|mkv\\|avi\\|flv\\|rm\\|rmvb\\|ogv\\)\\(?:\\.part\\)?\\'" ,cmd)
+              ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd)
+              ("\\.html?\\'" ,cmd)
+              ("\\.md\\'" ,cmd))))
+
+    (setq dired-omit-files
+          (concat dired-omit-files
+                  "\\|^.DS_Store$\\|^.projectile$\\|^.git*\\|^.svn$\\|^.vscode$\\|\\.js\\.meta$\\|\\.meta$\\|\\.elc$\\|^.emacs.*"))))
+
+;; `find-dired' alternative using `fd'
+(when (executable-find "fd")
+  (use-package fd-dired))
 
 (use-package ibuffer
   :ensure nil
@@ -742,9 +889,10 @@ Return the fastest package archive."
                              ;;  :empty-lines 1
                              ;;  :jump-to-captured t
                              ;;  :prepend f)
-                             ("l" "today i learned..." entry (file+olp+datetree "Journal.org")
+                             ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
                               "* %U - :%?"
                               :empty-lines-after 1
+                              :jump-to-captured t
                               :prepend f)
                              ("w" "Web site" entry
                               (file "")
@@ -991,6 +1139,110 @@ Return the fastest package archive."
     :config
 (setq deft-directory "~/Dropbox/Notes")
 (setq deft-extensions '("org")))
+
+(menu-bar-mode 1)
+
+;; Set up the visible bell
+(setq visible-bell t)
+;; Go straight to scratch buffer on startup
+(setq inhibit-startup-message t)
+;(toggle-frame-maximized)
+
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
+(setq mouse-wheel-progressive-speed nil)
+
+;;modeline上显示我的所有的按键和执行的命令
+(require 'keycast)
+(keycast-header-line-mode t)
+
+;(setq-default cursor-type '(bar . 5))
+(column-number-mode)
+(global-display-line-numbers-mode t)
+
+;; Set frame transparency
+;; Make frame transparency overridable
+(defvar frame-transparency '(95 . 95))
+
+;; (set-frame-parameter (selected-frame) 'alpha frame-transparency)
+;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
+;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (if (display-graphic-p)
+                (menu-bar-mode 1)
+              (menu-bar-mode -1))))
+
+
+;; hide the frame title
+;; (add-to-list 'default-frame-alist '(undecorated . t))
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+;; (set-fringe-mode 2)        ; Give some breathing room
+
+(global-visual-line-mode t)
+(require 'visual-fill-column)
+(add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
+(setq-default visual-fill-column-center-text t)
+(setq-default visual-fill-column-width 120)
+
+
+
+(use-package nerd-icons
+  :ensure t
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
+
+
+;; ;; These settings relate to how emacs interacts with your operating system
+;; (setq ;; makes killing/yanking interact with the clipboard
+;;       x-select-enable-clipboard t
+
+;;       ;; I'm actually not sure what this does but it's recommended?
+;;       x-select-enable-primary t
+
+;;       ;; Save
+;; (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
+
+(add-hook 'switch-buffer-functions
+          (lambda (prev curr)
+            (cl-assert (eq curr (current-buffer)))  ;; Always t
+            (message "%S -> %S" prev curr))) ;;TODO
+
+;; emacs windows configuration layout stack
+(use-package winner
+  :ensure nil
+  :hook (after-init . winner-mode)
+  :commands (winner-undo winner-redo)
+  :config
+  (setq winner-boring-buffers
+        '("*Completions*"
+          "*Compile-Log*"
+          "*inferior-lisp*"
+          "*Fuzzy Completions*"
+          "*Apropos*"
+          "*Help*"
+          "*cvs*"
+          "*Buffer List*"
+          "*Ibuffer*"
+          "*esh command on file*"))
+  )
 
 ;; Color Themes
   ;; Read http://batsov.com/articles/2012/02/19/color-theming-in-emacs-reloaded/
@@ -1368,13 +1620,6 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 ;;         ))
 ;; (global-svg-tag-mode 1)
 
-;;      (tab-bar-mode 1)
-;;      (setq tab-bar-new-button-show nil)
-;;      (setq tab-bar-close-button-show nil)
-;;      (setq tab-bar-show 1)
-;;      (setq tab-bar-tab-hints nil) ;; show number
-;;      (setq tab-bar-auto-width nil) ;; 取消自动 padding 大小(29.2 引入)
-;;      (setq )
 ;;      (defun my/update-tab-bar-after-theme-change (&rest _args)
 ;;        "Update tab bar face attributes after a theme change."
 ;;        (set-face-attribute 'tab-bar-tab nil
@@ -1395,14 +1640,15 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
 
 (use-package tabspaces
+  :hook (after-init . tabspaces-mode)
   :defer nil
   :init
   (defun +tab-bar-tab-name-function ()
     "Generate a name for the current tab based on the buffer name.
-      If the buffer name exceeds `tab-bar-tab-name-truncated-max` characters,
-      truncate it and append `tab-bar-tab-name-ellipsis`.  If there are multiple
-      windows in the tab, append the count of windows in parentheses.
-      Return the formatted tab name."
+        If the buffer name exceeds `tab-bar-tab-name-truncated-max` characters,
+        truncate it and append `tab-bar-tab-name-ellipsis`.  If there are multiple
+        windows in the tab, append the count of windows in parentheses.
+        Return the formatted tab name."
     (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
            (count (length (window-list-1 nil 'nomini)))
            (truncated-tab-name (if (< (length raw-tab-name)
@@ -1417,13 +1663,13 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
   (defun +tab-bar-tab-name-format-function (tab i)
     "Format the display name for a tab in the tab bar.
-      TAB is the tab descriptor, and I is the tab index.  Apply custom
-      styling to the tab name and index using `tab-bar-tab-face-function`.
+        TAB is the tab descriptor, and I is the tab index.  Apply custom
+        styling to the tab name and index using `tab-bar-tab-face-function`.
 
-      - Prefix the tab with its index and a colon, styled with a bold weight.
-      - Surround the tab name with spaces, adjusting vertical alignment
-        for aesthetics.
-      - Return the formatted tab name with applied text properties."
+        - Prefix the tab with its index and a colon, styled with a bold weight.
+        - Surround the tab name with spaces, adjusting vertical alignment
+          for aesthetics.
+        - Return the formatted tab name with applied text properties."
     (let ((face (funcall tab-bar-tab-face-function tab)))
       (concat
        ;; change tab-bar's height
@@ -1459,7 +1705,8 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   (tab-bar-auto-width-max '((200)  20))
   ;; Sessions
   (tabspaces-session t)
-  (tabspaces-session-auto-restore t))
+  (tabspaces-session-auto-restore t)
+  )
 
 ;; telega notification
 (defvar +tab-bar-telega-indicator-cache nil)
@@ -2025,15 +2272,14 @@ to refresh the icon and returns the updated value."
 
 (use-package shackle
   :ensure t
-  :defer nil
-  :init
-
-   (setq shackle-lighter "")
-   (setq shackle-select-reused-windows nil) ; default nil
-   (setq shackle-default-alignment 'below) ; default below
-   (setq shackle-default-size 0.4) ; default 0.5
-   (setq shackle-default-rule '(:select t))
-   (setq shackle-rules
+  ;; :defer nil
+  :custom
+   (shackle-lighter "")
+   (shackle-select-reused-windows nil) ; default nil
+   (shackle-default-alignment 'below) ; default below
+   (shackle-default-size 0.4) ; default 0.5
+   (shackle-default-rule '(:select t))
+   (shackle-rules
          ;; CONDITION(:regexp)            :select     :inhibit-window-quit   :size+:align|:other     :same|:popup
          '((compilation-mode              :select nil                                                            )
            ("*undo-tree*"                 :size 0.25                         :align right)
@@ -2057,51 +2303,44 @@ to refresh the icon and returns the updated value."
            (pdf-outline-buffer-mode :select t :align 'below)
            ("*eshell*" :select t :align below :size 0.3 :popup t)
            ("*Gemini*" :select t :align right :size 0.4 :popup t)
+         
            ))
-   :config
-   (shackle-mode 1))
+   :hook
+   (after-init . shackle-mode))
 
 (use-package popper
   :ensure t
   :bind (("C-`"   . popper-toggle)
          ("M-`"   . popper-cycle)
          ("C-M-`" . popper-toggle-type))
-  :init
-  (setq popper-reference-buffers
+  :custom
+  (popper-reference-buffers
         '("\\*Messages\\*"
           "\\*Async Shell Command\\*"
           help-mode
-          helpful-mode
           occur-mode
-          pass-view-mode
           eshell-mode
-          "^\\*eshell.*\\*$" eshell-mode ;; eshell as a popup
-          "^\\*shell.*\\*$"  shell-mode  ;; shell as a popup
+          "^\\*eshell.*\\*$" eshell-mode 
+          "^\\*shell.*\\*$"  shell-mode
           ;; ("\\*corfu\\*" . hide)
           (compilation-mode . hide)
           ibuffer-mode
-          debugger-mode
-          ;; "CAPTURE-Task.org"
-          ;; derived from `fundamental-mode' and fewer than 10 lines will be considered a popup
-          (lambda (buf) (with-current-buffer buf
-                          (and (derived-mode-p 'fundamental-mode)
-                               (< (count-lines (point-min) (point-max))
-                                  10))))
+          debugger-mode           
           magit-status-mode
-          )
-        )
-  (popper-mode +1)
-  (popper-echo-mode +1)
-  :config
+          "*Gemini*"
+          ))
   ;; group by project.el, projectile, directory or perspective
-  (setq popper-group-function nil)
-
+  (popper-group-function nil)
   ;; pop in child frame or not
-  (setq popper-display-function #'display-buffer-in-child-frame)
-
+  (popper-display-function #'display-buffer-in-child-frame)
   ;; use `shackle.el' to control popup
-  (setq popper-display-control nil)
+  (popper-display-control nil)
 
+  :hook 
+  (after-init . popper-mode)
+  (after-init . popper-echo-mode)
+
+  :config    
   ;; HACK: close popper window with `C-g'
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."
@@ -2114,6 +2353,154 @@ to refresh the icon and returns the updated value."
   (advice-add #'keyboard-quit-dwim :before #'+popper-close-window-hack)
   )
 
+;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+ ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+
+ (defun my/set-tab-theme ()
+   (let ((bg (face-attribute 'mode-line :background))
+         (fg (face-attribute 'default :foreground))
+       (hg (face-attribute 'default :background))
+         (base (face-attribute 'mode-line :background))
+         (box-width (/ (line-pixel-height) 4)))
+     (set-face-attribute 'tab-line nil
+               :background base
+               :foreground fg
+               :height 0.8
+               :inherit nil
+               :box (list :line-width -1 :color base)
+               )
+     (set-face-attribute 'tab-line-tab nil
+               :foreground fg
+               :background bg
+               :weight 'normal
+               :inherit nil
+               :box (list :line-width box-width :color bg))
+     (set-face-attribute 'tab-line-tab-inactive nil
+               :foreground fg
+               :background base
+               :weight 'normal
+               :inherit nil
+               :box (list :line-width box-width :color base))
+     (set-face-attribute 'tab-line-highlight nil
+               :foreground fg
+               :background hg
+               :weight 'normal
+               :inherit nil
+               :box (list :line-width box-width :color hg))
+     (set-face-attribute 'tab-line-tab-current nil
+               :foreground fg
+               :background hg
+               :weight 'normal
+               :inherit nil
+               :box (list :line-width box-width :color hg))))
+
+ (defun my/tab-line-name-buffer (buffer &rest _buffers)
+   "Create name for tab with padding and truncation.
+   If buffer name is shorter than `tab-line-tab-max-width' it gets
+   centered with spaces, otherwise it is truncated, to preserve
+   equal width for all tabs.  This function also tries to fit as
+   many tabs in window as possible, so if there are no room for tabs
+   with maximum width, it calculates new width for each tab and
+   truncates text if needed.  Minimal width can be set with
+   `tab-line-tab-min-width' variable."
+   (with-current-buffer buffer
+     (let* ((window-width (window-width (get-buffer-window)))
+            (tab-amount (length (tab-line-tabs-window-buffers)))
+            (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                      (/ window-width tab-amount)
+                                    tab-line-tab-max-width))
+            (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                 tab-line-tab-max-width)
+                                ((< window-max-tab-width tab-line-tab-min-width)
+                                 tab-line-tab-min-width)
+                                (t window-max-tab-width))
+                          3)) ;; compensation for ' x ' button
+            (buffer-name (string-trim (buffer-name)))
+            (name-width (length buffer-name)))
+       (if (>= name-width tab-width)
+           (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+         (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                (buffer-name (concat padding buffer-name)))
+           (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+
+ (defun tab-line-close-tab (&optional e)
+   "Close the selected tab.
+   If tab is presented in another window, close the tab by using
+   `bury-buffer` function.  If tab is unique to all existing
+   windows, kill the buffer with `kill-buffer` function.  Lastly, if
+   no tabs left in the window, it is deleted with `delete-window`
+   function."
+   (interactive "e")
+   (let* ((posnp (event-start e))
+          (window (posn-window posnp))
+          (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+     (with-selected-window window
+       (let ((tab-list (tab-line-tabs-window-buffers))
+             (buffer-list (flatten-list
+                           (seq-reduce (lambda (list window)
+                                         (select-window window t)
+                                         (cons (tab-line-tabs-window-buffers) list))
+                                       (window-list) nil))))
+         (select-window window)
+         (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+             (progn
+               (if (eq buffer (current-buffer))
+                   (bury-buffer)
+                 (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                 (set-window-next-buffers window (delq buffer (window-next-buffers))))
+               (unless (cdr tab-list)
+                 (ignore-errors (delete-window window))))
+           (and (kill-buffer buffer)
+                (unless (cdr tab-list)
+                  (ignore-errors (delete-window window)))))))))
+
+ (use-package tab-line
+   :ensure nil
+   :hook (after-init . global-tab-line-mode)
+   :config
+
+   (defcustom tab-line-tab-min-width 10
+     "Minimum width of a tab in characters."
+     :type 'integer
+     :group 'tab-line)
+
+   (defcustom tab-line-tab-max-width 30
+     "Maximum width of a tab in characters."
+     :type 'integer
+     :group 'tab-line)
+
+   (setq tab-line-close-button-show t
+         tab-line-new-button-show nil
+         tab-line-separator ""
+         tab-line-tab-name-function #'my/tab-line-name-buffer
+         tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                           'keymap tab-line-right-map
+                                           'mouse-face 'tab-line-highlight
+                                           'help-echo "Click to scroll right")
+         tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                          'keymap tab-line-left-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll left")
+         tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                           'keymap tab-line-tab-close-map
+                                           'mouse-face 'tab-line-close-highlight
+                                           'help-echo "Click to close tab"))
+
+   ;; (my/set-tab-theme)
+
+   ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
+   ;;(add-to-list 'tab-line-exclude-modes mode))
+   (dolist (mode '(ediff-mode process-menu-mode))
+     (add-to-list 'tab-line-exclude-modes mode))
+
+   ;; (use-package sort-tab
+   ;;   :defer nil
+   ;;   :vc (:url "https://github.com/manateelazycat/sort-tab")
+   ;;   :init (sort-tab-mode 1))
+   )
+
+(global-tab-line-mode t)
+
 ;; (with-eval-after-load "persp-mode-autoloads"
 ;;   (setq wg-morph-on nil) ;; switch off animation
 ;;   (setq persp-autokill-buffer-on-remove 'kill-weak)
@@ -2121,10 +2508,11 @@ to refresh the icon and returns the updated value."
 
 (use-package workgroups2
   :defer t
-  :init (setq wg-prefix-key (kbd "C-c w"))
-  :config
-  (workgroups-mode 1)
-  (setq wg-session-file "~/.emacs.d/var/workgroups"))
+  :hook
+  (after-init . workgroups-mode)
+  :custom
+  (wg-prefix-key (kbd "C-c w"))
+  (wg-session-file "~/.emacs.d/var/workgroups"))
 
 (use-package auto-save
     :defer nil
@@ -2200,7 +2588,8 @@ to refresh the icon and returns the updated value."
         treemacs-sorting                 'alphabetic-asc
         treemacs-follow-after-init       t
         treemacs-width                   30
-        treemacs-no-png-images           nil)
+        ;; treemacs-no-png-images           (not centaur-icon)
+        )
 
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
@@ -2213,6 +2602,7 @@ to refresh the icon and returns the updated value."
 
   (use-package treemacs-nerd-icons
     :demand t
+    ;; :when (icons-displayable-p)
     :custom-face
     (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
     (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
@@ -2229,76 +2619,77 @@ to refresh the icon and returns the updated value."
     :demand t
     :config (treemacs-set-scope-type 'Tabs)))
 
+  ;; (treemacs-start-on-boot)
+
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/copilot.el-main")
-  ;; (require 'copilot)
-  ;; (add-hook 'prog-mode-hook 'copilot-mode)
-  ;; ;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  ;; (define-key copilot-completion-map (kbd "M-w") 'copilot-accept-completion-by-word)
-  ;; (define-key copilot-completion-map (kbd "M-q") 'copilot-accept-completion-by-line)
+;; (require 'copilot)
+;; (add-hook 'prog-mode-hook 'copilot-mode)
+;; ;; (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+;; (define-key copilot-completion-map (kbd "M-w") 'copilot-accept-completion-by-word)
+;; (define-key copilot-completion-map (kbd "M-q") 'copilot-accept-completion-by-line)
 
-  (use-package gptel
-    :ensure nil
-    :defer t
-    :vc (:url "https://github.com/karthink/gptel")
-    :config
-    ;; default backend configuration
-    ;; (setq
-    ;;  gptel-model "codegeex4:latest"
-    ;;  gptel-backend (gptel-make-ollama "Ollama"
-    ;;                  :host "localhost:11434"
-    ;;                  :stream t
-    ;;                  :models '("codegeex4:latest")))
+(use-package gptel
+  :ensure nil
+  :defer nil
+  :vc (:url "https://github.com/karthink/gptel")
+  :config
+  ;; default backend configuration
+  ;; (setq
+  ;;  gptel-model "codegeex4:latest"
+  ;;  gptel-backend (gptel-make-ollama "Ollama"
+  ;;                  :host "localhost:11434"
+  ;;                  :stream t
+  ;;                  :models '("codegeex4:latest")))
 
-    ;; DeepSeek offers an OpenAI compatible API
-    (defun get-openai-api-key ()
-      "Return the OpenAI API key from ~/.authinfo."
-      (let ((authinfo-file (expand-file-name "~/.authinfo")))
-        (with-temp-buffer
-          (insert-file-contents authinfo-file)
-          (goto-char (point-min))
-          (when (re-search-forward "^machine api\\.deepseek\\.com login apikey password \\(\\S-+\\)$" nil t)
-            (match-string 1)))))
+  ;; DeepSeek offers an OpenAI compatible API
+  (defun get-openai-api-key ()
+    "Return the OpenAI API key from ~/.authinfo."
+    (let ((authinfo-file (expand-file-name "~/.authinfo")))
+      (with-temp-buffer
+        (insert-file-contents authinfo-file)
+        (goto-char (point-min))
+        (when (re-search-forward "^machine api\\.deepseek\\.com login apikey password \\(\\S-+\\)$" nil t)
+          (match-string 1)))))
 
-    ;; (setq gptel-model   "deepseek-chat"
-    ;;       gptel-backend
-    ;;       (gptel-make-openai "DeepSeek"     ;Any name you want
-    ;;         :host "api.deepseek.com"
-    ;;         :endpoint "/chat/completions"
-    ;;         :stream t
-    ;;         :key (get-openai-api-key)             ;can be a function that returns the key
-    ;;         :models '("deepseek-chat" "deepseek-coder")))
-
-    ;; OPTIONAL configuration
-    (setq
-     gptel-default-mode 'org-mode
-     gptel-model 'gemini-2.0-flash
-     gptel-backend (gptel-make-gemini "Gemini"
-                     :key "AIzaSyCNSfEqa_MS8PQGuJPNVWwfM0ivkuTe7xM"
-                     :stream t))
-
-    (use-package gptel-quick
-      :vc (:url "https://github.com/karthink/gptel-quick")
-    :config
-    (keymap-set embark-general-map "?" #'gptel-quick))
-
-)
+  (defvar gptel-make-gemini
+    (gptel-make-gemini "Gemini"
+      :key "AIzaSyCNSfEqa_MS8PQGuJPNVWwfM0ivkuTe7xM"
+      :stream t))
+  ;; OPTIONAL configuration
+  (setq
+   gptel-default-mode 'org-mode
+   gptel-model 'gemini-2.0-flash
+   gptel-backend gptel-make-gemini)
 
 
-  ;; (use-package immersive-translate
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
-  ;;   (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
-  ;;   )
-  ;; (setq immersive-translate-backend 'DeepSeek
-  ;;       immersive-translate-chatgpt-host "api.deepseek.com")
-  (require 'go-translate)
-  ;; (setq gt-langs '(en fr))
-  (setq gt-preset-translators
-        `((ts-1 . ,(gt-translator
-                    :taker (gt-taker :langs '(en zh) :text 'buffer)
-                    :engines (list (gt-google-engine))
-                    :render (gt-overlay-render)))))
+  )
+
+(use-package gptel-quick
+  :defer nil
+  :after gptel
+  :vc (gptel-quick :url "https://github.com/karthink/gptel-quick" :rev :newest)
+  :config
+  (setq gptel-quick-backend gptel-make-gemini
+        gptel-quick-model 'gemini-2.0-flash)
+  ;; ;; (keymap-set embark-general-map "?" #'gptel-quick)
+  ;; :hook （after-init . gptel-quick）
+  )
+
+;; (use-package immersive-translate
+;;   :ensure t
+;;   :config
+;;   (add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
+;;   (add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
+;;   )
+;; (setq immersive-translate-backend 'DeepSeek
+;;       immersive-translate-chatgpt-host "api.deepseek.com")
+(require 'go-translate)
+;; (setq gt-langs '(en fr))
+(setq gt-preset-translators
+      `((ts-1 . ,(gt-translator
+                  :taker (gt-taker :langs '(en zh) :text 'buffer)
+                  :engines (list (gt-google-engine))
+                  :render (gt-overlay-render)))))
 
 (use-package ox-hugo
   :ensure t
@@ -2321,122 +2712,263 @@ to refresh the icon and returns the updated value."
 (use-package eww
   :hook (eww-mode . my-nov-font-setup))
 
-  (use-package nov
-       :ensure t
-       :defer t
-       :mode ("\\.epub\\'" . nov-mode)
-       :bind (:map nov-mode-map
-                   ("j" . scroll-up-line)
-                   ("k" . scroll-down-line)))
+(use-package nov
+  :ensure t
+  :defer t
+  :mode ("\\.epub\\'" . nov-mode)
+  :bind (:map nov-mode-map
+              ("j" . scroll-up-line)
+              ("k" . scroll-down-line)))
 
-     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-     (setq nov-text-width 80)
-     ;; (setq nov-text-width t)
-     (setq visual-fill-column-center-text t)
-     (add-hook 'nov-mode-hook 'visual-line-mode)
-     (add-hook 'nov-mode-hook 'visual-fill-column-mode)
+(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+(setq nov-text-width 80)
+;; (setq nov-text-width t)
+(setq visual-fill-column-center-text t)
+(add-hook 'nov-mode-hook 'visual-line-mode)
+(add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
-     (add-hook 'nov-mode-hook 'my-nov-font-setup)
+(add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-     ;;Nov-rendering
-     (add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
-     (require 'justify-kp)
-     (use-package justify-kp
-       :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) :defer t)
+;;Nov-rendering
+(add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
+(require 'justify-kp)
+(use-package justify-kp
+  :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) :defer t)
 
-     (setq nov-text-width t)
+(setq nov-text-width t)
 
-     (defun my-nov-window-configuration-change-hook ()
-       (my-nov-post-html-render-hook)
-       (remove-hook 'window-configuration-change-hook
-                    'my-nov-window-configuration-change-hook
-                    t))
-     (defun my-nov-post-html-render-hook ()
-       (if (get-buffer-window)
-           (let ((max-width (pj-line-width))
-                 buffer-read-only)
-             (save-excursion
-               (goto-char (point-min))
-               (while (not (eobp))
-                 (when (not (looking-at "^[[:space:]]*$"))
-                   (goto-char (line-end-position))
-                   (when (> (shr-pixel-column) max-width)
-                     (goto-char (line-beginning-position))
-                     (pj-justify)))
-                 (forward-line 1))))
-         (add-hook 'window-configuration-change-hook
-                   'my-nov-window-configuration-change-hook
-                   nil t)))
+(defun my-nov-window-configuration-change-hook ()
+  (my-nov-post-html-render-hook)
+  (remove-hook 'window-configuration-change-hook
+               'my-nov-window-configuration-change-hook
+               t))
+(defun my-nov-post-html-render-hook ()
+  (if (get-buffer-window)
+      (let ((max-width (pj-line-width))
+            buffer-read-only)
+        (save-excursion
+          (goto-char (point-min))
+          (while (not (eobp))
+            (when (not (looking-at "^[[:space:]]*$"))
+              (goto-char (line-end-position))
+              (when (> (shr-pixel-column) max-width)
+                (goto-char (line-beginning-position))
+                (pj-justify)))
+            (forward-line 1))))
+    (add-hook 'window-configuration-change-hook
+              'my-nov-window-configuration-change-hook
+              nil t)))
 
-     (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
+(add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
 
-     (require 'pdf-tools)
-     (pdf-tools-install)  ; Standard activation command
-     (pdf-loader-install) ; On demand loading, leads to faster startup time
+(require 'pdf-tools)
+(pdf-tools-install)  ; Standard activation command
+(pdf-loader-install) ; On demand loading, leads to faster startup time
 
-     ;; == Markdown ==
-     (use-package markdown-mode
-       :ensure t
-      :defer t
-       :init
-       (add-hook 'markdown-mode-hook 'variable-pitch-mode)
-       (add-hook 'markdown-mode-hook 'my-nov-font-setup)
+;; == Markdown ==
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'markdown-mode-hook 'variable-pitch-mode)
+  (add-hook 'markdown-mode-hook 'my-nov-font-setup)
 
-       :mode (("\\.text\\'" . markdown-mode)
-              ("\\.markdown\\'" . markdown-mode)
-              ("\\.md\\'" . markdown-mode))
-       :config
-       (markdown-display-inline-images)
+  :mode (("\\.text\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode))
+  :config
+  (markdown-display-inline-images)
 
-      )
+  )
 
-     (use-package flyspell
-       :defer t
-       :diminish (flyspell-mode . " φ"))
+(use-package flyspell
+  :defer t
+  :diminish (flyspell-mode . " φ"))
 
-     ;;calibre
-     (use-package calibredb
-       :ensure t
-       :defer t
-       :commands calibredb
-       :bind ("\e\e b" . calibredb)
-       :config
-       (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
-       (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-       (setq calibredb-library-alist '(("~/Books/books")
-                                       ))
-       )
+;;calibre
+(use-package calibredb
+  :ensure t
+  :defer t
+  :commands calibredb
+  :bind ("\e\e b" . calibredb)
+  :config
+  (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Books/books")
+                                  ))
+  )
 
-     ;; bing-dict
-     (use-package bing-dict :ensure t)
-     (global-set-key (kbd "C-c d") 'bing-dict-brief)
-     (setq bing-dict-vocabulary-save t)
-     (setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
+;; bing-dict
+(use-package bing-dict :ensure t)
+(global-set-key (kbd "C-c d") 'bing-dict-brief)
+(setq bing-dict-vocabulary-save t)
+(setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
 
 (defun capture-sentence-at-point ()
-"Capture the sentence where the word at point is located."
-(interactive)
-(let* ((word (thing-at-point 'word))  ; Get the word at point
-       (sentence (save-excursion
-                   (let ((sentence-start (progn
-                                            (backward-sentence)  ; Move to the beginning of the sentence
-                                            (point)))
-                         (sentence-end (progn
-                                         (forward-sentence)  ; Move to the end of the sentence
-                                         (point))))
-           (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
-                     (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
-  (if word
-      (message "The word is: %s\nThe sentence is: %s" word sentence)
-    (message "No word found at point."))))
+  "Capture the sentence where the word at point is located."
+  (interactive)
+  (let* ((word (thing-at-point 'word))  ; Get the word at point
+         (sentence (save-excursion
+                     (let ((sentence-start (progn
+                                             (backward-sentence)  ; Move to the beginning of the sentence
+                                             (point)))
+                           (sentence-end (progn
+                                           (forward-sentence)  ; Move to the end of the sentence
+                                           (point))))
+                       (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
+                       (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
+    (if word
+        (message "The word is: %s\nThe sentence is: %s" word sentence)
+      (message "No word found at point."))))
 
-     ;; google-translate
-     ;; (use-package google-translate
-     ;;   :defines (google-translate-translation-directions-alist)
-     ;;   :bind (("C-c g" . google-translate-smooth-translate))
-     ;;   :config
-     ;;   (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
-     ;; )
+;; google-translate
+(use-package google-translate
+  :defines (google-translate-translation-directions-alist)
+  :bind (("C-c g" . google-translate-smooth-translate))
+  :config
+  (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
+  )
+
+;; Atom/RSS reader
+(use-package elfeed
+  ;; :pretty-hydra
+  ;; ((:title (pretty-hydra-title "Elfeed" 'faicon "nf-fa-rss_square" :face 'nerd-icons-orange)
+  ;;   :color amaranth :quit-key ("q" "C-g"))
+  ;;  ("Search"
+  ;;   (("c" elfeed-db-compact "compact db")
+  ;;    ("g" elfeed-search-update--force "refresh")
+  ;;    ("G" elfeed-search-fetch "update")
+  ;;    ("y" elfeed-search-yank "copy URL")
+  ;;    ("+" elfeed-search-tag-all "tag all")
+  ;;    ("-" elfeed-search-untag-all "untag all"))
+  ;;   "Filter"
+  ;;   (("l" elfeed-search-live-filter "live filter")
+  ;;    ("s" elfeed-search-set-filter "set filter")
+  ;;    ("*" (elfeed-search-set-filter "@6-months-ago +star") "starred")
+  ;;    ("a" (elfeed-search-set-filter "@6-months-ago") "all")
+  ;;    ("t" (elfeed-search-set-filter "@1-day-ago") "today"))
+  ;;   "Article"
+  ;;   (("b" elfeed-search-browse-url "browse")
+  ;;    ("n" next-line "next")
+  ;;    ("p" previous-line "previous")
+  ;;    ("u" elfeed-search-tag-all-unread "mark unread")
+  ;;    ("r" elfeed-search-untag-all-unread "mark read")
+  ;;    ("RET" elfeed-search-show-entry "show"))))
+  :bind (("C-x w" . elfeed)
+         :map elfeed-search-mode-map
+         ("?" . elfeed-hydra/body)
+         :map elfeed-show-mode-map
+         ("q" . delete-window))
+  ;; :hook (elfeed-show-mode . centaur-read-mode)
+  :init (setq url-queue-timeout 30
+              elfeed-db-directory (locate-user-emacs-file ".elfeed")
+              elfeed-show-entry-switch #'pop-to-buffer
+              elfeed-show-entry-delete #'delete-window
+              elfeed-feeds '(("https://planet.emacslife.com/atom.xml" planet emacslife)
+                             ("http://www.masteringemacs.org/feed/" mastering)
+                             ("https://oremacs.com/atom.xml" oremacs)
+                             ("https://pinecast.com/feed/emacscast" emacscast)
+                             ("https://emacstil.com/feed.xml" Emacs TIL)
+                             ;; ("https://www.reddit.com/r/emacs.rss" reddit)
+                             ))
+  :config
+  ;; Ignore db directory in recentf
+  (push elfeed-db-directory recentf-exclude)
+
+  ;; Add icons via tags
+  
+  (defun nerd-icon-for-tags (tags)
+    "Generate Nerd Font icon based on tags.
+  Returns default if no match."
+    (cond ((member "youtube" tags)  (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
+          ((member "instagram" tags) (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
+          ((or (member "emacs" tags) (member "emacslife" tags) (member "mastering" tags))
+           (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
+          ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
+          (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
+
+  (defun lucius/elfeed-search-print-entry--better-default (entry)
+    "Print ENTRY to the buffer."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (date-width (car (cdr elfeed-search-date-format)))
+           (title (concat (or (elfeed-meta entry :title)
+                              (elfeed-entry-title entry) "")
+                          ;; NOTE: insert " " for overlay to swallow
+                          " "))
+           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+           (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+           (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
+           (title-width (- (frame-width)
+                           ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
+                           date-width elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width) :left))
+
+           ;; Title/Feed ALIGNMENT
+           (align-to-feed-pixel (+ date-width
+                                   (max elfeed-search-title-min-width
+                                        (min title-width elfeed-search-title-max-width)))))
+      (insert (propertize date 'face 'elfeed-search-date-face) " ")
+      (insert (propertize title-column 'face title-faces 'kbd-help title))
+      (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
+      ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when feed-title
+        (insert " " (concat (nerd-icon-for-tags tags) " ")
+                (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when tags (insert "(" tags-str ")"))))
+
+  (setq  elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
+
+  ;; Use xwidget if possible
+  (with-no-warnings
+    (defun my-elfeed-show-visit (&optional use-generic-p)
+      "Visit the current entry in your browser using `browse-url'.
+If there is a prefix argument, visit the current entry in the
+browser defined by `browse-url-generic-program'."
+      (interactive "P")
+      (let ((link (elfeed-entry-link elfeed-show-entry)))
+        (when link
+          (message "Sent to browser: %s" link)
+          (if use-generic-p
+              (browse-url-generic link)
+            (centaur-browse-url link)))))
+    (advice-add #'elfeed-show-visit :override #'my-elfeed-show-visit)
+
+    (defun my-elfeed-search-browse-url (&optional use-generic-p)
+      "Visit the current entry in your browser using `browse-url'.
+If there is a prefix argument, visit the current entry in the
+browser defined by `browse-url-generic-program'."
+      (interactive "P")
+      (let ((entries (elfeed-search-selected)))
+        (cl-loop for entry in entries
+                 do (elfeed-untag entry 'unread)
+                 when (elfeed-entry-link entry)
+                 do (if use-generic-p
+                        (browse-url-generic it)
+                      (centaur-browse-url it)))
+        (mapc #'elfeed-search-update-entry entries)
+        (unless (or elfeed-search-remain-on-entry (use-region-p))
+          (forward-line))))
+    (advice-add #'elfeed-search-browse-url :override #'my-elfeed-search-browse-url)))
+
+;; Another Atom/RSS reader
+(use-package newsticker
+  :ensure nil
+  :bind ("C-x W" . newsticker-show-news)
+  ;; :hook (newsticker-treeview-item-mode . centaur-read-mode)
+  :init (setq newsticker-url-list
+              '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
+                ("Mastering Emacs" "http://www.masteringemacs.org/feed/")
+                ("Oremacs" "https://oremacs.com/atom.xml")
+                ("EmacsCast" "https://pinecast.com/feed/emacscast")
+                ("Emacs TIL" "https://emacstil.com/feed.xml")
+                ;; ("Emacs Reddit" "https://www.reddit.com/r/emacs.rss")
+                )))
 
 (use-package anki-helper
     :vc (:url https://github.com/Elilif/emacs-anki-helper)
@@ -2448,24 +2980,25 @@ to refresh the icon and returns the updated value."
      '(anki-helper-default-deck "org-deck")))
     ;; Make mouse wheel / trackpad scrolling less jerky
 
-(use-package eglot
-  :defer t
-  :hook
-  ;; (python-ts-mode . eglot-ensure)
-  ;; (clojure-mode . eglot-ensure)
-  ;; (clojure-ts-mode . eglot-ensure)
-  ;; (clojure-ts-clojurescript-mode .eglot-ensure)
-  (eglot-managed-mode . #'my/eglot-capf)
-  :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyright")))
-  (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
-  (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp")))
-  (add-to-list 'eglot-server-programs '(clojure-ts-clojurescript-mode . ("clojure-lsp")))
+;; (use-package eglot
+;;   :defer t
+;;   :hook
+;;   ;; (python-ts-mode . eglot-ensure)
+;;   ;; (clojure-mode . eglot-ensure)
+;;   ;; (clojure-ts-mode . eglot-ensure)
+;;   ;; (clojure-ts-clojurescript-mode .eglot-ensure)
+;;   (eglot-managed-mode . #'my/eglot-capf)
+  
+;;   :config
+;;   (add-to-list 'eglot-server-programs '(python-mode . ("pyright")))
+;;   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
+;;   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp")))
+;;   (add-to-list 'eglot-server-programs '(clojure-ts-clojurescript-mode . ("clojure-lsp")))
 
-  (defun my/eglot-capf ()
-    "Set custom completion-at-point functions for Eglot."
-    (setq-local completion-at-point-functions '(eglot-completion-at-point)))
-  )
+;;   (defun my/eglot-capf ()
+;;     "Set custom completion-at-point functions for Eglot."
+;;     (setq-local completion-at-point-functions '(eglot-completion-at-point)))
+;;   )
 
 ;; (use-package eglot
 ;;   :hook (eglot-managed-mode . my-eglot-mode-hook)
@@ -2487,12 +3020,12 @@ to refresh the icon and returns the updated value."
 ;;   (define-key eglot-mode-map (kbd "C-c f") 'eglot-code-actions-current-line)
 ;;   (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions))
 
-(require 'eglot)
+;; (require 'eglot)
 
-  (require 'eglot-java)
-  (add-hook 'java-mode-hook #'eglot-java-mode)
-  (setq eglot-java-server-install-dir "~/codebase/src/java/eclipse.jdt.ls")
-  (setq eglot-java-eclipse-jdt-cache-directory "~/tmp/eglot-eclipse-jdt-cache")
+;;   (require 'eglot-java)
+;;   (add-hook 'java-mode-hook #'eglot-java-mode)
+;;   (setq eglot-java-server-install-dir "~/codebase/src/java/eclipse.jdt.ls")
+;;   (setq eglot-java-eclipse-jdt-cache-directory "~/tmp/eglot-eclipse-jdt-cache")
 
 ;; (require 'ejc-sql)
 ;; (setq clomacs-httpd-default-port 8090) ; Use a port other than 8080.
@@ -2556,13 +3089,13 @@ to refresh the icon and returns the updated value."
 ;;   :vc (:url "https://github.com/shanecelis/hideshow-org"))
 ;; (global-set-key (kbd"C-c h") 'hs-org/minor-mode)
 
-(use-package lsp-brigde
-  :vc (:url "https://github.com/manateelazycat/lsp-bridge")
-  :config
-  (global-lsp-bridge-mode))
+;; (use-package lsp-brigde
+;;   :vc (:url "https://github.com/manateelazycat/lsp-bridge")
+;;   :config
+;;   (global-lsp-bridge-mode))
 
-(require 'yasnippet)
-(yas-global-mode 1)
+;; (require 'yasnippet)
+;; (yas-global-mode 1)
 
 (use-package esup
   :ensure t
@@ -2677,40 +3210,40 @@ to refresh the icon and returns the updated value."
     :hook (after-init . electric-pair-mode)
     :init (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
-;; Enable desired features for all lisp modes
-(require 'clojure-ts-mode)
-(setq clojure-ts-grammar-recipes nil)
+;; ;; Enable desired features for all lisp modes
+;; (require 'clojure-ts-mode)
+;; (setq clojure-ts-grammar-recipes nil)
 
-(require 'clojure-mode)
-(setq clojure-indent-style 'always-indent
-      clojure-indent-keyword-style 'always-indent
-      clojure-enable-indent-specs nil)
+;; (require 'clojure-mode)
+;; (setq clojure-indent-style 'always-indent
+;;       clojure-indent-keyword-style 'always-indent
+;;       clojure-enable-indent-specs nil)
 
-(push '(clojure-mode . clojure-ts-mode) major-mode-remap-alist)
-(push '(clojurescript-mode . clojure-ts-clojurescript-mode) major-mode-remap-alist)
+;; (push '(clojure-mode . clojure-ts-mode) major-mode-remap-alist)
+;; (push '(clojurescript-mode . clojure-ts-clojurescript-mode) major-mode-remap-alist)
 
-(require 'cljsbuild-mode)
-(require 'elein)
+;; (require 'cljsbuild-mode)
+;; (require 'elein)
 
-(add-hook 'after-save-hook #'check-parens nil t)
+;; (add-hook 'after-save-hook #'check-parens nil t)
 
-(require 'cider)
-(setq nrepl-popup-stacktraces nil)
-(add-hook 'clojure-ts-mode-hook #'cider-mode)
+;; (require 'cider)
+;; (setq nrepl-popup-stacktraces nil)
+;; (add-hook 'clojure-ts-mode-hook #'cider-mode)
 
-(with-eval-after-load 'cider
-  (add-hook 'cider-repl-mode-hook 'subword-mode))
+;; (with-eval-after-load 'cider
+;;   (add-hook 'cider-repl-mode-hook 'subword-mode))
 
-(require 'flycheck-clojure)
-(with-eval-after-load 'clojure-ts-mode
-    (with-eval-after-load 'cider
-      (with-eval-after-load 'flycheck
-        (flycheck-clojure-setup))))
+;; (require 'flycheck-clojure)
+;; (with-eval-after-load 'clojure-ts-mode
+;;     (with-eval-after-load 'cider
+;;       (with-eval-after-load 'flycheck
+;;         (flycheck-clojure-setup))))
 
-(unless (package-installed-p 'inf-clojure)
-  (package-refresh-contents)
-  (package-install 'inf-clojure))
-(add-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
+;; (unless (package-installed-p 'inf-clojure)
+;;   (package-refresh-contents)
+;;   (package-install 'inf-clojure))
+;; (add-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
 
 ;; Emacs lisp mode
 (use-package elisp-mode
@@ -2902,6 +3435,68 @@ Lisp function does not specify a special indentation."
       (ansi-color-apply-on-region compilation-filter-start (point-max)))))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; shell scripts
+(setq-default sh-basic-offset 2)
+(setq-default sh-indentation 2)
+
+;; No need for ~ files when editing
+(setq create-lockfiles nil)
+
+;; NOTE: If you want to move everything out of the ~/.emacs.d folder
+;; reliably, set `user-emacs-directory` before loading no-littering!
+;(setq user-emacs-directory "~/.cache/emacs")
+
+(use-package no-littering)
+
+;; no-littering doesn't set this by default so we must place
+;; auto save files in the same path as it uses for sessions
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+
+(use-package helpful
+  :commands (helpful-callable helpful-variable helpful-command helpful-key)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+
+;; set up for programming languages
+;; (require 'highlight-indent-guides)
+;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+;; (set-face-background 'highlight-indent-guides-odd-face "darkgray")
+;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
+;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+;; (setq highlight-indent-guides-method 'character)
+
+
+(use-package plantuml
+            :load-path "~/.emacs.d/site-lisp/plantuml-emacs/")
+(setq plantuml-jar-path "~/.emacs.d/site-lisp/plantuml-1.2024.6.jar"
+      plantuml-output-type "svg"
+      plantuml-relative-path "/home/madcomet/Pictures/plantuml-image/"
+      plantuml-theme "plain"
+      plantuml-font "source code pro medium"
+      plantuml-add-index-number t
+      plantuml-log-command t
+      plantuml-mindmap-contains-org-content t
+      plantuml-org-headline-bold t)
+
+(use-package eshell-syntax-highlighting
+  :after eshell-mode
+  :ensure t ;; Install if not already installed.
+  :hook
+  ;; Enable in all Eshell buffers.
+  (eshell-mode . eshell-syntax-highlighting-global-mode))
+
+
 (windmove-default-keybindings 'control)
 
 
@@ -2939,8 +3534,8 @@ Lisp function does not specify a special indentation."
     ("M-i" . imenu-anywhere))
 
   (use-package smooth-scrolling
-    :config
-    (smooth-scrolling-mode 1))
+    :hook
+    (after-init . smooth-scrolling-mode))
 
   ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -2951,8 +3546,6 @@ Lisp function does not specify a special indentation."
    ;; 将原本放在 .emacs.d 目录下的一些配置信息或动态信息，转移到 etc 或 var 子目录里，让配置目录更加简洁清爽
    (use-package no-littering
      :ensure t :defer t)
-
-   (provide 'tool)
 
 (defvar latitude "31.30883235990429")
 (defvar longitude "120.73078133558143")
