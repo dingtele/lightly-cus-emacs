@@ -245,376 +245,377 @@ Return the fastest package archive."
 * Editing & KeyBinding
 ** editing
 #+begin_src emacs-lisp
-(when *IS-MAC*
-  ;; modify meta from ⌥ to ⌘
-  (custom-set-variables
-   '(mac-command-modifier 'meta)
-   '(mac-option-modifier 'super)
-   ;; '(mac-option-modifier 'alt)
-   ;; '(mac-right-option-modifier 'super)
-   )
-  (bind-keys ([(super l)] . goto-line))
-  ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
-  (dolist (multiple '("" "double-" "triple-"))
-    (dolist (direction '("right" "left"))
-      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (use-package exec-path-from-shell
-    :defer t
-    :config
-    (exec-path-from-shell-initialize))
-  )
+  (when *IS-MAC*
+    ;; modify meta from ⌥ to ⌘
+    (custom-set-variables
+     '(mac-command-modifier 'meta)
+     '(mac-option-modifier 'super)
+     ;; '(mac-option-modifier 'alt)
+     ;; '(mac-right-option-modifier 'super)
+     )
+    (bind-keys ([(super l)] . goto-line))
+    ;; Make mouse wheel / trackpad scrolling less jerky
+    (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
+    (dolist (multiple '("" "double-" "triple-"))
+      (dolist (direction '("right" "left"))
+        (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
+    (use-package exec-path-from-shell
+      :defer t
+      :config
+      (exec-path-from-shell-initialize))
+    )
 
-;; Frame
-(when (display-graphic-p)
-  ;; Frame fullscreen
-  (add-hook 'window-setup-hook #'fix-fullscreen-cocoa)
-  ;; Frame transparence
-  (use-package transwin
-    :bind (("C-M-9" . transwin-inc)
-           ("C-M-8" . transwin-dec)
-           ("C-M-7" . transwin-toggle))
+  ;; Frame
+  (when (display-graphic-p)
+    ;; Frame fullscreen
+    (add-hook 'window-setup-hook #'fix-fullscreen-cocoa)
+    ;; Frame transparence
+    (use-package transwin
+      :bind (("C-M-9" . transwin-inc)
+             ("C-M-8" . transwin-dec)
+             ("C-M-7" . transwin-toggle))
+      :init
+      (when *IS-LINUX*
+        (setq transwin-parameter-alpha 'alpha-background))))
+
+  ;; PERF
+  ;; Garbage Collector Magic Hack
+  (use-package gcmh
+    :diminish
+    :hook (emacs-startup . gcmh-mode)
     :init
-    (when *IS-LINUX*
-      (setq transwin-parameter-alpha 'alpha-background))))
-
-;; PERF
-;; Garbage Collector Magic Hack
-(use-package gcmh
-  :diminish
-  :hook (emacs-startup . gcmh-mode)
-  :init
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x1000000)) ; 16MB
+    (setq gcmh-idle-delay 'auto
+          gcmh-auto-idle-delay-factor 10
+          gcmh-high-cons-threshold #x1000000)) ; 16MB
 
 
-;; A comprehensive visual interface to diff & patch
-(use-package ediff
-  :ensure nil
-  :hook(;; show org ediffs unfolded
-        (ediff-prepare-buffer . outline-show-all)
-        ;; reStore window layout when done
-        (ediff-quit . winner-undo))
-  :config
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain
-        ediff-split-window-function 'split-window-horizontally
-        ediff-merge-split-window-function 'split-window-horizontally))
-
-
-   (use-package vundo
-      :bind ("C-x u" . vundo)
-      :config (setq vundo-glyph-alist vundo-unicode-symbols))
-
-;; auto completion of function name/path/file name
-  (bind-key "C-<tab>" 'hippie-expand)
-  ;; (global-set-key "\M- " 'hippie-expand)
-  (setq hippie-expand-try-functions-list
-        '(try-expand-dabbrev
-          try-expand-dabbrev-all-buffers
-          try-expand-dabbrev-from-kill
-          try-complete-lisp-symbol-partially
-          try-complete-lisp-symbol))
-
-  ;; Don't use hard tabs
-  (setq-default indent-tabs-mode nil)
-  (set-variable 'tab-width 8)
-
-  ;; When you visit a file, point goes to the last place where it
-  ;; was when you previously visited the same file.
-  ;; http://www.emacswiki.org/emacs/SavePlace
-  (use-package saveplace
-    :defer nil
-    :config
-    (save-place-mode)
-    (setq save-place-file (concat user-emacs-directory "places")))
-
-;; History
-(use-package recentf
-  :bind (("C-x C-r" . recentf-open-files))
-  :hook (after-init . recentf-mode)
-  :init (setq recentf-max-saved-items 300
-              recentf-exclude
-              '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
-                "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                (lambda (file) (file-in-directory-p file package-user-dir))))
-  :config
-  (push (expand-file-name recentf-save-file) recentf-exclude)
-  (add-to-list 'recentf-filename-handlers #'abbreviate-file-name))
-
-  ;; Emacs can automatically create backup files. This tells Emacs to
-  ;; put all backups in ~/.emacs.d/backups. More info:
-  ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Backup-Files.html
-  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory
-                                                 "backups"))))
-
-  (use-package evil-nerd-commenter
-    :bind ("M-;" . evilnc-comment-or-uncomment-lines))
-
-  (delete-selection-mode t)
-
-  ;; fix weird os x kill error
-  (defun ns-get-pasteboard ()
-    "Returns the value of the pasteboard, or nil for unsupported formats."
-    (condition-case nil
-        (ns-get-selection-internal 'CLIPBOARD)
-      (quit nil)))
-
-  ;;disable electri
-  (setq electric-indent-mode nil)
-
-  ;;scroll down multiple lines
-  (defun previous-multilines ()
-    (interactive)
-    (scroll-down (/ (window-body-height) 3)))
-
-  (defun next-multilines ()
-    "scroll up multiple lines"
-    (interactive)
-    (scroll-up (/ (window-body-height) 3)))
-
-  (global-set-key "\M-n" 'next-multilines)
-  (global-set-key "\M-p" 'previous-multilines)
-  ;; Move line up
-  (defun move-line-up ()
-    (interactive)
-    (transpose-lines 1)
-    (previous-line 2))
-
-  ;; Move line down
-  (defun move-line-down ()
-    (interactive)
-    (next-line 1)
-    (transpose-lines 1)
-    (previous-line 1))
-
-  ;; Assign the custom keybindings
-  (global-set-key (kbd "M-<up>") 'move-line-up)
-  (global-set-key (kbd "M-<down>") 'move-line-down)
-
-  (global-set-key (kbd "M-o") 'other-window)
-  (windmove-default-keybindings)
-
-  (global-set-key (kbd "C-x g") 'magit-status)
-  ;; Shift lines up and down withM-up and M-down. When paredit is enabled,
-  ;; it will use those keybindings. For this reason, you might prefer to
-  ;; use M-S-up and M-S-down, which will work even in lisp modes.
-
-
-  (defun meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev)
-     '("<escape>" . ignore))
-    (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
-     '("a" . meow-append)
-     '("A" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change)
-     '("d" . meow-delete)
-     '("D" . meow-backward-delete)
-     '("e" . meow-next-word)
-     '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("h" . meow-left)
-     '("H" . meow-left-expand)
-     '("i" . meow-insert)
-     '("I" . meow-open-above)
-     '("j" . meow-next)
-     '("J" . meow-next-expand)
-     '("k" . meow-prev)
-     '("K" . meow-prev-expand)
-     '("l" . meow-right)
-     '("L" . meow-right-expand)
-     '("m" . meow-join)
-     '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
-     '("p" . meow-yank)
-     '("q" . meow-quit)
-     '("Q" . meow-goto-line)
-     '("r" . meow-replace)
-     '("R" . meow-swap-grab)
-     '("s" . meow-kill)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-visit)
-     '("w" . meow-mark-word)
-     '("W" . meow-mark-symbol)
-     '("x" . meow-line)
-     '("X" . meow-goto-line)
-     '("y" . meow-save)
-     '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("<escape>" . ignore)))
-
-  (require 'meow)
-  (meow-setup)
-  (meow-global-mode 1)
-
-
-  (use-package browse-url
+  ;; A comprehensive visual interface to diff & patch
+  (use-package ediff
     :ensure nil
-    :defines dired-mode-map
-    :bind (("C-c C-z ." . browse-url-at-point)
-           ("C-c C-z b" . browse-url-of-buffer)
-           ("C-c C-z r" . browse-url-of-region)
-           ("C-c C-z u" . browse-url)
-           ("C-c C-z e" . browse-url-emacs)
-           ("C-c C-z v" . browse-url-of-file))
-    :init
-    (with-eval-after-load 'dired
-      (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
-
-  ;; Click to browse URL or to send to e-mail address
-  (use-package goto-addr
-    :ensure nil
-    :hook ((text-mode . goto-address-mode)
-           (prog-mode . goto-address-prog-mode)))
-
-  ;; Edit multiple regions in the same way simultaneously
-  (use-package iedit
-    :defines desktop-minor-mode-table
-    :bind (("C-;" . iedit-mode)
-           ("C-x r RET" . iedit-rectangle-mode)
-           :map isearch-mode-map ("C-;" . iedit-mode-from-isearch)
-           :map esc-map ("C-;" . iedit-execute-last-modification)
-           :map help-map ("C-;" . iedit-mode-toggle-on-function))
+    :hook(;; show org ediffs unfolded
+          (ediff-prepare-buffer . outline-show-all)
+          ;; reStore window layout when done
+          (ediff-quit . winner-undo))
     :config
-    ;; Avoid restoring `iedit-mode'
-    (with-eval-after-load 'desktop
-      (add-to-list 'desktop-minor-mode-table
-                   '(iedit-mode nil))))
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain
+          ediff-split-window-function 'split-window-horizontally
+          ediff-merge-split-window-function 'split-window-horizontally))
 
-  ;; Redefine M-< and M-> for some modes
-  (use-package beginend
-    :diminish beginend-global-mode
-    :hook (after-init . beginend-global-mode)
-    :config (mapc (lambda (pair)
-                    (diminish (cdr pair)))
-                  beginend-modes))
+
+     (use-package vundo
+        :bind ("C-x u" . vundo)
+        :config (setq vundo-glyph-alist vundo-unicode-symbols))
+
+  ;; auto completion of function name/path/file name
+    (bind-key "C-<tab>" 'hippie-expand)
+    ;; (global-set-key "\M- " 'hippie-expand)
+    (setq hippie-expand-try-functions-list
+          '(try-expand-dabbrev
+            try-expand-dabbrev-all-buffers
+            try-expand-dabbrev-from-kill
+            try-complete-lisp-symbol-partially
+            try-complete-lisp-symbol))
+
+    ;; Don't use hard tabs
+    (setq-default indent-tabs-mode nil)
+    (set-variable 'tab-width 8)
+
+    ;; When you visit a file, point goes to the last place where it
+    ;; was when you previously visited the same file.
+    ;; http://www.emacswiki.org/emacs/SavePlace
+    (use-package saveplace
+      :defer nil
+      :config
+      (save-place-mode)
+      (setq save-place-file (concat user-emacs-directory "places")))
+
+  ;; History
+  (use-package recentf
+    :bind (("C-x C-r" . recentf-open-files))
+    :hook (after-init . recentf-mode)
+    :init (setq recentf-max-saved-items 300
+                recentf-exclude
+                '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                  "\\.\\(?:gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
+                  "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                  "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                  (lambda (file) (file-in-directory-p file package-user-dir))))
+    :config
+    (push (expand-file-name recentf-save-file) recentf-exclude)
+    (add-to-list 'recentf-filename-handlers #'abbreviate-file-name))
+
+    ;; Emacs can automatically create backup files. This tells Emacs to
+    ;; put all backups in ~/.emacs.d/backups. More info:
+    ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Backup-Files.html
+    (setq backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                                   "backups"))))
+
+    (use-package evil-nerd-commenter
+      :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+
+    (delete-selection-mode t)
+
+    ;; fix weird os x kill error
+    (defun ns-get-pasteboard ()
+      "Returns the value of the pasteboard, or nil for unsupported formats."
+      (condition-case nil
+          (ns-get-selection-internal 'CLIPBOARD)
+        (quit nil)))
+
+    ;;disable electri
+    (setq electric-indent-mode nil)
+
+    ;;scroll down multiple lines
+    (defun previous-multilines ()
+      (interactive)
+      (scroll-down (/ (window-body-height) 3)))
+
+    (defun next-multilines ()
+      "scroll up multiple lines"
+      (interactive)
+      (scroll-up (/ (window-body-height) 3)))
+
+    (global-set-key "\M-n" 'next-multilines)
+    (global-set-key "\M-p" 'previous-multilines)
+    ;; Move line up
+    (defun move-line-up ()
+      (interactive)
+      (transpose-lines 1)
+      (previous-line 2))
+
+    ;; Move line down
+    (defun move-line-down ()
+      (interactive)
+      (next-line 1)
+      (transpose-lines 1)
+      (previous-line 1))
+
+    ;; Assign the custom keybindings
+    (global-set-key (kbd "M-<up>") 'move-line-up)
+    (global-set-key (kbd "M-<down>") 'move-line-down)
+
+    (global-set-key (kbd "M-o") 'other-window)
+    (windmove-default-keybindings)
+
+    (global-set-key (kbd "C-x g") 'magit-status)
+    ;; Shift lines up and down withM-up and M-down. When paredit is enabled,
+    ;; it will use those keybindings. For this reason, you might prefer to
+    ;; use M-S-up and M-S-down, which will work even in lisp modes.
+
+
+    (defun meow-setup ()
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      (meow-motion-overwrite-define-key
+       '("j" . meow-next)
+       '("k" . meow-prev)
+       '("<escape>" . ignore))
+      (meow-leader-define-key
+       ;; SPC j/k will run the original command in MOTION state.
+       '("j" . "H-j")
+       '("k" . "H-k")
+       ;; Use SPC (0-9) for digit arguments.
+       '("1" . meow-digit-argument)
+       '("2" . meow-digit-argument)
+       '("3" . meow-digit-argument)
+       '("4" . meow-digit-argument)
+       '("5" . meow-digit-argument)
+       '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument)
+       '("8" . meow-digit-argument)
+       '("9" . meow-digit-argument)
+       '("0" . meow-digit-argument)
+       '("/" . meow-keypad-describe-key)
+       '("?" . meow-cheatsheet))
+      (meow-normal-define-key
+       '("0" . meow-expand-0)
+       '("9" . meow-expand-9)
+       '("8" . meow-expand-8)
+       '("7" . meow-expand-7)
+       '("6" . meow-expand-6)
+       '("5" . meow-expand-5)
+       '("4" . meow-expand-4)
+       '("3" . meow-expand-3)
+       '("2" . meow-expand-2)
+       '("1" . meow-expand-1)
+       '("-" . negative-argument)
+       '(";" . meow-reverse)
+       '("," . meow-inner-of-thing)
+       '("." . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
+       '("a" . meow-append)
+       '("A" . meow-open-below)
+       '("b" . meow-back-word)
+       '("B" . meow-back-symbol)
+       '("c" . meow-change)
+       '("d" . meow-delete)
+       '("D" . meow-backward-delete)
+       '("e" . meow-next-word)
+       '("E" . meow-next-symbol)
+       '("f" . meow-find)
+       '("g" . meow-cancel-selection)
+       '("G" . meow-grab)
+       '("h" . meow-left)
+       '("H" . meow-left-expand)
+       '("i" . meow-insert)
+       '("I" . meow-open-above)
+       '("j" . meow-next)
+       '("J" . meow-next-expand)
+       '("k" . meow-prev)
+       '("K" . meow-prev-expand)
+       '("l" . meow-right)
+       '("L" . meow-right-expand)
+       '("m" . meow-join)
+       '("n" . meow-search)
+       '("o" . meow-block)
+       '("O" . meow-to-block)
+       '("p" . meow-yank)
+       '("q" . meow-quit)
+       '("Q" . meow-goto-line)
+       '("r" . meow-replace)
+       '("R" . meow-swap-grab)
+       '("s" . meow-kill)
+       '("t" . meow-till)
+       '("u" . meow-undo)
+       '("U" . meow-undo-in-selection)
+       '("v" . meow-visit)
+       '("w" . meow-mark-word)
+       '("W" . meow-mark-symbol)
+       '("x" . meow-line)
+       '("X" . meow-goto-line)
+       '("y" . meow-save)
+       '("Y" . meow-sync-grab)
+       '("z" . meow-pop-selection)
+       '("'" . repeat)
+       '("<escape>" . ignore)))
+
+    (require 'meow)
+    (meow-setup)
+    (meow-global-mode 1)
+
+
+    (use-package browse-url
+      :ensure nil
+      :defines dired-mode-map
+      :bind (("C-c C-z ." . browse-url-at-point)
+             ("C-c C-z b" . browse-url-of-buffer)
+             ("C-c C-z r" . browse-url-of-region)
+             ("C-c C-z u" . browse-url)
+             ("C-c C-z e" . browse-url-emacs)
+             ("C-c C-z v" . browse-url-of-file))
+      :init
+      (with-eval-after-load 'dired
+        (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
+
+    ;; Click to browse URL or to send to e-mail address
+    (use-package goto-addr
+      :ensure nil
+      :hook ((text-mode . goto-address-mode)
+             (prog-mode . goto-address-prog-mode)
+             (org-mode . goto-address-mode)))
+
+    ;; Edit multiple regions in the same way simultaneously
+    (use-package iedit
+      :defines desktop-minor-mode-table
+      :bind (("C-;" . iedit-mode)
+             ("C-x r RET" . iedit-rectangle-mode)
+             :map isearch-mode-map ("C-;" . iedit-mode-from-isearch)
+             :map esc-map ("C-;" . iedit-execute-last-modification)
+             :map help-map ("C-;" . iedit-mode-toggle-on-function))
+      :config
+      ;; Avoid restoring `iedit-mode'
+      (with-eval-after-load 'desktop
+        (add-to-list 'desktop-minor-mode-table
+                     '(iedit-mode nil))))
+
+    ;; Redefine M-< and M-> for some modes
+    (use-package beginend
+      :diminish beginend-global-mode
+      :hook (after-init . beginend-global-mode)
+      :config (mapc (lambda (pair)
+                      (diminish (cdr pair)))
+                    beginend-modes))
 #+end_src
 ** Rime
 #+begin_src emacs-lisp
 
-  (use-package rime
-    :commands (toggle-input-method)
-    :hook
-    ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
-                                      (set-input-method "rime"))))
-     (meow-insert-exit . (lambda() (set-input-method nil))))
-    :bind
-    (:map rime-mode-map
-     ("C-j" . rime-inline-ascii)
-     :map rime-mode-map
-     ("C-l" . rime-force-enable))
-    :custom
-    (default-input-method 'rime)
-    (rime-show-candidate 'posframe)
-    (rime-posframe-style 'vertical)
-    (rime-posframe-properties 
-     (list :background-color "#333333"
-           :foreground-color "#dcdccc"
-           :internal-border-width 5))
-    (rime-disable-predicates
-     '(rime-predicate-prog-in-code-p
+  ;; (use-package rime
+  ;;   :commands (toggle-input-method)
+  ;;   :hook
+  ;;   ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
+  ;;                                     (set-input-method "rime"))))
+  ;;    (meow-insert-exit . (lambda() (set-input-method nil))))
+  ;;   :bind
+  ;;   (:map rime-mode-map
+  ;;    ("C-j" . rime-inline-ascii)
+  ;;    :map rime-mode-map
+  ;;    ("C-l" . rime-force-enable))
+  ;;   :custom
+  ;;   (default-input-method 'rime)
+  ;;   (rime-show-candidate 'posframe)
+  ;;   (rime-posframe-style 'vertical)
+  ;;   (rime-posframe-properties 
+  ;;    (list :background-color "#333333"
+  ;;          :foreground-color "#dcdccc"
+  ;;          :internal-border-width 5))
+  ;;   (rime-disable-predicates
+  ;;    '(rime-predicate-prog-in-code-p
 
-       rime-predicate-auto-english-p
+  ;;      rime-predicate-auto-english-p
 
-       rime-predicate-punctuation-after-ascii-p
-       rime-predicate-punctuation-line-begin-p
-       my/rime-predicate-punctuation-next-char-is-paired-p
-       rime-predicate-tex-math-or-command-p
-       rime-predicate-org-latex-mode-p
-       rime-predicate-current-uppercase-letter-p
-       (lambda () (button-at (point)))
-       meow-normal-mode-p
-       meow-motion-mode-p
-       meow-keypad-mode-p
-       ;; +rime--punctuation-line-begin-p
-       ;; +rime--english-prober
-       ;; If the cursor is after a alphabet character.
-       rime-predicate-after-alphabet-char-p
-       ;; If input a punctuation after
-       ;; a Chinese charactor with whitespace.
-       rime-predicate-punctuation-after-space-cc-p
-       rime-predicate-special-ascii-line-begin-p
-       ))
-    (rime-inline-predicates
-     ;; If cursor is after a whitespace
-     ;; which follow a non-ascii character.
-     '(rime-predicate-space-after-cc-p
-       ;; If the current charactor entered is a uppercase letter.
-       rime-predicate-current-uppercase-letter-p))
+  ;;      rime-predicate-punctuation-after-ascii-p
+  ;;      rime-predicate-punctuation-line-begin-p
+  ;;      my/rime-predicate-punctuation-next-char-is-paired-p
+  ;;      rime-predicate-tex-math-or-command-p
+  ;;      rime-predicate-org-latex-mode-p
+  ;;      rime-predicate-current-uppercase-letter-p
+  ;;      (lambda () (button-at (point)))
+  ;;      meow-normal-mode-p
+  ;;      meow-motion-mode-p
+  ;;      meow-keypad-mode-p
+  ;;      ;; +rime--punctuation-line-begin-p
+  ;;      ;; +rime--english-prober
+  ;;      ;; If the cursor is after a alphabet character.
+  ;;      rime-predicate-after-alphabet-char-p
+  ;;      ;; If input a punctuation after
+  ;;      ;; a Chinese charactor with whitespace.
+  ;;      rime-predicate-punctuation-after-space-cc-p
+  ;;      rime-predicate-special-ascii-line-begin-p
+  ;;      ))
+  ;;   (rime-inline-predicates
+  ;;    ;; If cursor is after a whitespace
+  ;;    ;; which follow a non-ascii character.
+  ;;    '(rime-predicate-space-after-cc-p
+  ;;      ;; If the current charactor entered is a uppercase letter.
+  ;;      rime-predicate-current-uppercase-letter-p))
 
-    (rime-user-data-dir "~/.emacs.d/rime/")
-    (rime-librime-root "~/.emacs.d/librime/dist")
-    (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+  ;;   (rime-user-data-dir "~/.emacs.d/rime/")
+  ;;   (rime-librime-root "~/.emacs.d/librime/dist")
+  ;;   (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
 
-    (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+  ;;   (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
 
-    :init
-    (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
-      (if (not (eq (point) (point-max)))
-          (and (rime-predicate-current-input-punctuation-p)
-               (not (string-match-p
-                     (rx (any "\"\(\[\{"))
-                     (buffer-substring (point) (1- (point)))
-                     )
-                    )
-               (string-match-p
-                (rx (any "\}\]\)\""))
-                (buffer-substring (point) (1+ (point)))))
-        nil))
+  ;;   :init
+  ;;   (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
+  ;;     (if (not (eq (point) (point-max)))
+  ;;         (and (rime-predicate-current-input-punctuation-p)
+  ;;              (not (string-match-p
+  ;;                    (rx (any "\"\(\[\{"))
+  ;;                    (buffer-substring (point) (1- (point)))
+  ;;                    )
+  ;;                   )
+  ;;              (string-match-p
+  ;;               (rx (any "\}\]\)\""))
+  ;;               (buffer-substring (point) (1+ (point)))))
+  ;;       nil))
 
-    (defun rime-predicate-special-ascii-line-begin-p ()
-      "If '/' or '#' at the beginning of the line."
-      (and (> (point) (save-excursion (back-to-indentation) (point)))
-           (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-             (string-match-p "^[\/#]" string))))
+  ;;   (defun rime-predicate-special-ascii-line-begin-p ()
+  ;;     "If '/' or '#' at the beginning of the line."
+  ;;     (and (> (point) (save-excursion (back-to-indentation) (point)))
+  ;;          (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+  ;;            (string-match-p "^[\/#]" string))))
 
-    )
+  ;;   )
 
 
   (use-package pangu-spacing
@@ -1180,9 +1181,9 @@ https://github.com/abo-abo/hydra
 (use-package org-supertag
 :defer t
 :after org-mode
-:vc (:url "https://github.com/yibie/org-supertag")
-:config
-(org-supertag-config))
+:vc (:url "https://github.com/yibie/org-supertag" :rev :newest)
+:hook
+(after-init . org-supertag-config))
 #+end_src
 ** org-node
 ** org-zeft
@@ -1448,6 +1449,9 @@ https://github.com/abo-abo/hydra
   ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
   (defvar zh-font-list '("TsangerJinKai03 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
   (defvar en-font-list '("JetBrains Maple Mono" "Iosevka Fixed SS14" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
+  (defvar font-size
+    (cond (*IS-LINUX* 12)
+          (*IS-MAC* 14)))
 
   (defun ding-make-font-string (font-name font-size)
     (if (and (stringp font-size)
@@ -1467,7 +1471,7 @@ https://github.com/abo-abo/hydra
                    collect (cons x chinese-font-scale)))
 
     "english-font-size could be set to \":pixelsize=18\" or a integer.
-  If set/leave chinese-font-scale to nil, it will follow english-font-size"
+    If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
     (let ((en-font (ding-make-font-string
                     (cl-find-if #'ding-font-existsp english-fonts)
@@ -1484,15 +1488,15 @@ https://github.com/abo-abo/hydra
       (dolist (charset '(kana han symbol cjk-misc bopomofo))
         (set-fontset-font (frame-parameter nil 'font)
                           charset zh-font))))
-  ;;;;;;  SIZE HERE!!! ;;;;;;
-  (ding-set-font en-font-list 14 zh-font-list)
+    ;;;;;;  set fonts HERE!!! ;;;;;;
+  (ding-set-font en-font-list font-size zh-font-list)
   (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
-  ;;;;;; set for reading mode ;;;;;;
+    ;;;;;; set for reading mode ;;;;;;
   (defun my-nov-font-setup ()
     (face-remap-add-relative 'variable-pitch
-                              :family "TsangerJinKai03 W04"
-                              :height 1.1))
+                             :family "TsangerJinKai03 W04"
+                             :height 1.1))
 #+end_src
 ** Frame
 #+begin_src emacs-lisp
@@ -2075,14 +2079,14 @@ https://github.com/abo-abo/hydra
     )
 
 
-      ;; (use-package vertico-posframe
-      ;;   :hook (vertico-mode . vertico-posframe-mode)
-      ;;   :after posframe
-      ;;   :init (setq
-      ;; 	 vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
-      ;;          vertico-posframe-parameters
-      ;;          '((left-fringe  . 8)
-      ;;            (right-fringe . 8))))
+      (use-package vertico-posframe
+        :hook (vertico-mode . vertico-posframe-mode)
+        :after posframe
+        :init (setq
+    	 vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
+               vertico-posframe-parameters
+               '((left-fringe  . 8)
+                 (right-fringe . 8))))
 
       (use-package nerd-icons-completion
         :hook (vertico-mode . nerd-icons-completion-mode))
@@ -2550,153 +2554,153 @@ https://github.com/karthink/popper
 # https://www.reddit.com/r/emacs/comments/1c3oqqh/modern_tabs_in_emacs/
 
 #+begin_src emacs-lisp
-  ;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
-  ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+   ;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+   ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
 
   (defun my/set-tab-theme ()
-    (let ((bg (face-attribute 'mode-line :background))
-          (fg (face-attribute 'default :foreground))
-        (hg (face-attribute 'default :background))
-          (base (face-attribute 'mode-line :background))
-          (box-width (/ (line-pixel-height) 4)))
-      (set-face-attribute 'tab-line nil
-                :background base
-                :foreground fg
-                :height 0.8
-                :inherit nil
-                :box (list :line-width -1 :color base)
-                )
-      (set-face-attribute 'tab-line-tab nil
-                :foreground fg
-                :background bg
-                :weight 'normal
-                :inherit nil
-                :box (list :line-width box-width :color bg))
-      (set-face-attribute 'tab-line-tab-inactive nil
-                :foreground fg
-                :background base
-                :weight 'normal
-                :inherit nil
-                :box (list :line-width box-width :color base))
-      (set-face-attribute 'tab-line-highlight nil
-                :foreground fg
-                :background hg
-                :weight 'normal
-                :inherit nil
-                :box (list :line-width box-width :color hg))
-      (set-face-attribute 'tab-line-tab-current nil
-                :foreground fg
-                :background hg
-                :weight 'normal
-                :inherit nil
-                :box (list :line-width box-width :color hg))))
+     (let ((bg (face-attribute 'mode-line :background))
+           (fg (face-attribute 'default :foreground))
+         (hg (face-attribute 'default :background))
+           (base (face-attribute 'mode-line :background))
+           (box-width (/ (line-pixel-height) 4)))
+       (set-face-attribute 'tab-line nil
+                 :background base
+                 :foreground fg
+                 :height 0.8
+                 :inherit nil
+                 :box (list :line-width -1 :color base)
+                 )
+       (set-face-attribute 'tab-line-tab nil
+                 :foreground fg
+                 :background bg
+                 :weight 'normal
+                 :inherit nil
+                 :box (list :line-width box-width :color bg))
+       (set-face-attribute 'tab-line-tab-inactive nil
+                 :foreground fg
+                 :background base
+                 :weight 'normal
+                 :inherit nil
+                 :box (list :line-width box-width :color base))
+       (set-face-attribute 'tab-line-highlight nil
+                 :foreground fg
+                 :background hg
+                 :weight 'normal
+                 :inherit nil
+                 :box (list :line-width box-width :color hg))
+       (set-face-attribute 'tab-line-tab-current nil
+                 :foreground fg
+                 :background hg
+                 :weight 'normal
+                 :inherit nil
+                 :box (list :line-width box-width :color hg))))
 
-  (defun my/tab-line-name-buffer (buffer &rest _buffers)
-    "Create name for tab with padding and truncation.
-    If buffer name is shorter than `tab-line-tab-max-width' it gets
-    centered with spaces, otherwise it is truncated, to preserve
-    equal width for all tabs.  This function also tries to fit as
-    many tabs in window as possible, so if there are no room for tabs
-    with maximum width, it calculates new width for each tab and
-    truncates text if needed.  Minimal width can be set with
-    `tab-line-tab-min-width' variable."
-    (with-current-buffer buffer
-      (let* ((window-width (window-width (get-buffer-window)))
-             (tab-amount (length (tab-line-tabs-window-buffers)))
-             (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
-                                       (/ window-width tab-amount)
-                                     tab-line-tab-max-width))
-             (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
-                                  tab-line-tab-max-width)
-                                 ((< window-max-tab-width tab-line-tab-min-width)
-                                  tab-line-tab-min-width)
-                                 (t window-max-tab-width))
-                           3)) ;; compensation for ' x ' button
-             (buffer-name (string-trim (buffer-name)))
-             (name-width (length buffer-name)))
-        (if (>= name-width tab-width)
-            (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
-          (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
-                 (buffer-name (concat padding buffer-name)))
-            (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+   (defun my/tab-line-name-buffer (buffer &rest _buffers)
+     "Create name for tab with padding and truncation.
+     If buffer name is shorter than `tab-line-tab-max-width' it gets
+     centered with spaces, otherwise it is truncated, to preserve
+     equal width for all tabs.  This function also tries to fit as
+     many tabs in window as possible, so if there are no room for tabs
+     with maximum width, it calculates new width for each tab and
+     truncates text if needed.  Minimal width can be set with
+     `tab-line-tab-min-width' variable."
+     (with-current-buffer buffer
+       (let* ((window-width (window-width (get-buffer-window)))
+              (tab-amount (length (tab-line-tabs-window-buffers)))
+              (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                        (/ window-width tab-amount)
+                                      tab-line-tab-max-width))
+              (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                   tab-line-tab-max-width)
+                                  ((< window-max-tab-width tab-line-tab-min-width)
+                                   tab-line-tab-min-width)
+                                  (t window-max-tab-width))
+                            3)) ;; compensation for ' x ' button
+              (buffer-name (string-trim (buffer-name)))
+              (name-width (length buffer-name)))
+         (if (>= name-width tab-width)
+             (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+           (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                  (buffer-name (concat padding buffer-name)))
+             (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
 
-  (defun tab-line-close-tab (&optional e)
-    "Close the selected tab.
-    If tab is presented in another window, close the tab by using
-    `bury-buffer` function.  If tab is unique to all existing
-    windows, kill the buffer with `kill-buffer` function.  Lastly, if
-    no tabs left in the window, it is deleted with `delete-window`
-    function."
-    (interactive "e")
-    (let* ((posnp (event-start e))
-           (window (posn-window posnp))
-           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-      (with-selected-window window
-        (let ((tab-list (tab-line-tabs-window-buffers))
-              (buffer-list (flatten-list
-                            (seq-reduce (lambda (list window)
-                                          (select-window window t)
-                                          (cons (tab-line-tabs-window-buffers) list))
-                                        (window-list) nil))))
-          (select-window window)
-          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-              (progn
-                (if (eq buffer (current-buffer))
-                    (bury-buffer)
-                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
-                (unless (cdr tab-list)
-                  (ignore-errors (delete-window window))))
-            (and (kill-buffer buffer)
+   (defun tab-line-close-tab (&optional e)
+     "Close the selected tab.
+     If tab is presented in another window, close the tab by using
+     `bury-buffer` function.  If tab is unique to all existing
+     windows, kill the buffer with `kill-buffer` function.  Lastly, if
+     no tabs left in the window, it is deleted with `delete-window`
+     function."
+     (interactive "e")
+     (let* ((posnp (event-start e))
+            (window (posn-window posnp))
+            (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+       (with-selected-window window
+         (let ((tab-list (tab-line-tabs-window-buffers))
+               (buffer-list (flatten-list
+                             (seq-reduce (lambda (list window)
+                                           (select-window window t)
+                                           (cons (tab-line-tabs-window-buffers) list))
+                                         (window-list) nil))))
+           (select-window window)
+           (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+               (progn
+                 (if (eq buffer (current-buffer))
+                     (bury-buffer)
+                   (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                   (set-window-next-buffers window (delq buffer (window-next-buffers))))
                  (unless (cdr tab-list)
-                   (ignore-errors (delete-window window)))))))))
+                   (ignore-errors (delete-window window))))
+             (and (kill-buffer buffer)
+                  (unless (cdr tab-list)
+                    (ignore-errors (delete-window window)))))))))
 
-  (use-package tab-line
-    :ensure nil
-    :hook (after-init . global-tab-line-mode)
-    :config
+   (use-package tab-line
+     :ensure nil
+     :hook (after-init . global-tab-line-mode)
+     :config
 
-    (defcustom tab-line-tab-min-width 10
-      "Minimum width of a tab in characters."
-      :type 'integer
-      :group 'tab-line)
+     (defcustom tab-line-tab-min-width 10
+       "Minimum width of a tab in characters."
+       :type 'integer
+       :group 'tab-line)
 
-    (defcustom tab-line-tab-max-width 30
-      "Maximum width of a tab in characters."
-      :type 'integer
-      :group 'tab-line)
+     (defcustom tab-line-tab-max-width 30
+       "Maximum width of a tab in characters."
+       :type 'integer
+       :group 'tab-line)
 
-    (setq tab-line-close-button-show t
-          tab-line-new-button-show nil
-          tab-line-separator ""
-          tab-line-tab-name-function #'my/tab-line-name-buffer
-          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                            'keymap tab-line-right-map
+     (setq tab-line-close-button-show t
+           tab-line-new-button-show nil
+           tab-line-separator ""
+           tab-line-tab-name-function #'my/tab-line-name-buffer
+           tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                             'keymap tab-line-right-map
+                                             'mouse-face 'tab-line-highlight
+                                             'help-echo "Click to scroll right")
+           tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                            'keymap tab-line-left-map
                                             'mouse-face 'tab-line-highlight
-                                            'help-echo "Click to scroll right")
-          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                           'keymap tab-line-left-map
-                                           'mouse-face 'tab-line-highlight
-                                           'help-echo "Click to scroll left")
-          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
-                                            'keymap tab-line-tab-close-map
-                                            'mouse-face 'tab-line-close-highlight
-                                            'help-echo "Click to close tab"))
+                                            'help-echo "Click to scroll left")
+           tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                             'keymap tab-line-tab-close-map
+                                             'mouse-face 'tab-line-close-highlight
+                                             'help-echo "Click to close tab"))
 
-    ;; (my/set-tab-theme)
+     ;; (my/set-tab-theme)
 
-    ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
-    ;;(add-to-list 'tab-line-exclude-modes mode))
-    (dolist (mode '(ediff-mode process-menu-mode))
-      (add-to-list 'tab-line-exclude-modes mode))
+     ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
+     ;;(add-to-list 'tab-line-exclude-modes mode))
+     (dolist (mode '(ediff-mode process-menu-mode))
+       (add-to-list 'tab-line-exclude-modes mode))
 
-    ;; (use-package sort-tab
-    ;;   :defer nil
-    ;;   :vc (:url "https://github.com/manateelazycat/sort-tab")
-    ;;   :init (sort-tab-mode 1))
-    )
+     ;; (use-package sort-tab
+     ;;   :defer nil
+     ;;   :vc (:url "https://github.com/manateelazycat/sort-tab")
+     ;;   :init (sort-tab-mode 1))
+     )
 
- (global-tab-line-mode t)
+  (global-tab-line-mode t)
 #+end_src
 
 ** persp-mode
@@ -2902,13 +2906,14 @@ https://github.com/karthink/popper
   ;;   )
   ;; (setq immersive-translate-backend 'DeepSeek
   ;;       immersive-translate-chatgpt-host "api.deepseek.com")
-  (require 'go-translate)
-  ;; (setq gt-langs '(en fr))
-  (setq gt-preset-translators
-        `((ts-1 . ,(gt-translator
-                    :taker (gt-taker :langs '(en zh) :text 'buffer)
-                    :engines (list (gt-google-engine))
-                    :render (gt-overlay-render)))))
+  (use-package go-translate
+    ;; (setq gt-langs '(en fr))
+    :custom  
+    (gt-preset-translators
+     `((ts-1 . ,(gt-translator
+                 :taker (gt-taker :langs '(en zh) :text 'buffer)
+                 :engines (list (gt-google-engine))
+                 :render (gt-overlay-render))))))
 #+end_src
 
 #+RESULTS:
@@ -2927,8 +2932,8 @@ https://github.com/karthink/popper
 * Reading & notes
 ** Common
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/pos-tag-highlight")
-  (require 'pos-tag-highlight)
+  (use-package pos-tag-highlight
+    :vc (:url "https://github.com/yibie/pos-tag-highlight" :rev :newest))
 #+end_src
 ** Shrface
 
@@ -3328,13 +3333,20 @@ https://github.com/karthink/popper
 ** Tree-sitter: querying and highlighting
 #+begin_src emacs-lisp
   (require 'treesit)
-  (require 'treesit-auto)
-(treesit-auto-mode t)
-  (global-treesit-auto-mode t)
-    (setq treesit-auto-install 'prompt)
+
     (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
+ ;; Automatic Tree-sitter grammar management
+  (use-package treesit-auto
+    :hook (after-init . global-treesit-auto-mode)
+    :init (setq treesit-auto-install 'prompt))
+
+  ;; Code folding indicators using Tree-sitter
+  (use-package treesit-fold-indicators
+    :ensure treesit-fold
+    :hook (after-init . global-treesit-fold-indicators-mode)
+    :init (setq treesit-fold-indicators-priority -1))
 #+end_src
 ** origami
 https://github.com/gregsexton/origami.el

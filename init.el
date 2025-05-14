@@ -94,44 +94,55 @@ Otherwise the startup will be very slow."
    '(("ts-gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
      ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
  '(package-selected-packages
-   '(a aggressive-indent all-the-icons-nerd-fonts anki-helper auctex auto-compile
-       auto-complete auto-dark auto-dim-other-buffers auto-package-update
-       auto-save beginend benchmark-init bing-dict buffer-name-relative
-       bug-hunter burly cal-china-x calibredb cape capf-autosuggest cdlatex
-       circadian clipetty cljsbuild-mode clojure-ts-mode colorful-mode
-       consult-flyspell consult-todo consult-yasnippet counsel dash-functional
-       datetime deft denote diminish dimmer dired-git-info dired-quick-sort
-       dired-rsync diredfl docker docker-compose-mode doom-modeline eask
-       ef-themes eglot-java ejc-sql eldoc-box elein elfeed elisp-def elpy
-       embark-consult eshell-syntax-highlighting esup evil-nerd-commenter
-       ewal-doom-themes exec-path-from-shell fd-dired flx-ido flycheck-clojure
-       gcmh ghub gnu-elpa-keyring-update go-translate goggles google-translate
-       gptel-quick groovy-mode gruvbox-theme haskell-mode helm-lsp helpful
-       hideshow-org highlight-defined highlight-parentheses ibuffer-project
-       ibuffer-projectile ibuffer-vc iedit imenu-anywhere indent-bars
-       inf-clojure ivy-prescient json-mode json-navigator justify-kp keycast
-       lsp-brigde lsp-ivy lsp-java lsp-ui macrostep marginalia mct memoize meow
-       nano-minibuffer nano-modeline nano-theme nerd-icons-completion
-       nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-ivy-rich
-       netease-cloud-music no-littering nov nova ob-rust orderless org-alert
-       org-appear org-block-capf org-bullets org-contrib org-journal
-       org-make-toc org-modern org-node org-noter org-preview-html
-       org-protocol-jekyll org-remark org-roam-ui org-ros org-sidebar
-       org-supertag org-zettel-ref-mode origami ox-hugo pangu-spacing paredit
-       parent-mode pdf-tools pinyinlib pkg-info popper promise
-       rainbow-delimiters rainbow-identifiers region-occurrences-highlighter rg
-       rime rust-mode setup shackle shrface smartparens smooth-scrolling
-       sort-tab spacemacs-theme svg-tag-mode tabspaces tagedit telega toc-org
-       transient-posframe transwin tree-sitter-langs treemacs-evil
-       treemacs-icons-dired treemacs-magit treemacs-nerd-icons treemacs-persp
-       treemacs-perspective treemacs-projectile treemacs-tab-bar treesit-auto
-       vertico-posframe vundo workgroups2 xterm-color zeft zotxt))
+   '(aggressive-indent all-the-icons-nerd-fonts anki-helper auctex auto-compile
+                       auto-complete auto-dark auto-dim-other-buffers
+                       auto-package-update auto-save beginend benchmark-init
+                       bing-dict buffer-name-relative bug-hunter burly
+                       cal-china-x calibredb cape capf-autosuggest cdlatex
+                       circadian clipetty cljsbuild-mode clojure-ts-mode
+                       colorful-mode consult-flyspell consult-todo
+                       consult-yasnippet counsel dash-functional datetime deft
+                       denote diminish dimmer dired-git-info dired-quick-sort
+                       dired-rsync diredfl docker docker-compose-mode
+                       doom-modeline eask ef-themes eglot-java ejc-sql eldoc-box
+                       elein elfeed elisp-def elpy embark-consult
+                       eshell-syntax-highlighting esup evil-nerd-commenter
+                       ewal-doom-themes exec-path-from-shell fd-dired flx-ido
+                       flycheck-clojure gcmh ghub gnu-elpa-keyring-update
+                       go-translate goggles google-translate gptel-quick
+                       groovy-mode gruvbox-theme haskell-mode helm-lsp helpful
+                       hideshow-org highlight-defined highlight-parentheses
+                       hl-todo ibuffer-project ibuffer-projectile ibuffer-vc
+                       iedit imenu-anywhere indent-bars inf-clojure
+                       ivy-prescient json-mode json-navigator justify-kp keycast
+                       lsp-brigde lsp-ivy lsp-java lsp-ui macrostep marginalia
+                       mct memoize meow nano-minibuffer nano-modeline nano-theme
+                       nerd-icons-completion nerd-icons-corfu nerd-icons-dired
+                       nerd-icons-ibuffer nerd-icons-ivy-rich
+                       netease-cloud-music no-littering nov nova ob-rust
+                       orderless org-alert org-appear org-block-capf org-bullets
+                       org-contrib org-journal org-make-toc org-modern org-node
+                       org-noter org-preview-html org-protocol-jekyll org-remark
+                       org-roam-ui org-ros org-sidebar org-supertag
+                       org-zettel-ref-mode origami ox-hugo pangu-spacing paredit
+                       parent-mode pdf-tools pinyinlib pkg-info popper
+                       pretty-symbols promise rainbow-delimiters
+                       rainbow-identifiers region-occurrences-highlighter rg
+                       rime rust-mode setup shackle shrface smartparens
+                       smooth-scrolling sort-tab spacemacs-theme svg-tag-mode
+                       tabspaces tagedit telega toc-org transient-posframe
+                       transwin tree-sitter-langs treemacs-evil
+                       treemacs-icons-dired treemacs-magit treemacs-nerd-icons
+                       treemacs-persp treemacs-perspective treemacs-projectile
+                       treemacs-tab-bar treesit-auto vertico-posframe vundo
+                       workgroups2 xterm-color zeft zotxt))
  '(package-vc-selected-packages
-   '((gptel-quick :url "https://github.com/karthink/gptel-quick")
-     (sort-tab :url "https://github.com/manateelazycat/sort-tab")
+   '((pos-tag-highlight :url "https://github.com/yibie/pos-tag-highlight")
+     (gptel-quick :url "https://github.com/karthink/gptel-quick")
      (auto-save :url "https://github.com/manateelazycat/auto-save")
      (zeft :url "https://github.com/casouri/zeft")
      (org-supertag :url "https://github.com/yibie/org-supertag")
+     (sort-tab :url "https://github.com/manateelazycat/sort-tab")
      (lsp-brigde :url "https://github.com/manateelazycat/lsp-bridge")))
  '(read-buffer-completion-ignore-case t)
  '(read-file-name-completion-ignore-case t)
