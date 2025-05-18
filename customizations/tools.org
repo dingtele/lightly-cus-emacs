@@ -900,56 +900,77 @@ https://github.com/abo-abo/hydra
 * Org-mode
 ** org-capture
 #+begin_src emacs-lisp
-    (use-package org-capture
-      :ensure nil
-      :bind ("C-c x" . (lambda () (interactive) (org-capture)))
-      :hook ((org-capture-mode . (lambda ()
-                                   (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
-             (org-capture-mode . delete-other-windows))
-      :custom
-      (org-default-notes-file "~/org/inbox.org")
-      (org-capture-use-agenda-date nil)
-      ;; define common template
-      (org-capture-templates `(
-                               ("t" "Task")
-                               ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
-                                "** TODO %?   %^g"
-                                :prepend t
-                                :jump-to-captured t)
-                               ("tp" "Weekly-emacs-plugin" entry (file+headline "Task.org" "Weekly-Emacs-Plugin")
-                                ;; "** TODO %?   %^g"
-                                "%(fetch-weather-data)\n"
-                                :prepend t
-                                :jump-to-captured t)
-                               ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
-                                "* TODO %i%?"
-                                :empty-lines-after
-                                :jump-to-captured t
-                                :prepend t)
-                               ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
-                                "* %? %^g\n%i\n"
-                                :empty-lines-after 1)
-                               ;; For EWW
-                               ;; ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
-                               ;;  "* %:description\n\n%a%?"
-                               ;;  :empty-lines 1
-                               ;;  :immediate-finish t)
-                               ;; ("j" "Journal")
-                               ;; ("jt" "Today's TODO" entry (file+olp+datetree "Journal.org" "Today's TODO")
-                               ;;  "* TODO %U [/] \n - [ ] %?"
-                               ;;  :empty-lines 1
-                               ;;  :jump-to-captured t
-                               ;;  :prepend f)
-                               ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
-                                "* %U - :%?"
-                                :empty-lines-after 1
-                                :jump-to-captured t
-                                :prepend f)
-                               ("w" "Web site" entry
-                                (file "")
-                                "* %a :website:\n\n%U %?\n\n%:initial")
-                               ))
-      )
+  (use-package org-capture
+    :ensure nil
+    :bind ("C-c x" . (lambda () (interactive) (org-capture)))
+    :hook ((org-capture-mode . (lambda ()
+                                 (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
+           (org-capture-mode . delete-other-windows))
+    :custom
+    (org-default-notes-file "~/org/inbox.org")
+    (org-capture-use-agenda-date nil)
+    ;; define common template
+    (defvar my-blog-title "")
+    (defun input-blog-title ()
+      (setq my-blog-title (read-from-minibuffer "Enter blog title: "))
+      my-blog-title)
+
+    (defun my/org-capture-new-file-with-date ()
+      "Prompt for a new Org file name and return full path with date prefix."
+      (let ((title (read-string "New post title: ")))
+        (setq my-blog-title title)
+        (expand-file-name
+         (format "%s-%s.org"
+                 (format-time-string "%Y-%m-%d")
+                 (org-hugo-slug title))
+         "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
+
+    (org-capture-templates `(
+                             ("t" "Task")
+                             ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
+                              "** TODO %?   %^g"
+                              :prepend t
+                              :jump-to-captured t)
+                             ("tp" "Weekly-emacs-plugin" entry (file+headline "Task.org" "Weekly-Emacs-Plugin")
+                              ;; "** TODO %?   %^g"
+                              "%(fetch-weather-data)\n"
+                              :prepend t
+                              :jump-to-captured t)
+                             ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
+                              "* TODO %i%?"
+                              :empty-lines-after
+                              :jump-to-captured t
+                              :prepend t)
+                             ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
+                              "* %? %^g\n%i\n"
+                              :empty-lines-after 1)
+                             
+                             ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
+                              "* %U - :%?"
+                              :empty-lines-after 1
+                              :jump-to-captured t
+                              :prepend f)
+
+                             ("b" "Blog" plain (file ,(function my/org-capture-new-file-with-date))
+                              ,(concat "* TODO %(progn my-blog-title)  :%^g:@%^{categories}:\n"
+                                       ":PROPERTIES:\n"
+                                       ":EXPORT_FILE_NAME: %(org-hugo-slug my-blog-title)\n"
+                                       ":EXPORT_DATE: " (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)) "\n"
+                                       ":END:\n"
+                                       "%?\n"))
+                             ("g" "Gallery")
+                             ("gf" "字体收藏" entry
+                              (file+olp "~/Dropbox/20250518105542-gallery.org" "字体收藏")
+                              "** NAME: %?\n- 特点: \n- 样例: /样例文字/\n- 链接: %a")
+                             
+                             ("gc" "颜色收藏" entry
+                              (file+olp "~/Dropbox/20250518105542-gallery.org" "色彩方案")
+                              "** %?\n- 色号: \n- 用途: \n#+BEGIN_SRC emacs-lisp\n(setq my-color \"\")\n#+END_SRC")
+                             
+                             )
+                           )
+)
+
 
     (use-package org-agenda
       :ensure nil
@@ -994,8 +1015,8 @@ https://github.com/abo-abo/hydra
 
       (defun org-journal-save-entry-and-exit()
         "Simple convenience function.
-      Saves the buffer of the current day's entry and kills the window
-      Similar to org-capture like behavior"
+              Saves the buffer of the current day's entry and kills the window
+              Similar to org-capture like behavior"
         (interactive)
         (save-buffer)
         (kill-buffer-and-window))
@@ -1025,17 +1046,17 @@ https://github.com/abo-abo/hydra
       (setq org-zettel-ref-highlight-types
             (append org-zettel-ref-highlight-types
                     '(("warning" . (:char "w"
-                                          :face (:background "#FFA726"
-                                                             :foreground "#000000"
-                                                             :extend t)
-                                          :name "warning"
-                                          :prefix "⚠️"))
+                                    :face (:background "#FFA726"
+                                           :foreground "#000000"
+                                           :extend t)
+                                    :name "warning"
+                                    :prefix "⚠️"))
                       ("success" . (:char "s"
-                                          :face (:background "#66BB6A"
-                                                             :foreground "#FFFFFF"
-                                                             :extend t)
-                                          :name "success"
-                                          :prefix "✅")))))
+                                    :face (:background "#66BB6A"
+                                           :foreground "#FFFFFF"
+                                           :extend t)
+                                    :name "success"
+                                    :prefix "✅")))))
       (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
       (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
       )
@@ -1172,7 +1193,7 @@ https://github.com/abo-abo/hydra
       (org-roam-db-autosync-mode)
       ;; If using org-roam-protocol
       ;; (require 'org-roam-protocol)
-  )
+      )
 
 #+end_src
 ** org-agenda
@@ -2091,8 +2112,8 @@ https://github.com/abo-abo/hydra
       (use-package nerd-icons-completion
         :hook (vertico-mode . nerd-icons-completion-mode))
 
-      (use-package marginalia
-        :hook (after-init . marginalia-mode))
+      ;; (use-package marginalia
+      ;;   :hook (after-init . marginalia-mode))
 
       (use-package consult
         :bind (;; C-c bindings in `mode-specific-map'
@@ -2423,7 +2444,7 @@ https://depp.brause.cc/shackle/
              (pdf-outline-buffer-mode :select t :align 'below)
              ("*eshell*" :select t :align below :size 0.3 :popup t)
              ("*Gemini*" :select t :align right :size 0.4 :popup t)
-           
+             (treemacs-mode                 :select t :inhibit-window-quit t :align left :size 0.4 :popup t)
              ))
      :hook
      (after-init . shackle-mode))
@@ -2657,7 +2678,9 @@ https://github.com/karthink/popper
 
    (use-package tab-line
      :ensure nil
-     :hook (after-init . global-tab-line-mode)
+     ;; :hook (after-init . global-tab-line-mode)
+     :custom
+     (tab-line-tabs-function 'tab-line-tabs-window-buffers)
      :config
 
      (defcustom tab-line-tab-min-width 10
@@ -2694,13 +2717,13 @@ https://github.com/karthink/popper
      (dolist (mode '(ediff-mode process-menu-mode))
        (add-to-list 'tab-line-exclude-modes mode))
 
-     ;; (use-package sort-tab
-     ;;   :defer nil
-     ;;   :vc (:url "https://github.com/manateelazycat/sort-tab")
-     ;;   :init (sort-tab-mode 1))
      )
 
-  (global-tab-line-mode t)
+ (use-package bufferlo
+  :ensure t
+  :init
+  (bufferlo-mode))
+
 #+end_src
 
 ** persp-mode
@@ -2854,7 +2877,7 @@ https://github.com/karthink/popper
   (use-package gptel
     :ensure nil
     :defer nil
-    :vc (:url "https://github.com/karthink/gptel")
+    :vc (:url "https://github.com/karthink/gptel" :rev :newest)
     :config
     ;; default backend configuration
     ;; (setq
@@ -2925,7 +2948,31 @@ https://github.com/karthink/popper
   (use-package ox-hugo
     :ensure t
     :defer t
-    :after ox)
+    :after ox
+    :custom
+    (org-hugo-base-dir "~/codebase/blog-bus/dingtele.github.io/"))
+
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+            See `org-capture-templates' for more information."
+    (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+           (date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
+           (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+           (tags (read-from-minibuffer "tags: "))
+           (categories (read-from-minibuffer "categories: "))
+           (fname (org-hugo-slug title)))
+      (mapconcat #'identity
+                 `(
+                   ,(concat "* TODO " title "  :" tags ":" categories)
+                   ":PROPERTIES:"
+                   ,(concat ":EXPORT_FILE_NAME: " fname)
+                   ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                   ":END:"
+                   "%?\n")                ;Place the cursor here finally
+                 "\n")))
+
+
+
 
 #+end_src
 
