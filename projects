@@ -1,0 +1,6 @@
+;;; -*- lisp-data -*-
+(("/home/madcomet/.emacs.d/elpa/pos-tag-highlight/")
+ ("/home/madcomet/.emacs.d/elpa/gptel-quick/")
+ ("/home/madcomet/.emacs.d/elpa/auto-save/")
+ ("/home/madcomet/.emacs.d/elpa/zeft/") ("/home/madcomet/.emacs.d/")
+ ("/home/madcomet/.emacs.d/elpa/org-supertag/"))

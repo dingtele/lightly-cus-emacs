@@ -1,1 +1,10 @@
-nil
+((docker nil)
+ (docker-container-help nil)
+ (docker-container-logs nil)
+ (docker-container-rm nil)
+ (docker-container-start nil)
+ (magit-commit nil)
+ (magit-diff
+  ("--no-ext-diff" "--stat"))
+ (magit-dispatch nil)
+ (magit-push nil))

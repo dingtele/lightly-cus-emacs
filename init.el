@@ -83,7 +83,7 @@ Otherwise the startup will be very slow."
      ("http://www.masteringemacs.org/feed/" mastering)
      ("https://oremacs.com/atom.xml" oremacs)
      ("https://pinecast.com/feed/emacscast" emacscast)
-     ("https://emacstil.com/feed.xml" Emacs TIL)) t)
+     ("https://emacstil.com/feed.xml" Emacs TIL)))
  '(kill-whole-line t)
  '(load-prefer-newer t t)
  '(mouse-yank-at-point t)
@@ -99,16 +99,16 @@ Otherwise the startup will be very slow."
                        auto-package-update auto-save beginend benchmark-init
                        bing-dict buffer-name-relative bufferlo bug-hunter burly
                        cal-china-x calibredb cape capf-autosuggest cdlatex
-                       circadian citeproc clipetty cljsbuild-mode
-                       clojure-ts-mode colorful-mode consult-flyspell
-                       consult-todo consult-yasnippet counsel dash-functional
-                       datetime deft denote diminish dimmer dired-git-info
-                       dired-quick-sort dired-rsync diredfl docker
-                       docker-compose-mode doom-modeline eask ef-themes
-                       eglot-java ejc-sql eldoc-box elein elfeed elisp-def elpy
-                       embark-consult eshell-syntax-highlighting esup
-                       evil-nerd-commenter ewal-doom-themes exec-path-from-shell
-                       fd-dired flx-ido flycheck-clojure gcmh ghub
+                       circadian clipetty cljsbuild-mode clojure-ts-mode
+                       colorful-mode consult-flyspell consult-todo
+                       consult-yasnippet counsel dash-functional datetime deft
+                       denote diminish dimmer dired-git-info dired-quick-sort
+                       dired-rsync diredfl docker docker-compose-mode
+                       doom-modeline eask ef-themes eglot-java ejc-sql eldoc-box
+                       elein elfeed elisp-def elpy embark-consult
+                       eshell-syntax-highlighting esup evil-nerd-commenter
+                       ewal-doom-themes exec-path-from-shell fanyi fd-dired
+                       flx-ido flycheck-clojure gcmh ghub
                        gnu-elpa-keyring-update go-translate goggles
                        google-translate gptel gptel-quick groovy-mode
                        gruvbox-theme haskell-mode helm-lsp helpful hideshow-org
@@ -128,8 +128,8 @@ Otherwise the startup will be very slow."
                        org-zettel-ref-mode origami ox-hugo pangu-spacing paredit
                        parent-mode pdf-tools pinyinlib pkg-info popper
                        pretty-symbols promise rainbow-delimiters
-                       rainbow-identifiers region-occurrences-highlighter rg
-                       rime rust-mode setup shackle shrface smartparens
+                       rainbow-identifiers reader region-occurrences-highlighter
+                       rg rime rust-mode setup shackle shrface smartparens
                        smooth-scrolling sort-tab spacemacs-theme svg-tag-mode
                        tabspaces tagedit telega toc-org transient-posframe
                        transwin tree-sitter-langs treemacs-evil
@@ -138,7 +138,8 @@ Otherwise the startup will be very slow."
                        treemacs-tab-bar treesit-auto vertico-posframe vundo
                        workgroups2 xterm-color zeft zotxt))
  '(package-vc-selected-packages
-   '((sort-tab :url "https://github.com/manateelazycat/sort-tab")
+   '((reader :url "https://codeberg.org/divyaranjan/emacs-reader" :make "all")
+     (sort-tab :url "https://github.com/manateelazycat/sort-tab")
      (pos-tag-highlight :url "https://github.com/yibie/pos-tag-highlight")
      (gptel-quick :url "https://github.com/karthink/gptel-quick")
      (auto-save :url "https://github.com/manateelazycat/auto-save")

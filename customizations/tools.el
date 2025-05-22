@@ -489,7 +489,10 @@ Return the fastest package archive."
   (use-package goto-addr
     :ensure nil
     :hook ((text-mode . goto-address-mode)
-           (prog-mode . goto-address-prog-mode)))
+           (prog-mode . goto-address-prog-mode)
+           (org-mode . goto-address-mode)))
+           (prog-mode . goto-address-prog-mode)
+           (org-mode . goto-address-mode)))
 
   ;; Edit multiple regions in the same way simultaneously
   (use-package iedit
@@ -513,83 +516,153 @@ Return the fastest package archive."
                     (diminish (cdr pair)))
                   beginend-modes))
 
-(use-package rime
-  :commands (toggle-input-method)
-  :hook
-  ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
-                                    (set-input-method "rime"))))
-   (meow-insert-exit . (lambda() (set-input-method nil))))
-  :bind
-  (:map rime-mode-map
-   ("C-j" . rime-inline-ascii)
-   :map rime-mode-map
-   ("C-l" . rime-force-enable))
-  :custom
-  (default-input-method 'rime)
-  (rime-show-candidate 'posframe)
-  (rime-posframe-style 'vertical)
-  (rime-posframe-properties 
-   (list :background-color "#333333"
-         :foreground-color "#dcdccc"
-         :internal-border-width 5))
-  (rime-disable-predicates
-   '(rime-predicate-prog-in-code-p
+;; (use-package rime
+;;   :commands (toggle-input-method)
+;;   :hook
+;;   ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
+;;                                     (set-input-method "rime"))))
+;;    (meow-insert-exit . (lambda() (set-input-method nil))))
+;;   :bind
+;;   (:map rime-mode-map
+;;    ("C-j" . rime-inline-ascii)
+;;    :map rime-mode-map
+;;    ("C-l" . rime-force-enable))
+;;   :custom
+;;   (default-input-method 'rime)
+;;   (rime-show-candidate 'posframe)
+;;   (rime-posframe-style 'vertical)
+;;   (rime-posframe-properties 
+;;    (list :background-color "#333333"
+;;          :foreground-color "#dcdccc"
+;;          :internal-border-width 5))
+;;   (rime-disable-predicates
+;;    '(rime-predicate-prog-in-code-p
+;; (use-package rime
+;;   :commands (toggle-input-method)
+;;   :hook
+;;   ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
+;;                                     (set-input-method "rime"))))
+;;    (meow-insert-exit . (lambda() (set-input-method nil))))
+;;   :bind
+;;   (:map rime-mode-map
+;;    ("C-j" . rime-inline-ascii)
+;;    :map rime-mode-map
+;;    ("C-l" . rime-force-enable))
+;;   :custom
+;;   (default-input-method 'rime)
+;;   (rime-show-candidate 'posframe)
+;;   (rime-posframe-style 'vertical)
+;;   (rime-posframe-properties 
+;;    (list :background-color "#333333"
+;;          :foreground-color "#dcdccc"
+;;          :internal-border-width 5))
+;;   (rime-disable-predicates
+;;    '(rime-predicate-prog-in-code-p
 
-     rime-predicate-auto-english-p
+;;      rime-predicate-auto-english-p
+;;      rime-predicate-auto-english-p
 
-     rime-predicate-punctuation-after-ascii-p
-     rime-predicate-punctuation-line-begin-p
-     my/rime-predicate-punctuation-next-char-is-paired-p
-     rime-predicate-tex-math-or-command-p
-     rime-predicate-org-latex-mode-p
-     rime-predicate-current-uppercase-letter-p
-     (lambda () (button-at (point)))
-     meow-normal-mode-p
-     meow-motion-mode-p
-     meow-keypad-mode-p
-     ;; +rime--punctuation-line-begin-p
-     ;; +rime--english-prober
-     ;; If the cursor is after a alphabet character.
-     rime-predicate-after-alphabet-char-p
-     ;; If input a punctuation after
-     ;; a Chinese charactor with whitespace.
-     rime-predicate-punctuation-after-space-cc-p
-     rime-predicate-special-ascii-line-begin-p
-     ))
-  (rime-inline-predicates
-   ;; If cursor is after a whitespace
-   ;; which follow a non-ascii character.
-   '(rime-predicate-space-after-cc-p
-     ;; If the current charactor entered is a uppercase letter.
-     rime-predicate-current-uppercase-letter-p))
+;;      rime-predicate-punctuation-after-ascii-p
+;;      rime-predicate-punctuation-line-begin-p
+;;      my/rime-predicate-punctuation-next-char-is-paired-p
+;;      rime-predicate-tex-math-or-command-p
+;;      rime-predicate-org-latex-mode-p
+;;      rime-predicate-current-uppercase-letter-p
+;;      (lambda () (button-at (point)))
+;;      meow-normal-mode-p
+;;      meow-motion-mode-p
+;;      meow-keypad-mode-p
+;;      ;; +rime--punctuation-line-begin-p
+;;      ;; +rime--english-prober
+;;      ;; If the cursor is after a alphabet character.
+;;      rime-predicate-after-alphabet-char-p
+;;      ;; If input a punctuation after
+;;      ;; a Chinese charactor with whitespace.
+;;      rime-predicate-punctuation-after-space-cc-p
+;;      rime-predicate-special-ascii-line-begin-p
+;;      ))
+;;   (rime-inline-predicates
+;;    ;; If cursor is after a whitespace
+;;    ;; which follow a non-ascii character.
+;;    '(rime-predicate-space-after-cc-p
+;;      ;; If the current charactor entered is a uppercase letter.
+;;      rime-predicate-current-uppercase-letter-p))
+;;      rime-predicate-punctuation-after-ascii-p
+;;      rime-predicate-punctuation-line-begin-p
+;;      my/rime-predicate-punctuation-next-char-is-paired-p
+;;      rime-predicate-tex-math-or-command-p
+;;      rime-predicate-org-latex-mode-p
+;;      rime-predicate-current-uppercase-letter-p
+;;      (lambda () (button-at (point)))
+;;      meow-normal-mode-p
+;;      meow-motion-mode-p
+;;      meow-keypad-mode-p
+;;      ;; +rime--punctuation-line-begin-p
+;;      ;; +rime--english-prober
+;;      ;; If the cursor is after a alphabet character.
+;;      rime-predicate-after-alphabet-char-p
+;;      ;; If input a punctuation after
+;;      ;; a Chinese charactor with whitespace.
+;;      rime-predicate-punctuation-after-space-cc-p
+;;      rime-predicate-special-ascii-line-begin-p
+;;      ))
+;;   (rime-inline-predicates
+;;    ;; If cursor is after a whitespace
+;;    ;; which follow a non-ascii character.
+;;    '(rime-predicate-space-after-cc-p
+;;      ;; If the current charactor entered is a uppercase letter.
+;;      rime-predicate-current-uppercase-letter-p))
 
-  (rime-user-data-dir "~/.emacs.d/rime/")
-  (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+;;   (rime-user-data-dir "~/.emacs.d/rime/")
+;;   (rime-librime-root "~/.emacs.d/librime/dist")
+;;   (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+;;   (rime-user-data-dir "~/.emacs.d/rime/")
+;;   (rime-librime-root "~/.emacs.d/librime/dist")
+;;   (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
 
-  (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+;;   (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+;;   (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
 
-  :init
-  (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
-    (if (not (eq (point) (point-max)))
-        (and (rime-predicate-current-input-punctuation-p)
-             (not (string-match-p
-                   (rx (any "\"\(\[\{"))
-                   (buffer-substring (point) (1- (point)))
-                   )
-                  )
-             (string-match-p
-              (rx (any "\}\]\)\""))
-              (buffer-substring (point) (1+ (point)))))
-      nil))
+;;   :init
+;;   (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
+;;     (if (not (eq (point) (point-max)))
+;;         (and (rime-predicate-current-input-punctuation-p)
+;;              (not (string-match-p
+;;                    (rx (any "\"\(\[\{"))
+;;                    (buffer-substring (point) (1- (point)))
+;;                    )
+;;                   )
+;;              (string-match-p
+;;               (rx (any "\}\]\)\""))
+;;               (buffer-substring (point) (1+ (point)))))
+;;       nil))
+;;   :init
+;;   (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
+;;     (if (not (eq (point) (point-max)))
+;;         (and (rime-predicate-current-input-punctuation-p)
+;;              (not (string-match-p
+;;                    (rx (any "\"\(\[\{"))
+;;                    (buffer-substring (point) (1- (point)))
+;;                    )
+;;                   )
+;;              (string-match-p
+;;               (rx (any "\}\]\)\""))
+;;               (buffer-substring (point) (1+ (point)))))
+;;       nil))
 
-  (defun rime-predicate-special-ascii-line-begin-p ()
-    "If '/' or '#' at the beginning of the line."
-    (and (> (point) (save-excursion (back-to-indentation) (point)))
-         (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-           (string-match-p "^[\/#]" string))))
+;;   (defun rime-predicate-special-ascii-line-begin-p ()
+;;     "If '/' or '#' at the beginning of the line."
+;;     (and (> (point) (save-excursion (back-to-indentation) (point)))
+;;          (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+;;            (string-match-p "^[\/#]" string))))
+;;   (defun rime-predicate-special-ascii-line-begin-p ()
+;;     "If '/' or '#' at the beginning of the line."
+;;     (and (> (point) (save-excursion (back-to-indentation) (point)))
+;;          (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+;;            (string-match-p "^[\/#]" string))))
 
-  )
+;;   )
+;;   )
 
 
 (use-package pangu-spacing
@@ -859,6 +932,36 @@ Return the fastest package archive."
     (org-default-notes-file "~/org/inbox.org")
     (org-capture-use-agenda-date nil)
     ;; define common template
+    (defvar my-blog-title "")
+    (defun input-blog-title ()
+      (setq my-blog-title (read-from-minibuffer "Enter blog title: "))
+      my-blog-title)
+
+    (defun my/org-capture-new-file-with-date ()
+      "Prompt for a new Org file name and return full path with date prefix."
+      (let ((title (read-string "New post title: ")))
+        (setq my-blog-title title)
+        (expand-file-name
+         (format "%s-%s.org"
+                 (format-time-string "%Y-%m-%d")
+                 (org-hugo-slug title))
+         "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
+
+    (defvar my-blog-title "")
+    (defun input-blog-title ()
+      (setq my-blog-title (read-from-minibuffer "Enter blog title: "))
+      my-blog-title)
+
+    (defun my/org-capture-new-file-with-date ()
+      "Prompt for a new Org file name and return full path with date prefix."
+      (let ((title (read-string "New post title: ")))
+        (setq my-blog-title title)
+        (expand-file-name
+         (format "%s-%s.org"
+                 (format-time-string "%Y-%m-%d")
+                 (org-hugo-slug title))
+         "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
+
     (org-capture-templates `(
                              ("t" "Task")
                              ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
@@ -878,257 +981,477 @@ Return the fastest package archive."
                              ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
                               "* %? %^g\n%i\n"
                               :empty-lines-after 1)
-                             ;; For EWW
-                             ;; ("b" "Bookmarks" entry (file+headline "capture.org" "Bookmarks")
-                             ;;  "* %:description\n\n%a%?"
-                             ;;  :empty-lines 1
-                             ;;  :immediate-finish t)
-                             ;; ("j" "Journal")
-                             ;; ("jt" "Today's TODO" entry (file+olp+datetree "Journal.org" "Today's TODO")
-                             ;;  "* TODO %U [/] \n - [ ] %?"
-                             ;;  :empty-lines 1
-                             ;;  :jump-to-captured t
-                             ;;  :prepend f)
+                             
+                             
                              ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
                               "* %U - :%?"
                               :empty-lines-after 1
                               :jump-to-captured t
                               :prepend f)
-                             ("w" "Web site" entry
-                              (file "")
-                              "* %a :website:\n\n%U %?\n\n%:initial")
-                             ))
-    )
 
-  (use-package org-agenda
-    :ensure nil
-    :after org
-    :bind
-    ("C-c a" . org-agenda)
-    :custom
-    (org-agenda-include-diary t)
-    (org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
-                                ;; Indent todo items by level to show nesting
-                                (todo . " %i %-12:c%l")
-                                (tags . " %i %-12:c")
-                                (search . " %i %-12:c")))
-    (org-agenda-start-on-weekday nil)
-    (custom-set-variables '(org-agenda-files
-                            '("~/Dropbox/org/Task.org")))
-    )
-
-  (require 'org-habit)
-
-  ;; (use-package org-super-agenda
-  ;;   :defer nil
-  ;;   :custom
-  ;;   (org-super-agenda-groups '((:auto-dir-name t)))
-  ;;   :config
-  ;;   (org-super-agenda-mode))
-
-  (use-package org-sidebar :ensure t)
-
-  (use-package org-journal
-    :ensure t
-    :defer t
-    :bind (("C-x j" . org-journal-new-entry))
-    :config
-    (setq org-journal-dir  "~/Dropbox/org/")
-    (setq org-journal-date-format   "%F, %A")
-    (setq org-journal-time-format  "%T ")
-    (setq org-journal-file-format  "%Y.org")  ; their file names
-    (setq org-journal-file-type  'yearly)
-    (setq org-journal-enable-agenda-integration  t)
-    (setq org-journal-enable-cache  t)
-
-    (defun org-journal-save-entry-and-exit()
-      "Simple convenience function.
-    Saves the buffer of the current day's entry and kills the window
-    Similar to org-capture like behavior"
-      (interactive)
-      (save-buffer)
-      (kill-buffer-and-window))
-    (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
-
-  (use-package org-alert
-    :config
-    )
-
-  (use-package org-zettel-ref-mode
-    :ensure nil
-    :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
-    ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
-    :init
-    (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
-    :config
-    ;; (setq org-zettel-ref-mode-type 'denote)
-    (setq org-zettel-ref-mode-type 'org-roam)
-    ;; (setq org-zettel-ref-mode-type 'normal)
-    (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
-    (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/to-be-converted/")
-    (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted-org")
-    (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
-    (setq org-zettel-ref-python-environment 'venv)
-    (setq org-zettel-ref-python-env-name "venv")
-    (setq org-zettel-ref-debug t)
-    (setq org-zettel-ref-highlight-types
-          (append org-zettel-ref-highlight-types
-                  '(("warning" . (:char "w"
-                                        :face (:background "#FFA726"
-                                                           :foreground "#000000"
-                                                           :extend t)
-                                        :name "warning"
-                                        :prefix "⚠️"))
-                    ("success" . (:char "s"
-                                        :face (:background "#66BB6A"
-                                                           :foreground "#FFFFFF"
-                                                           :extend t)
-                                        :name "success"
-                                        :prefix "✅")))))
-    (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
-    (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
-    )
-
-  (use-package calendar
-    :ensure nil
-    :hook (calendar-today-visible . calendar-mark-today)
-    :custom
-    ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
-    (calendar-chinese-all-holidays-flag nil)
-    ;; 是否显示节日
-    (calendar-mark-holidays-flag t)
-    ;; 是否显示Emacs的日记，我们使用org的日记
-    (calendar-mark-diary-entries-flag nil)
-    ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
-    (calendar-time-zone-style 'numeric)
-    ;; 日期显示方式：year/month/day
-    (calendar-date-style 'iso)
-    ;; 中文天干地支设置
-    (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
-    (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
-    ;; 设置中文月份
-    (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
-    ;; 设置星期标题显示
-    (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
-    ;; 周一作为一周第一天
-    (calendar-week-start-day 1)
-    )
-
-  ;; 时间解析增加中文拼音
-  (use-package parse-time
-    :ensure nil
-    :defer t
-    :config
-    (setq parse-time-months
-          (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
-                    ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
-                    ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
-                    ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
-                    ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
-                    ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
-                    ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
-                    ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
-                  parse-time-months))
-
-    (setq parse-time-weekdays
-          (append '(("zri" . 0) ("zqi" . 0)
-                    ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
-                    ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
-                    ("zr" . 0) ("zq" . 0)
-                    ("zy" . 1) ("ze" . 2) ("zs" . 3)
-                    ("zsi" . 4) ("zw" . 5) ("zl" . 6))
-                  parse-time-weekdays)))
-
-  ;; 中国节日设置
-  (use-package cal-china-x
-    :ensure t
-    :commands cal-china-x-setup
-    :hook (after-init . cal-china-x-setup)
-    :config
-    ;; 重要节日设置
-    (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-    ;; 所有节日设置
-    (setq cal-china-x-general-holidays
-          '(;;公历节日
-            (holiday-fixed 1 1 "元旦")
-            (holiday-fixed 2 14 "情人节")
-            (holiday-fixed 3 8 "妇女节")
-            (holiday-fixed 3 14 "白色情人节")
-            (holiday-fixed 4 1 "愚人节")
-            (holiday-fixed 5 1 "劳动节")
-            (holiday-fixed 5 4 "青年节")
-            (holiday-float 5 0 2 "母亲节")
-            (holiday-fixed 6 1 "儿童节")
-            (holiday-float 6 0 3 "父亲节")
-            (holiday-fixed 9 10 "教师节")
-            (holiday-fixed 10 1 "国庆节")
-            (holiday-fixed 10 2 "国庆节")
-            (holiday-fixed 10 3 "国庆节")
-            (holiday-fixed 10 24 "程序员节")
-            (holiday-fixed 11 11 "双11购物节")
-            (holiday-fixed 12 25 "圣诞节")
-            ;; 农历节日
-            (holiday-lunar 12 30 "春节" 0)
-            (holiday-lunar 1 1 "春节" 0)
-            (holiday-lunar 1 2 "春节" 0)
-            (holiday-lunar 1 15 "元宵节" 0)
-            (holiday-solar-term "清明" "清明节")
-            (holiday-solar-term "小寒" "小寒")
-            (holiday-solar-term "大寒" "大寒")
-            (holiday-solar-term "立春" "立春")
-            (holiday-solar-term "雨水" "雨水")
-            (holiday-solar-term "惊蛰" "惊蛰")
-            (holiday-solar-term "春分" "春分")
-            (holiday-solar-term "谷雨" "谷雨")
-            (holiday-solar-term "立夏" "立夏")
-            (holiday-solar-term "小满" "小满")
-            (holiday-solar-term "芒种" "芒种")
-            (holiday-solar-term "夏至" "夏至")
-            (holiday-solar-term "小暑" "小暑")
-            (holiday-solar-term "大暑" "大暑")
-            (holiday-solar-term "立秋" "立秋")
-            (holiday-solar-term "处暑" "处暑")
-            (holiday-solar-term "白露" "白露")
-            (holiday-solar-term "秋分" "秋分")
-            (holiday-solar-term "寒露" "寒露")
-            (holiday-solar-term "霜降" "霜降")
-            (holiday-solar-term "立冬" "立冬")
-            (holiday-solar-term "小雪" "小雪")
-            (holiday-solar-term "大雪" "大雪")
-            (holiday-solar-term "冬至" "冬至")
-            (holiday-lunar 5 5 "端午节" 0)
-            (holiday-lunar 8 15 "中秋节" 0)
-            (holiday-lunar 7 7 "七夕情人节" 0)
-            (holiday-lunar 12 8 "腊八节" 0)
-            (holiday-lunar 9 9 "重阳节" 0)))
-    ;; 设置日历的节日，通用节日已经包含了所有节日
-    (setq calendar-holidays (append cal-china-x-general-holidays)))
-
-  (use-package org-roam
-    :ensure t
-    :custom
-    (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture)
-           ;; Dailies
-           ("C-c n j" . org-roam-dailies-capture-today))
-    :config
-    ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (org-roam-db-autosync-mode)
-    ;; If using org-roam-protocol
-    ;; (require 'org-roam-protocol)
+                             ("b" "Blog" plain (file ,(function my/org-capture-new-file-with-date))
+                              ,(concat "* TODO %(progn my-blog-title)  :%^g:@%^{categories}:\n"
+                                       ":PROPERTIES:\n"
+                                       ":EXPORT_FILE_NAME: %(org-hugo-slug my-blog-title)\n"
+                                       ":EXPORT_DATE: " (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)) "\n"
+                                       ":END:\n"
+                                       "%?\n"))
+                             ("g" "Gallery")
+                             ("gf" "字体收藏" entry
+                              (file+olp "~/Dropbox/20250518105542-gallery.org" "字体收藏")
+                              "** NAME: %?\n- 特点: \n- 样例: /样例文字/\n- 链接: %a")
+                             
+                             ("gc" "颜色收藏" entry
+                              (file+olp "~/Dropbox/20250518105542-gallery.org" "色彩方案")
+                              "** %?\n- 色号: \n- 用途: \n#+BEGIN_SRC emacs-lisp\n(setq my-color \"\")\n#+END_SRC")
+                             
+                             )
+                           )
 )
+
+
+    (use-package org-agenda
+      :ensure nil
+      :after org
+      :bind
+      ("C-c a" . org-agenda)
+      :custom
+      (org-agenda-include-diary t)
+      (org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
+                                  ;; Indent todo items by level to show nesting
+                                  (todo . " %i %-12:c%l")
+                                  (tags . " %i %-12:c")
+                                  (search . " %i %-12:c")))
+      (org-agenda-start-on-weekday nil)
+      (custom-set-variables '(org-agenda-files
+                              '("~/Dropbox/org/Task.org")))
+      )
+    (use-package org-agenda
+      :ensure nil
+      :after org
+      :bind
+      ("C-c a" . org-agenda)
+      :custom
+      (org-agenda-include-diary t)
+      (org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
+                                  ;; Indent todo items by level to show nesting
+                                  (todo . " %i %-12:c%l")
+                                  (tags . " %i %-12:c")
+                                  (search . " %i %-12:c")))
+      (org-agenda-start-on-weekday nil)
+      (custom-set-variables '(org-agenda-files
+                              '("~/Dropbox/org/Task.org")))
+      )
+
+    (require 'org-habit)
+    (require 'org-habit)
+
+    ;; (use-package org-super-agenda
+    ;;   :defer nil
+    ;;   :custom
+    ;;   (org-super-agenda-groups '((:auto-dir-name t)))
+    ;;   :config
+    ;;   (org-super-agenda-mode))
+    ;; (use-package org-super-agenda
+    ;;   :defer nil
+    ;;   :custom
+    ;;   (org-super-agenda-groups '((:auto-dir-name t)))
+    ;;   :config
+    ;;   (org-super-agenda-mode))
+
+    (use-package org-sidebar :ensure t)
+    (use-package org-sidebar :ensure t)
+
+    (use-package org-journal
+      :ensure t
+      :defer t
+      :bind (("C-x j" . org-journal-new-entry))
+      :config
+      (setq org-journal-dir  "~/Dropbox/org/")
+      (setq org-journal-date-format   "%F, %A")
+      (setq org-journal-time-format  "%T ")
+      (setq org-journal-file-format  "%Y.org")  ; their file names
+      (setq org-journal-file-type  'yearly)
+      (setq org-journal-enable-agenda-integration  t)
+      (setq org-journal-enable-cache  t)
+    (use-package org-journal
+      :ensure t
+      :defer t
+      :bind (("C-x j" . org-journal-new-entry))
+      :config
+      (setq org-journal-dir  "~/Dropbox/org/")
+      (setq org-journal-date-format   "%F, %A")
+      (setq org-journal-time-format  "%T ")
+      (setq org-journal-file-format  "%Y.org")  ; their file names
+      (setq org-journal-file-type  'yearly)
+      (setq org-journal-enable-agenda-integration  t)
+      (setq org-journal-enable-cache  t)
+
+      (defun org-journal-save-entry-and-exit()
+        "Simple convenience function.
+              Saves the buffer of the current day's entry and kills the window
+              Similar to org-capture like behavior"
+        (interactive)
+        (save-buffer)
+        (kill-buffer-and-window))
+      (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
+      (defun org-journal-save-entry-and-exit()
+        "Simple convenience function.
+              Saves the buffer of the current day's entry and kills the window
+              Similar to org-capture like behavior"
+        (interactive)
+        (save-buffer)
+        (kill-buffer-and-window))
+      (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
+
+    (use-package org-alert
+      :config
+      )
+    (use-package org-alert
+      :config
+      )
+
+    (use-package org-zettel-ref-mode
+      :ensure nil
+      :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
+      ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
+      :init
+      (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
+      :config
+      ;; (setq org-zettel-ref-mode-type 'denote)
+      (setq org-zettel-ref-mode-type 'org-roam)
+      ;; (setq org-zettel-ref-mode-type 'normal)
+      (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
+      (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/to-be-converted/")
+      (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted-org")
+      (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
+      (setq org-zettel-ref-python-environment 'venv)
+      (setq org-zettel-ref-python-env-name "venv")
+      (setq org-zettel-ref-debug t)
+      (setq org-zettel-ref-highlight-types
+            (append org-zettel-ref-highlight-types
+                    '(("warning" . (:char "w"
+                                    :face (:background "#FFA726"
+                                           :foreground "#000000"
+                                           :extend t)
+                                    :name "warning"
+                                    :prefix "⚠️"))
+                      ("success" . (:char "s"
+                                    :face (:background "#66BB6A"
+                                           :foreground "#FFFFFF"
+                                           :extend t)
+                                    :name "success"
+                                    :prefix "✅")))))
+      (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
+      (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
+      )
+    (use-package org-zettel-ref-mode
+      :ensure nil
+      :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
+      ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
+      :init
+      (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
+      :config
+      ;; (setq org-zettel-ref-mode-type 'denote)
+      (setq org-zettel-ref-mode-type 'org-roam)
+      ;; (setq org-zettel-ref-mode-type 'normal)
+      (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
+      (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/to-be-converted/")
+      (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted-org")
+      (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
+      (setq org-zettel-ref-python-environment 'venv)
+      (setq org-zettel-ref-python-env-name "venv")
+      (setq org-zettel-ref-debug t)
+      (setq org-zettel-ref-highlight-types
+            (append org-zettel-ref-highlight-types
+                    '(("warning" . (:char "w"
+                                    :face (:background "#FFA726"
+                                           :foreground "#000000"
+                                           :extend t)
+                                    :name "warning"
+                                    :prefix "⚠️"))
+                      ("success" . (:char "s"
+                                    :face (:background "#66BB6A"
+                                           :foreground "#FFFFFF"
+                                           :extend t)
+                                    :name "success"
+                                    :prefix "✅")))))
+      (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
+      (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
+      )
+
+    (use-package calendar
+      :ensure nil
+      :hook (calendar-today-visible . calendar-mark-today)
+      :custom
+      ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
+      (calendar-chinese-all-holidays-flag nil)
+      ;; 是否显示节日
+      (calendar-mark-holidays-flag t)
+      ;; 是否显示Emacs的日记，我们使用org的日记
+      (calendar-mark-diary-entries-flag nil)
+      ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
+      (calendar-time-zone-style 'numeric)
+      ;; 日期显示方式：year/month/day
+      (calendar-date-style 'iso)
+      ;; 中文天干地支设置
+      (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+      (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+      ;; 设置中文月份
+      (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
+      ;; 设置星期标题显示
+      (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
+      ;; 周一作为一周第一天
+      (calendar-week-start-day 1)
+      )
+    (use-package calendar
+      :ensure nil
+      :hook (calendar-today-visible . calendar-mark-today)
+      :custom
+      ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
+      (calendar-chinese-all-holidays-flag nil)
+      ;; 是否显示节日
+      (calendar-mark-holidays-flag t)
+      ;; 是否显示Emacs的日记，我们使用org的日记
+      (calendar-mark-diary-entries-flag nil)
+      ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
+      (calendar-time-zone-style 'numeric)
+      ;; 日期显示方式：year/month/day
+      (calendar-date-style 'iso)
+      ;; 中文天干地支设置
+      (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+      (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+      ;; 设置中文月份
+      (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
+      ;; 设置星期标题显示
+      (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
+      ;; 周一作为一周第一天
+      (calendar-week-start-day 1)
+      )
+
+    ;; 时间解析增加中文拼音
+    (use-package parse-time
+      :ensure nil
+      :defer t
+      :config
+      (setq parse-time-months
+            (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
+                      ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
+                      ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
+                      ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
+                      ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                      ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                      ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                      ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                    parse-time-months))
+    ;; 时间解析增加中文拼音
+    (use-package parse-time
+      :ensure nil
+      :defer t
+      :config
+      (setq parse-time-months
+            (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
+                      ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
+                      ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
+                      ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
+                      ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                      ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                      ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                      ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                    parse-time-months))
+
+      (setq parse-time-weekdays
+            (append '(("zri" . 0) ("zqi" . 0)
+                      ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                      ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                      ("zr" . 0) ("zq" . 0)
+                      ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                      ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                    parse-time-weekdays)))
+      (setq parse-time-weekdays
+            (append '(("zri" . 0) ("zqi" . 0)
+                      ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                      ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                      ("zr" . 0) ("zq" . 0)
+                      ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                      ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                    parse-time-weekdays)))
+
+    ;; 中国节日设置
+    (use-package cal-china-x
+      :ensure t
+      :commands cal-china-x-setup
+      :hook (after-init . cal-china-x-setup)
+      :config
+      ;; 重要节日设置
+      (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+      ;; 所有节日设置
+      (setq cal-china-x-general-holidays
+            '(;;公历节日
+              (holiday-fixed 1 1 "元旦")
+              (holiday-fixed 2 14 "情人节")
+              (holiday-fixed 3 8 "妇女节")
+              (holiday-fixed 3 14 "白色情人节")
+              (holiday-fixed 4 1 "愚人节")
+              (holiday-fixed 5 1 "劳动节")
+              (holiday-fixed 5 4 "青年节")
+              (holiday-float 5 0 2 "母亲节")
+              (holiday-fixed 6 1 "儿童节")
+              (holiday-float 6 0 3 "父亲节")
+              (holiday-fixed 9 10 "教师节")
+              (holiday-fixed 10 1 "国庆节")
+              (holiday-fixed 10 2 "国庆节")
+              (holiday-fixed 10 3 "国庆节")
+              (holiday-fixed 10 24 "程序员节")
+              (holiday-fixed 11 11 "双11购物节")
+              (holiday-fixed 12 25 "圣诞节")
+              ;; 农历节日
+              (holiday-lunar 12 30 "春节" 0)
+              (holiday-lunar 1 1 "春节" 0)
+              (holiday-lunar 1 2 "春节" 0)
+              (holiday-lunar 1 15 "元宵节" 0)
+              (holiday-solar-term "清明" "清明节")
+              (holiday-solar-term "小寒" "小寒")
+              (holiday-solar-term "大寒" "大寒")
+              (holiday-solar-term "立春" "立春")
+              (holiday-solar-term "雨水" "雨水")
+              (holiday-solar-term "惊蛰" "惊蛰")
+              (holiday-solar-term "春分" "春分")
+              (holiday-solar-term "谷雨" "谷雨")
+              (holiday-solar-term "立夏" "立夏")
+              (holiday-solar-term "小满" "小满")
+              (holiday-solar-term "芒种" "芒种")
+              (holiday-solar-term "夏至" "夏至")
+              (holiday-solar-term "小暑" "小暑")
+              (holiday-solar-term "大暑" "大暑")
+              (holiday-solar-term "立秋" "立秋")
+              (holiday-solar-term "处暑" "处暑")
+              (holiday-solar-term "白露" "白露")
+              (holiday-solar-term "秋分" "秋分")
+              (holiday-solar-term "寒露" "寒露")
+              (holiday-solar-term "霜降" "霜降")
+              (holiday-solar-term "立冬" "立冬")
+              (holiday-solar-term "小雪" "小雪")
+              (holiday-solar-term "大雪" "大雪")
+              (holiday-solar-term "冬至" "冬至")
+              (holiday-lunar 5 5 "端午节" 0)
+              (holiday-lunar 8 15 "中秋节" 0)
+              (holiday-lunar 7 7 "七夕情人节" 0)
+              (holiday-lunar 12 8 "腊八节" 0)
+              (holiday-lunar 9 9 "重阳节" 0)))
+      ;; 设置日历的节日，通用节日已经包含了所有节日
+      (setq calendar-holidays (append cal-china-x-general-holidays)))
+    ;; 中国节日设置
+    (use-package cal-china-x
+      :ensure t
+      :commands cal-china-x-setup
+      :hook (after-init . cal-china-x-setup)
+      :config
+      ;; 重要节日设置
+      (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+      ;; 所有节日设置
+      (setq cal-china-x-general-holidays
+            '(;;公历节日
+              (holiday-fixed 1 1 "元旦")
+              (holiday-fixed 2 14 "情人节")
+              (holiday-fixed 3 8 "妇女节")
+              (holiday-fixed 3 14 "白色情人节")
+              (holiday-fixed 4 1 "愚人节")
+              (holiday-fixed 5 1 "劳动节")
+              (holiday-fixed 5 4 "青年节")
+              (holiday-float 5 0 2 "母亲节")
+              (holiday-fixed 6 1 "儿童节")
+              (holiday-float 6 0 3 "父亲节")
+              (holiday-fixed 9 10 "教师节")
+              (holiday-fixed 10 1 "国庆节")
+              (holiday-fixed 10 2 "国庆节")
+              (holiday-fixed 10 3 "国庆节")
+              (holiday-fixed 10 24 "程序员节")
+              (holiday-fixed 11 11 "双11购物节")
+              (holiday-fixed 12 25 "圣诞节")
+              ;; 农历节日
+              (holiday-lunar 12 30 "春节" 0)
+              (holiday-lunar 1 1 "春节" 0)
+              (holiday-lunar 1 2 "春节" 0)
+              (holiday-lunar 1 15 "元宵节" 0)
+              (holiday-solar-term "清明" "清明节")
+              (holiday-solar-term "小寒" "小寒")
+              (holiday-solar-term "大寒" "大寒")
+              (holiday-solar-term "立春" "立春")
+              (holiday-solar-term "雨水" "雨水")
+              (holiday-solar-term "惊蛰" "惊蛰")
+              (holiday-solar-term "春分" "春分")
+              (holiday-solar-term "谷雨" "谷雨")
+              (holiday-solar-term "立夏" "立夏")
+              (holiday-solar-term "小满" "小满")
+              (holiday-solar-term "芒种" "芒种")
+              (holiday-solar-term "夏至" "夏至")
+              (holiday-solar-term "小暑" "小暑")
+              (holiday-solar-term "大暑" "大暑")
+              (holiday-solar-term "立秋" "立秋")
+              (holiday-solar-term "处暑" "处暑")
+              (holiday-solar-term "白露" "白露")
+              (holiday-solar-term "秋分" "秋分")
+              (holiday-solar-term "寒露" "寒露")
+              (holiday-solar-term "霜降" "霜降")
+              (holiday-solar-term "立冬" "立冬")
+              (holiday-solar-term "小雪" "小雪")
+              (holiday-solar-term "大雪" "大雪")
+              (holiday-solar-term "冬至" "冬至")
+              (holiday-lunar 5 5 "端午节" 0)
+              (holiday-lunar 8 15 "中秋节" 0)
+              (holiday-lunar 7 7 "七夕情人节" 0)
+              (holiday-lunar 12 8 "腊八节" 0)
+              (holiday-lunar 9 9 "重阳节" 0)))
+      ;; 设置日历的节日，通用节日已经包含了所有节日
+      (setq calendar-holidays (append cal-china-x-general-holidays)))
+
+    (use-package org-roam
+      :ensure t
+      :custom
+      (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
+      :bind (("C-c n l" . org-roam-buffer-toggle)
+             ("C-c n f" . org-roam-node-find)
+             ("C-c n g" . org-roam-graph)
+             ("C-c n i" . org-roam-node-insert)
+             ("C-c n c" . org-roam-capture)
+             ;; Dailies
+             ("C-c n j" . org-roam-dailies-capture-today))
+      :config
+      ;; If you're using a vertical completion framework, you might want a more informative completion interface
+      (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+      (org-roam-db-autosync-mode)
+      ;; If using org-roam-protocol
+      ;; (require 'org-roam-protocol)
+      )
+    (use-package org-roam
+      :ensure t
+      :custom
+      (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
+      :bind (("C-c n l" . org-roam-buffer-toggle)
+             ("C-c n f" . org-roam-node-find)
+             ("C-c n g" . org-roam-graph)
+             ("C-c n i" . org-roam-node-insert)
+             ("C-c n c" . org-roam-capture)
+             ;; Dailies
+             ("C-c n j" . org-roam-dailies-capture-today))
+      :config
+      ;; If you're using a vertical completion framework, you might want a more informative completion interface
+      (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+      (org-roam-db-autosync-mode)
+      ;; If using org-roam-protocol
+      ;; (require 'org-roam-protocol)
+      )
 
 (use-package org-supertag
 :defer t
 :after org-mode
-:vc (:url "https://github.com/yibie/org-supertag")
-:config
-(org-supertag-config))
+:vc (:url "https://github.com/yibie/org-supertag" :rev :newest)
+:hook
+(after-init . org-supertag-config))
+:vc (:url "https://github.com/yibie/org-supertag" :rev :newest)
+:hook
+(after-init . org-supertag-config))
 
 (use-package zeft
     :vc (:url "https://github.com/casouri/zeft")
@@ -1382,6 +1705,12 @@ Return the fastest package archive."
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
 (defvar zh-font-list '("TsangerJinKai03 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
 (defvar en-font-list '("JetBrains Maple Mono" "Iosevka Fixed SS14" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
+(defvar font-size
+  (cond (*IS-LINUX* 12)
+        (*IS-MAC* 14)))
+(defvar font-size
+  (cond (*IS-LINUX* 12)
+        (*IS-MAC* 14)))
 
 (defun ding-make-font-string (font-name font-size)
   (if (and (stringp font-size)
@@ -1401,7 +1730,8 @@ Return the fastest package archive."
                  collect (cons x chinese-font-scale)))
 
   "english-font-size could be set to \":pixelsize=18\" or a integer.
-If set/leave chinese-font-scale to nil, it will follow english-font-size"
+  If set/leave chinese-font-scale to nil, it will follow english-font-size"
+  If set/leave chinese-font-scale to nil, it will follow english-font-size"
 
   (let ((en-font (ding-make-font-string
                   (cl-find-if #'ding-font-existsp english-fonts)
@@ -1418,15 +1748,20 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))))
-;;;;;;  SIZE HERE!!! ;;;;;;
-(ding-set-font en-font-list 14 zh-font-list)
+  ;;;;;;  set fonts HERE!!! ;;;;;;
+(ding-set-font en-font-list font-size zh-font-list)
+  ;;;;;;  set fonts HERE!!! ;;;;;;
+(ding-set-font en-font-list font-size zh-font-list)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
 
-;;;;;; set for reading mode ;;;;;;
+  ;;;;;; set for reading mode ;;;;;;
+  ;;;;;; set for reading mode ;;;;;;
 (defun my-nov-font-setup ()
   (face-remap-add-relative 'variable-pitch
-                            :family "TsangerJinKai03 W04"
-                            :height 1.1))
+                           :family "TsangerJinKai03 W04"
+                           :height 1.1))
+                           :family "TsangerJinKai03 W04"
+                           :height 1.1))
 
 (use-package dimmer
   :ensure t
@@ -1959,9 +2294,9 @@ to refresh the icon and returns the updated value."
   (use-package vertico
     :custom (vertico-count 15)
     :bind (:map vertico-map
-    ;;        ("RET" . vertico-directory-enter)
+           ("RET" . vertico-directory-enter)
            ("DEL" . vertico-directory-delete-char)
-    ;;        ("M-DEL" . vertico-directory-delete-word)
+           ("M-DEL" . vertico-directory-delete-word)
            )
     :hook ((after-init . vertico-mode)
            (rfn-eshadow-update-overlay . vertico-directory-tidy)
@@ -1969,20 +2304,20 @@ to refresh the icon and returns the updated value."
 )
 
 
-  ;; (use-package vertico-posframe
-  ;;   :hook (vertico-mode . vertico-posframe-mode)
-  ;;   :after posframe
-  ;;   :init (setq
-  ;; 	 vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
-  ;;          vertico-posframe-parameters
-  ;;          '((left-fringe  . 8)
-  ;;            (right-fringe . 8))))
+  (use-package vertico-posframe
+    :hook (vertico-mode . vertico-posframe-mode)
+    :after posframe
+    :init (setq
+	 vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
+           vertico-posframe-parameters
+           '((left-fringe  . 8)
+             (right-fringe . 8))))
 
   (use-package nerd-icons-completion
     :hook (vertico-mode . nerd-icons-completion-mode))
 
-  (use-package marginalia
-    :hook (after-init . marginalia-mode))
+  ;; (use-package marginalia
+  ;;   :hook (after-init . marginalia-mode))
 
   (use-package consult
     :bind (;; C-c bindings in `mode-specific-map'
@@ -2272,13 +2607,13 @@ to refresh the icon and returns the updated value."
 
 (use-package shackle
   :ensure t
-  ;; :defer nil
+  :defer nil
   :custom
    (shackle-lighter "")
    (shackle-select-reused-windows nil) ; default nil
    (shackle-default-alignment 'below) ; default below
    (shackle-default-size 0.4) ; default 0.5
-   (shackle-default-rule '(:select t))
+   ;; (shackle-default-rule '(:select t))
    (shackle-rules
          ;; CONDITION(:regexp)            :select     :inhibit-window-quit   :size+:align|:other     :same|:popup
          '((compilation-mode              :select nil                                                            )
@@ -2303,7 +2638,8 @@ to refresh the icon and returns the updated value."
            (pdf-outline-buffer-mode :select t :align 'below)
            ("*eshell*" :select t :align below :size 0.3 :popup t)
            ("*Gemini*" :select t :align right :size 0.4 :popup t)
-         
+           (treemacs-mode                 :select t :inhibit-window-quit t :align left :size 0.4 :popup t)
+           (treemacs-mode                 :select t :inhibit-window-quit t :align left :size 0.4 :popup t)
            ))
    :hook
    (after-init . shackle-mode))
@@ -2354,152 +2690,288 @@ to refresh the icon and returns the updated value."
   )
 
 ;; Taken from https://andreyor.st/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
- ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+  ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
+  ;; https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#tabline
 
  (defun my/set-tab-theme ()
-   (let ((bg (face-attribute 'mode-line :background))
-         (fg (face-attribute 'default :foreground))
-       (hg (face-attribute 'default :background))
-         (base (face-attribute 'mode-line :background))
-         (box-width (/ (line-pixel-height) 4)))
-     (set-face-attribute 'tab-line nil
-               :background base
-               :foreground fg
-               :height 0.8
-               :inherit nil
-               :box (list :line-width -1 :color base)
-               )
-     (set-face-attribute 'tab-line-tab nil
-               :foreground fg
-               :background bg
-               :weight 'normal
-               :inherit nil
-               :box (list :line-width box-width :color bg))
-     (set-face-attribute 'tab-line-tab-inactive nil
-               :foreground fg
-               :background base
-               :weight 'normal
-               :inherit nil
-               :box (list :line-width box-width :color base))
-     (set-face-attribute 'tab-line-highlight nil
-               :foreground fg
-               :background hg
-               :weight 'normal
-               :inherit nil
-               :box (list :line-width box-width :color hg))
-     (set-face-attribute 'tab-line-tab-current nil
-               :foreground fg
-               :background hg
-               :weight 'normal
-               :inherit nil
-               :box (list :line-width box-width :color hg))))
+    (let ((bg (face-attribute 'mode-line :background))
+          (fg (face-attribute 'default :foreground))
+        (hg (face-attribute 'default :background))
+          (base (face-attribute 'mode-line :background))
+          (box-width (/ (line-pixel-height) 4)))
+      (set-face-attribute 'tab-line nil
+                :background base
+                :foreground fg
+                :height 0.8
+                :inherit nil
+                :box (list :line-width -1 :color base)
+                )
+      (set-face-attribute 'tab-line-tab nil
+                :foreground fg
+                :background bg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color bg))
+      (set-face-attribute 'tab-line-tab-inactive nil
+                :foreground fg
+                :background base
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color base))
+      (set-face-attribute 'tab-line-highlight nil
+                :foreground fg
+                :background hg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color hg))
+      (set-face-attribute 'tab-line-tab-current nil
+                :foreground fg
+                :background hg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color hg))))
+    (let ((bg (face-attribute 'mode-line :background))
+          (fg (face-attribute 'default :foreground))
+        (hg (face-attribute 'default :background))
+          (base (face-attribute 'mode-line :background))
+          (box-width (/ (line-pixel-height) 4)))
+      (set-face-attribute 'tab-line nil
+                :background base
+                :foreground fg
+                :height 0.8
+                :inherit nil
+                :box (list :line-width -1 :color base)
+                )
+      (set-face-attribute 'tab-line-tab nil
+                :foreground fg
+                :background bg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color bg))
+      (set-face-attribute 'tab-line-tab-inactive nil
+                :foreground fg
+                :background base
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color base))
+      (set-face-attribute 'tab-line-highlight nil
+                :foreground fg
+                :background hg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color hg))
+      (set-face-attribute 'tab-line-tab-current nil
+                :foreground fg
+                :background hg
+                :weight 'normal
+                :inherit nil
+                :box (list :line-width box-width :color hg))))
 
- (defun my/tab-line-name-buffer (buffer &rest _buffers)
-   "Create name for tab with padding and truncation.
-   If buffer name is shorter than `tab-line-tab-max-width' it gets
-   centered with spaces, otherwise it is truncated, to preserve
-   equal width for all tabs.  This function also tries to fit as
-   many tabs in window as possible, so if there are no room for tabs
-   with maximum width, it calculates new width for each tab and
-   truncates text if needed.  Minimal width can be set with
-   `tab-line-tab-min-width' variable."
-   (with-current-buffer buffer
-     (let* ((window-width (window-width (get-buffer-window)))
-            (tab-amount (length (tab-line-tabs-window-buffers)))
-            (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
-                                      (/ window-width tab-amount)
-                                    tab-line-tab-max-width))
-            (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
-                                 tab-line-tab-max-width)
-                                ((< window-max-tab-width tab-line-tab-min-width)
-                                 tab-line-tab-min-width)
-                                (t window-max-tab-width))
-                          3)) ;; compensation for ' x ' button
-            (buffer-name (string-trim (buffer-name)))
-            (name-width (length buffer-name)))
-       (if (>= name-width tab-width)
-           (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
-         (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
-                (buffer-name (concat padding buffer-name)))
-           (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+  (defun my/tab-line-name-buffer (buffer &rest _buffers)
+    "Create name for tab with padding and truncation.
+    If buffer name is shorter than `tab-line-tab-max-width' it gets
+    centered with spaces, otherwise it is truncated, to preserve
+    equal width for all tabs.  This function also tries to fit as
+    many tabs in window as possible, so if there are no room for tabs
+    with maximum width, it calculates new width for each tab and
+    truncates text if needed.  Minimal width can be set with
+    `tab-line-tab-min-width' variable."
+    (with-current-buffer buffer
+      (let* ((window-width (window-width (get-buffer-window)))
+             (tab-amount (length (tab-line-tabs-window-buffers)))
+             (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                       (/ window-width tab-amount)
+                                     tab-line-tab-max-width))
+             (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                  tab-line-tab-max-width)
+                                 ((< window-max-tab-width tab-line-tab-min-width)
+                                  tab-line-tab-min-width)
+                                 (t window-max-tab-width))
+                           3)) ;; compensation for ' x ' button
+             (buffer-name (string-trim (buffer-name)))
+             (name-width (length buffer-name)))
+        (if (>= name-width tab-width)
+            (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+          (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                 (buffer-name (concat padding buffer-name)))
+            (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
+  (defun my/tab-line-name-buffer (buffer &rest _buffers)
+    "Create name for tab with padding and truncation.
+    If buffer name is shorter than `tab-line-tab-max-width' it gets
+    centered with spaces, otherwise it is truncated, to preserve
+    equal width for all tabs.  This function also tries to fit as
+    many tabs in window as possible, so if there are no room for tabs
+    with maximum width, it calculates new width for each tab and
+    truncates text if needed.  Minimal width can be set with
+    `tab-line-tab-min-width' variable."
+    (with-current-buffer buffer
+      (let* ((window-width (window-width (get-buffer-window)))
+             (tab-amount (length (tab-line-tabs-window-buffers)))
+             (window-max-tab-width (if (>= (* (+ tab-line-tab-max-width 3) tab-amount) window-width)
+                                       (/ window-width tab-amount)
+                                     tab-line-tab-max-width))
+             (tab-width (- (cond ((> window-max-tab-width tab-line-tab-max-width)
+                                  tab-line-tab-max-width)
+                                 ((< window-max-tab-width tab-line-tab-min-width)
+                                  tab-line-tab-min-width)
+                                 (t window-max-tab-width))
+                           3)) ;; compensation for ' x ' button
+             (buffer-name (string-trim (buffer-name)))
+             (name-width (length buffer-name)))
+        (if (>= name-width tab-width)
+            (concat  " " (truncate-string-to-width buffer-name (- tab-width 2)) "…")
+          (let* ((padding (make-string (+ (/ (- tab-width name-width) 2) 1) ?\s))
+                 (buffer-name (concat padding buffer-name)))
+            (concat buffer-name (make-string (- tab-width (length buffer-name)) ?\s)))))))
 
- (defun tab-line-close-tab (&optional e)
-   "Close the selected tab.
-   If tab is presented in another window, close the tab by using
-   `bury-buffer` function.  If tab is unique to all existing
-   windows, kill the buffer with `kill-buffer` function.  Lastly, if
-   no tabs left in the window, it is deleted with `delete-window`
-   function."
-   (interactive "e")
-   (let* ((posnp (event-start e))
-          (window (posn-window posnp))
-          (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-     (with-selected-window window
-       (let ((tab-list (tab-line-tabs-window-buffers))
-             (buffer-list (flatten-list
-                           (seq-reduce (lambda (list window)
-                                         (select-window window t)
-                                         (cons (tab-line-tabs-window-buffers) list))
-                                       (window-list) nil))))
-         (select-window window)
-         (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-             (progn
-               (if (eq buffer (current-buffer))
-                   (bury-buffer)
-                 (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                 (set-window-next-buffers window (delq buffer (window-next-buffers))))
-               (unless (cdr tab-list)
-                 (ignore-errors (delete-window window))))
-           (and (kill-buffer buffer)
+  (defun tab-line-close-tab (&optional e)
+    "Close the selected tab.
+    If tab is presented in another window, close the tab by using
+    `bury-buffer` function.  If tab is unique to all existing
+    windows, kill the buffer with `kill-buffer` function.  Lastly, if
+    no tabs left in the window, it is deleted with `delete-window`
+    function."
+    (interactive "e")
+    (let* ((posnp (event-start e))
+           (window (posn-window posnp))
+           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+      (with-selected-window window
+        (let ((tab-list (tab-line-tabs-window-buffers))
+              (buffer-list (flatten-list
+                            (seq-reduce (lambda (list window)
+                                          (select-window window t)
+                                          (cons (tab-line-tabs-window-buffers) list))
+                                        (window-list) nil))))
+          (select-window window)
+          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+              (progn
+                (if (eq buffer (current-buffer))
+                    (bury-buffer)
+                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
                 (unless (cdr tab-list)
-                  (ignore-errors (delete-window window)))))))))
+                  (ignore-errors (delete-window window))))
+            (and (kill-buffer buffer)
+                 (unless (cdr tab-list)
+                   (ignore-errors (delete-window window)))))))))
+  (defun tab-line-close-tab (&optional e)
+    "Close the selected tab.
+    If tab is presented in another window, close the tab by using
+    `bury-buffer` function.  If tab is unique to all existing
+    windows, kill the buffer with `kill-buffer` function.  Lastly, if
+    no tabs left in the window, it is deleted with `delete-window`
+    function."
+    (interactive "e")
+    (let* ((posnp (event-start e))
+           (window (posn-window posnp))
+           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+      (with-selected-window window
+        (let ((tab-list (tab-line-tabs-window-buffers))
+              (buffer-list (flatten-list
+                            (seq-reduce (lambda (list window)
+                                          (select-window window t)
+                                          (cons (tab-line-tabs-window-buffers) list))
+                                        (window-list) nil))))
+          (select-window window)
+          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+              (progn
+                (if (eq buffer (current-buffer))
+                    (bury-buffer)
+                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                (unless (cdr tab-list)
+                  (ignore-errors (delete-window window))))
+            (and (kill-buffer buffer)
+                 (unless (cdr tab-list)
+                   (ignore-errors (delete-window window)))))))))
 
- (use-package tab-line
-   :ensure nil
-   :hook (after-init . global-tab-line-mode)
-   :config
+  (use-package tab-line
+    :ensure nil
+    ;; :hook (after-init . global-tab-line-mode)
+    :custom
+    (tab-line-tabs-function 'tab-line-tabs-window-buffers)
+    :config
+  (use-package tab-line
+    :ensure nil
+    ;; :hook (after-init . global-tab-line-mode)
+    :custom
+    (tab-line-tabs-function 'tab-line-tabs-window-buffers)
+    :config
 
-   (defcustom tab-line-tab-min-width 10
-     "Minimum width of a tab in characters."
-     :type 'integer
-     :group 'tab-line)
+    (defcustom tab-line-tab-min-width 10
+      "Minimum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
+    (defcustom tab-line-tab-min-width 10
+      "Minimum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
 
-   (defcustom tab-line-tab-max-width 30
-     "Maximum width of a tab in characters."
-     :type 'integer
-     :group 'tab-line)
+    (defcustom tab-line-tab-max-width 30
+      "Maximum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
+    (defcustom tab-line-tab-max-width 30
+      "Maximum width of a tab in characters."
+      :type 'integer
+      :group 'tab-line)
 
-   (setq tab-line-close-button-show t
-         tab-line-new-button-show nil
-         tab-line-separator ""
-         tab-line-tab-name-function #'my/tab-line-name-buffer
-         tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                           'keymap tab-line-right-map
+    (setq tab-line-close-button-show t
+          tab-line-new-button-show nil
+          tab-line-separator ""
+          tab-line-tab-name-function #'my/tab-line-name-buffer
+          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                            'keymap tab-line-right-map
+                                            'mouse-face 'tab-line-highlight
+                                            'help-echo "Click to scroll right")
+          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                           'keymap tab-line-left-map
                                            'mouse-face 'tab-line-highlight
-                                           'help-echo "Click to scroll right")
-         tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                          'keymap tab-line-left-map
-                                          'mouse-face 'tab-line-highlight
-                                          'help-echo "Click to scroll left")
-         tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
-                                           'keymap tab-line-tab-close-map
-                                           'mouse-face 'tab-line-close-highlight
-                                           'help-echo "Click to close tab"))
+                                           'help-echo "Click to scroll left")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                            'keymap tab-line-tab-close-map
+                                            'mouse-face 'tab-line-close-highlight
+                                            'help-echo "Click to close tab"))
+    (setq tab-line-close-button-show t
+          tab-line-new-button-show nil
+          tab-line-separator ""
+          tab-line-tab-name-function #'my/tab-line-name-buffer
+          tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                            'keymap tab-line-right-map
+                                            'mouse-face 'tab-line-highlight
+                                            'help-echo "Click to scroll right")
+          tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                           'keymap tab-line-left-map
+                                           'mouse-face 'tab-line-highlight
+                                           'help-echo "Click to scroll left")
+          tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+                                            'keymap tab-line-tab-close-map
+                                            'mouse-face 'tab-line-close-highlight
+                                            'help-echo "Click to close tab"))
 
-   ;; (my/set-tab-theme)
+    ;; (my/set-tab-theme)
+    ;; (my/set-tab-theme)
 
-   ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
-   ;;(add-to-list 'tab-line-exclude-modes mode))
-   (dolist (mode '(ediff-mode process-menu-mode))
-     (add-to-list 'tab-line-exclude-modes mode))
+    ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
+    ;;(add-to-list 'tab-line-exclude-modes mode))
+    (dolist (mode '(ediff-mode process-menu-mode))
+      (add-to-list 'tab-line-exclude-modes mode))
+    ;;(dolist (mode '(ediff-mode process-menu-mode term-mode vterm-mode))
+    ;;(add-to-list 'tab-line-exclude-modes mode))
+    (dolist (mode '(ediff-mode process-menu-mode))
+      (add-to-list 'tab-line-exclude-modes mode))
 
-   ;; (use-package sort-tab
-   ;;   :defer nil
-   ;;   :vc (:url "https://github.com/manateelazycat/sort-tab")
-   ;;   :init (sort-tab-mode 1))
-   )
+    )
+    )
 
-(global-tab-line-mode t)
+(use-package bufferlo
+ :ensure t
+ :init
+ (bufferlo-mode))
+(use-package bufferlo
+ :ensure t
+ :init
+ (bufferlo-mode))
 
 ;; (with-eval-after-load "persp-mode-autoloads"
 ;;   (setq wg-morph-on nil) ;; switch off animation
@@ -2567,59 +3039,63 @@ to refresh the icon and returns the updated value."
   ;;   )
 
 ;; A tree layout file explorer
-(use-package treemacs
-  :commands (treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-git-mode)
-  :custom-face
-  (cfrs-border-color ((t (:inherit posframe-border))))
-  :bind (([f8]        . treemacs)
-         ("M-0"       . treemacs-select-window)
-         ("C-x t 1"   . treemacs-delete-other-windows)
-         ("C-x t t"   . treemacs)
-         ("C-x t b"   . treemacs-bookmark)
-         ("C-x t C-t" . treemacs-find-file)
-         ("C-x t M-t" . treemacs-find-tag)
-         :map treemacs-mode-map
-         ([mouse-1]   . treemacs-single-click-expand-action))
-  :config
-  (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
-        treemacs-missing-project-action  'remove
-        treemacs-sorting                 'alphabetic-asc
-        treemacs-follow-after-init       t
-        treemacs-width                   30
-        ;; treemacs-no-png-images           (not centaur-icon)
-        )
-
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (pcase (cons (not (null (executable-find "git")))
-               (not (null (executable-find "python3"))))
-    (`(t . t)
-     (treemacs-git-mode 'deferred))
-    (`(t . _)
-     (treemacs-git-mode 'simple)))
-
-  (use-package treemacs-nerd-icons
-    :demand t
-    ;; :when (icons-displayable-p)
+  (use-package treemacs
+:defer nil
+    :commands (treemacs-follow-mode
+               treemacs-filewatch-mode
+               treemacs-git-mode)
+    :hook (after-init . treemacs)
     :custom-face
-    (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
-    (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
-    :config (treemacs-load-theme "nerd-icons"))
+    (cfrs-border-color ((t (:inherit posframe-border))))
+    :bind (([f8]        . treemacs)
+           ("M-0"       . treemacs-select-window)
+           ("C-x t 1"   . treemacs-delete-other-windows)
+           ("C-x t t"   . treemacs)
+           ("C-x t b"   . treemacs-bookmark)
+           ("C-x t C-t" . treemacs-find-file)
+           ("C-x t M-t" . treemacs-find-tag)
+           :map treemacs-mode-map
+           ([mouse-1]   . treemacs-single-click-expand-action))
+    :config
+    (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
+          treemacs-missing-project-action  'remove
+          treemacs-sorting                 'alphabetic-asc
+          treemacs-follow-after-init       t
+          treemacs-width                   30
+          ;; treemacs-no-png-images           (not centaur-icon)
+          )
+(setq treemacs-position 'left
+      treemacs-display-in-side-window t)
 
-  (use-package treemacs-magit
-    :hook ((magit-post-commit
-            git-commit-post-finish
-            magit-post-stage
-            magit-post-unstage)
-           . treemacs-magit--schedule-update))
 
-  (use-package treemacs-tab-bar
-    :demand t
-    :config (treemacs-set-scope-type 'Tabs)))
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null (executable-find "python3"))))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
 
-  ;; (treemacs-start-on-boot)
+    (use-package treemacs-nerd-icons
+      :demand t
+      ;; :when (icons-displayable-p)
+      :custom-face
+      (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
+      (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
+      :config (treemacs-load-theme "nerd-icons"))
+
+    (use-package treemacs-magit
+      :hook ((magit-post-commit
+              git-commit-post-finish
+              magit-post-stage
+              magit-post-unstage)
+             . treemacs-magit--schedule-update))
+
+    (use-package treemacs-tab-bar
+      :demand t
+      :config (treemacs-set-scope-type 'Tabs)))
+    ;; (treemacs-start-on-boot)
 
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/copilot.el-main")
 ;; (require 'copilot)
@@ -2631,7 +3107,8 @@ to refresh the icon and returns the updated value."
 (use-package gptel
   :ensure nil
   :defer nil
-  :vc (:url "https://github.com/karthink/gptel")
+  :vc (:url "https://github.com/karthink/gptel" :rev :newest)
+  :vc (:url "https://github.com/karthink/gptel" :rev :newest)
   :config
   ;; default backend configuration
   ;; (setq
@@ -2683,21 +3160,76 @@ to refresh the icon and returns the updated value."
 ;;   )
 ;; (setq immersive-translate-backend 'DeepSeek
 ;;       immersive-translate-chatgpt-host "api.deepseek.com")
-(require 'go-translate)
-;; (setq gt-langs '(en fr))
-(setq gt-preset-translators
-      `((ts-1 . ,(gt-translator
-                  :taker (gt-taker :langs '(en zh) :text 'buffer)
-                  :engines (list (gt-google-engine))
-                  :render (gt-overlay-render)))))
+(use-package go-translate
+  ;; (setq gt-langs '(en fr))
+  :custom  
+  (gt-preset-translators
+   `((ts-1 . ,(gt-translator
+               :taker (gt-taker :langs '(en zh) :text 'buffer)
+               :engines (list (gt-google-engine))
+               :render (gt-overlay-render))))))
+(use-package go-translate
+  ;; (setq gt-langs '(en fr))
+  :custom  
+  (gt-preset-translators
+   `((ts-1 . ,(gt-translator
+               :taker (gt-taker :langs '(en zh) :text 'buffer)
+               :engines (list (gt-google-engine))
+               :render (gt-overlay-render))))))
 
 (use-package ox-hugo
   :ensure t
   :defer t
-  :after ox)
+  :after ox
+  :custom
+  (org-hugo-base-dir "~/codebase/blog-bus/dingtele.github.io/"))
 
-(add-to-list 'load-path "~/.emacs.d/site-lisp/pos-tag-highlight")
-(require 'pos-tag-highlight)
+(defun org-hugo-new-subtree-post-capture-template ()
+  "Returns `org-capture' template string for new Hugo post.
+          See `org-capture-templates' for more information."
+  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+         (date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
+         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+         (tags (read-from-minibuffer "tags: "))
+         (categories (read-from-minibuffer "categories: "))
+         (fname (org-hugo-slug title)))
+    (mapconcat #'identity
+               `(
+                 ,(concat "* TODO " title "  :" tags ":" categories)
+                 ":PROPERTIES:"
+                 ,(concat ":EXPORT_FILE_NAME: " fname)
+                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                 ":END:"
+                 "%?\n")                ;Place the cursor here finally
+               "\n")))
+
+(use-package pos-tag-highlight
+  :vc (:url "https://github.com/yibie/pos-tag-highlight" :rev :newest))
+  :after ox
+  :custom
+  (org-hugo-base-dir "~/codebase/blog-bus/dingtele.github.io/"))
+
+(defun org-hugo-new-subtree-post-capture-template ()
+  "Returns `org-capture' template string for new Hugo post.
+          See `org-capture-templates' for more information."
+  (let* (;; http://www.holgerschurig.de/en/emacs-blog-from-org-to-hugo/
+         (date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
+         (title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+         (tags (read-from-minibuffer "tags: "))
+         (categories (read-from-minibuffer "categories: "))
+         (fname (org-hugo-slug title)))
+    (mapconcat #'identity
+               `(
+                 ,(concat "* TODO " title "  :" tags ":" categories)
+                 ":PROPERTIES:"
+                 ,(concat ":EXPORT_FILE_NAME: " fname)
+                 ,(concat ":EXPORT_DATE: " date) ;Enter current date and time
+                 ":END:"
+                 "%?\n")                ;Place the cursor here finally
+               "\n")))
+
+(use-package pos-tag-highlight
+  :vc (:url "https://github.com/yibie/pos-tag-highlight" :rev :newest))
 
 (with-eval-after-load 'nov
   (define-key nov-mode-map (kbd "<tab>") 'shrface-outline-cycle)
@@ -2708,267 +3240,273 @@ to refresh the icon and returns the updated value."
   (define-key nov-mode-map (kbd "M-l") 'shrface-links-counsel) ; or 'shrface-links-helm or 'shrface-links-consult
   (define-key nov-mode-map (kbd "M-h") 'shrface-headline-consult)) ; or 'shrface-headline-helm or 'shrface-headline-consult
 
+(setq package-vc-allow-build-commands t)
+  (use-package reader
+    :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
+  	    :make "all"))  
+
+
 ;;epub reading
-(use-package eww
-  :hook (eww-mode . my-nov-font-setup))
+  (use-package eww
+    :hook (eww-mode . my-nov-font-setup))
 
-(use-package nov
-  :ensure t
-  :defer t
-  :mode ("\\.epub\\'" . nov-mode)
-  :bind (:map nov-mode-map
-              ("j" . scroll-up-line)
-              ("k" . scroll-down-line)))
+  (use-package nov
+    :ensure t
+    :defer t
+    :mode ("\\.epub\\'" . nov-mode)
+    :bind (:map nov-mode-map
+                ("j" . scroll-up-line)
+                ("k" . scroll-down-line)))
 
-(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-(setq nov-text-width 80)
-;; (setq nov-text-width t)
-(setq visual-fill-column-center-text t)
-(add-hook 'nov-mode-hook 'visual-line-mode)
-(add-hook 'nov-mode-hook 'visual-fill-column-mode)
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-text-width 80)
+  ;; (setq nov-text-width t)
+  (setq visual-fill-column-center-text t)
+  (add-hook 'nov-mode-hook 'visual-line-mode)
+  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
-(add-hook 'nov-mode-hook 'my-nov-font-setup)
+  (add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-;;Nov-rendering
-(add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
-(require 'justify-kp)
-(use-package justify-kp
-  :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) :defer t)
+  ;;Nov-rendering
+  (add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
+  (require 'justify-kp)
+  (use-package justify-kp
+    :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) :defer t)
 
-(setq nov-text-width t)
+  (setq nov-text-width t)
 
-(defun my-nov-window-configuration-change-hook ()
-  (my-nov-post-html-render-hook)
-  (remove-hook 'window-configuration-change-hook
-               'my-nov-window-configuration-change-hook
-               t))
-(defun my-nov-post-html-render-hook ()
-  (if (get-buffer-window)
-      (let ((max-width (pj-line-width))
-            buffer-read-only)
-        (save-excursion
-          (goto-char (point-min))
-          (while (not (eobp))
-            (when (not (looking-at "^[[:space:]]*$"))
-              (goto-char (line-end-position))
-              (when (> (shr-pixel-column) max-width)
-                (goto-char (line-beginning-position))
-                (pj-justify)))
-            (forward-line 1))))
-    (add-hook 'window-configuration-change-hook
-              'my-nov-window-configuration-change-hook
-              nil t)))
+  (defun my-nov-window-configuration-change-hook ()
+    (my-nov-post-html-render-hook)
+    (remove-hook 'window-configuration-change-hook
+                 'my-nov-window-configuration-change-hook
+                 t))
+  (defun my-nov-post-html-render-hook ()
+    (if (get-buffer-window)
+        (let ((max-width (pj-line-width))
+              buffer-read-only)
+          (save-excursion
+            (goto-char (point-min))
+            (while (not (eobp))
+              (when (not (looking-at "^[[:space:]]*$"))
+                (goto-char (line-end-position))
+                (when (> (shr-pixel-column) max-width)
+                  (goto-char (line-beginning-position))
+                  (pj-justify)))
+              (forward-line 1))))
+      (add-hook 'window-configuration-change-hook
+                'my-nov-window-configuration-change-hook
+                nil t)))
 
-(add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
+  (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
 
-(require 'pdf-tools)
-(pdf-tools-install)  ; Standard activation command
-(pdf-loader-install) ; On demand loading, leads to faster startup time
+  (require 'pdf-tools)
+  (pdf-tools-install)  ; Standard activation command
+  (pdf-loader-install) ; On demand loading, leads to faster startup time
 
-;; == Markdown ==
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'markdown-mode-hook 'variable-pitch-mode)
-  (add-hook 'markdown-mode-hook 'my-nov-font-setup)
+  ;; == Markdown ==
+  (use-package markdown-mode
+    :ensure t
+    :defer t
+    :init
+    (add-hook 'markdown-mode-hook 'variable-pitch-mode)
+    (add-hook 'markdown-mode-hook 'my-nov-font-setup)
 
-  :mode (("\\.text\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)
-         ("\\.md\\'" . markdown-mode))
-  :config
-  (markdown-display-inline-images)
+    :mode (("\\.text\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode)
+           ("\\.md\\'" . markdown-mode))
+    :config
+    (markdown-display-inline-images)
 
-  )
+    )
 
-(use-package flyspell
-  :defer t
-  :diminish (flyspell-mode . " φ"))
+  (use-package flyspell
+    :defer t
+    :diminish (flyspell-mode . " φ"))
 
-;;calibre
-(use-package calibredb
-  :ensure t
-  :defer t
-  :commands calibredb
-  :bind ("\e\e b" . calibredb)
-  :config
-  (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
-  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/Books/books")
-                                  ))
-  )
+  ;;calibre
+  (use-package calibredb
+    :ensure t
+    :defer t
+    :commands calibredb
+    :bind ("\e\e b" . calibredb)
+    :config
+    (setq calibredb-root-dir "/Users/dingyu/Documents/calibre")
+    (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+    (setq calibredb-library-alist '(("~/Books/books")
+                                    ))
+    )
 
-;; bing-dict
-(use-package bing-dict :ensure t)
-(global-set-key (kbd "C-c d") 'bing-dict-brief)
-(setq bing-dict-vocabulary-save t)
-(setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
+  ;; bing-dict
+  (use-package bing-dict :ensure t)
+  (global-set-key (kbd "C-c d") 'bing-dict-brief)
+  (setq bing-dict-vocabulary-save t)
+  (setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
 
-(defun capture-sentence-at-point ()
-  "Capture the sentence where the word at point is located."
-  (interactive)
-  (let* ((word (thing-at-point 'word))  ; Get the word at point
-         (sentence (save-excursion
-                     (let ((sentence-start (progn
-                                             (backward-sentence)  ; Move to the beginning of the sentence
-                                             (point)))
-                           (sentence-end (progn
-                                           (forward-sentence)  ; Move to the end of the sentence
-                                           (point))))
-                       (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
-                       (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
-    (if word
-        (message "The word is: %s\nThe sentence is: %s" word sentence)
-      (message "No word found at point."))))
+  (defun capture-sentence-at-point ()
+    "Capture the sentence where the word at point is located."
+    (interactive)
+    (let* ((word (thing-at-point 'word))  ; Get the word at point
+           (sentence (save-excursion
+                       (let ((sentence-start (progn
+                                               (backward-sentence)  ; Move to the beginning of the sentence
+                                               (point)))
+                             (sentence-end (progn
+                                             (forward-sentence)  ; Move to the end of the sentence
+                                             (point))))
+                         (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
+                         (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
+      (if word
+          (message "The word is: %s\nThe sentence is: %s" word sentence)
+        (message "No word found at point."))))
 
-;; google-translate
-(use-package google-translate
-  :defines (google-translate-translation-directions-alist)
-  :bind (("C-c g" . google-translate-smooth-translate))
-  :config
-  (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
-  )
+  ;; google-translate
+  (use-package google-translate
+    :defines (google-translate-translation-directions-alist)
+    :bind (("C-c g" . google-translate-smooth-translate))
+    :config
+    (setq google-translate-translation-directions-alist '(("en" . "zh-CN")))
+    )
 
-;; Atom/RSS reader
-(use-package elfeed
-  ;; :pretty-hydra
-  ;; ((:title (pretty-hydra-title "Elfeed" 'faicon "nf-fa-rss_square" :face 'nerd-icons-orange)
-  ;;   :color amaranth :quit-key ("q" "C-g"))
-  ;;  ("Search"
-  ;;   (("c" elfeed-db-compact "compact db")
-  ;;    ("g" elfeed-search-update--force "refresh")
-  ;;    ("G" elfeed-search-fetch "update")
-  ;;    ("y" elfeed-search-yank "copy URL")
-  ;;    ("+" elfeed-search-tag-all "tag all")
-  ;;    ("-" elfeed-search-untag-all "untag all"))
-  ;;   "Filter"
-  ;;   (("l" elfeed-search-live-filter "live filter")
-  ;;    ("s" elfeed-search-set-filter "set filter")
-  ;;    ("*" (elfeed-search-set-filter "@6-months-ago +star") "starred")
-  ;;    ("a" (elfeed-search-set-filter "@6-months-ago") "all")
-  ;;    ("t" (elfeed-search-set-filter "@1-day-ago") "today"))
-  ;;   "Article"
-  ;;   (("b" elfeed-search-browse-url "browse")
-  ;;    ("n" next-line "next")
-  ;;    ("p" previous-line "previous")
-  ;;    ("u" elfeed-search-tag-all-unread "mark unread")
-  ;;    ("r" elfeed-search-untag-all-unread "mark read")
-  ;;    ("RET" elfeed-search-show-entry "show"))))
-  :bind (("C-x w" . elfeed)
-         :map elfeed-search-mode-map
-         ("?" . elfeed-hydra/body)
-         :map elfeed-show-mode-map
-         ("q" . delete-window))
-  ;; :hook (elfeed-show-mode . centaur-read-mode)
-  :init (setq url-queue-timeout 30
-              elfeed-db-directory (locate-user-emacs-file ".elfeed")
-              elfeed-show-entry-switch #'pop-to-buffer
-              elfeed-show-entry-delete #'delete-window
-              elfeed-feeds '(("https://planet.emacslife.com/atom.xml" planet emacslife)
-                             ("http://www.masteringemacs.org/feed/" mastering)
-                             ("https://oremacs.com/atom.xml" oremacs)
-                             ("https://pinecast.com/feed/emacscast" emacscast)
-                             ("https://emacstil.com/feed.xml" Emacs TIL)
-                             ;; ("https://www.reddit.com/r/emacs.rss" reddit)
-                             ))
-  :config
-  ;; Ignore db directory in recentf
-  (push elfeed-db-directory recentf-exclude)
+  ;; Atom/RSS reader
+  (use-package elfeed
+    ;; :pretty-hydra
+    ;; ((:title (pretty-hydra-title "Elfeed" 'faicon "nf-fa-rss_square" :face 'nerd-icons-orange)
+    ;;   :color amaranth :quit-key ("q" "C-g"))
+    ;;  ("Search"
+    ;;   (("c" elfeed-db-compact "compact db")
+    ;;    ("g" elfeed-search-update--force "refresh")
+    ;;    ("G" elfeed-search-fetch "update")
+    ;;    ("y" elfeed-search-yank "copy URL")
+    ;;    ("+" elfeed-search-tag-all "tag all")
+    ;;    ("-" elfeed-search-untag-all "untag all"))
+    ;;   "Filter"
+    ;;   (("l" elfeed-search-live-filter "live filter")
+    ;;    ("s" elfeed-search-set-filter "set filter")
+    ;;    ("*" (elfeed-search-set-filter "@6-months-ago +star") "starred")
+    ;;    ("a" (elfeed-search-set-filter "@6-months-ago") "all")
+    ;;    ("t" (elfeed-search-set-filter "@1-day-ago") "today"))
+    ;;   "Article"
+    ;;   (("b" elfeed-search-browse-url "browse")
+    ;;    ("n" next-line "next")
+    ;;    ("p" previous-line "previous")
+    ;;    ("u" elfeed-search-tag-all-unread "mark unread")
+    ;;    ("r" elfeed-search-untag-all-unread "mark read")
+    ;;    ("RET" elfeed-search-show-entry "show"))))
+    :bind (("C-x w" . elfeed)
+           :map elfeed-search-mode-map
+           ("?" . elfeed-hydra/body)
+           :map elfeed-show-mode-map
+           ("q" . delete-window))
+    ;; :hook (elfeed-show-mode . centaur-read-mode)
+    :init (setq url-queue-timeout 30
+                elfeed-db-directory (locate-user-emacs-file ".elfeed")
+                elfeed-show-entry-switch #'pop-to-buffer
+                elfeed-show-entry-delete #'delete-window
+                elfeed-feeds '(("https://planet.emacslife.com/atom.xml" planet emacslife)
+                               ("http://www.masteringemacs.org/feed/" mastering)
+                               ("https://oremacs.com/atom.xml" oremacs)
+                               ("https://pinecast.com/feed/emacscast" emacscast)
+                               ("https://emacstil.com/feed.xml" Emacs TIL)
+                               ;; ("https://www.reddit.com/r/emacs.rss" reddit)
+                               ))
+    :config
+    ;; Ignore db directory in recentf
+    (push elfeed-db-directory recentf-exclude)
 
-  ;; Add icons via tags
-  
-  (defun nerd-icon-for-tags (tags)
-    "Generate Nerd Font icon based on tags.
-  Returns default if no match."
-    (cond ((member "youtube" tags)  (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
-          ((member "instagram" tags) (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
-          ((or (member "emacs" tags) (member "emacslife" tags) (member "mastering" tags))
-           (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
-          ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
-          (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
+    ;; Add icons via tags
+    
+    (defun nerd-icon-for-tags (tags)
+      "Generate Nerd Font icon based on tags.
+    Returns default if no match."
+      (cond ((member "youtube" tags)  (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
+            ((member "instagram" tags) (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
+            ((or (member "emacs" tags) (member "emacslife" tags) (member "mastering" tags))
+             (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
+            ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
+            (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 
-  (defun lucius/elfeed-search-print-entry--better-default (entry)
-    "Print ENTRY to the buffer."
-    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
-           (date-width (car (cdr elfeed-search-date-format)))
-           (title (concat (or (elfeed-meta entry :title)
-                              (elfeed-entry-title entry) "")
-                          ;; NOTE: insert " " for overlay to swallow
-                          " "))
-           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
-           (feed (elfeed-entry-feed entry))
-           (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
-           (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
-           (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
-           (title-width (- (frame-width)
-                           ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
-                           date-width elfeed-search-trailing-width))
-           (title-column (elfeed-format-column
-                          title (elfeed-clamp
-                                 elfeed-search-title-min-width
-                                 title-width
-                                 elfeed-search-title-max-width) :left))
+    (defun lucius/elfeed-search-print-entry--better-default (entry)
+      "Print ENTRY to the buffer."
+      (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+             (date-width (car (cdr elfeed-search-date-format)))
+             (title (concat (or (elfeed-meta entry :title)
+                                (elfeed-entry-title entry) "")
+                            ;; NOTE: insert " " for overlay to swallow
+                            " "))
+             (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+             (feed (elfeed-entry-feed entry))
+             (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+             (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+             (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
+             (title-width (- (frame-width)
+                             ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
+                             date-width elfeed-search-trailing-width))
+             (title-column (elfeed-format-column
+                            title (elfeed-clamp
+                                   elfeed-search-title-min-width
+                                   title-width
+                                   elfeed-search-title-max-width) :left))
 
-           ;; Title/Feed ALIGNMENT
-           (align-to-feed-pixel (+ date-width
-                                   (max elfeed-search-title-min-width
-                                        (min title-width elfeed-search-title-max-width)))))
-      (insert (propertize date 'face 'elfeed-search-date-face) " ")
-      (insert (propertize title-column 'face title-faces 'kbd-help title))
-      (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
-      ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
-      (when feed-title
-        (insert " " (concat (nerd-icon-for-tags tags) " ")
-                (propertize feed-title 'face 'elfeed-search-feed-face) " "))
-      (when tags (insert "(" tags-str ")"))))
+             ;; Title/Feed ALIGNMENT
+             (align-to-feed-pixel (+ date-width
+                                     (max elfeed-search-title-min-width
+                                          (min title-width elfeed-search-title-max-width)))))
+        (insert (propertize date 'face 'elfeed-search-date-face) " ")
+        (insert (propertize title-column 'face title-faces 'kbd-help title))
+        (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
+        ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+        (when feed-title
+          (insert " " (concat (nerd-icon-for-tags tags) " ")
+                  (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+        (when tags (insert "(" tags-str ")"))))
 
-  (setq  elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
+    (setq  elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
 
-  ;; Use xwidget if possible
-  (with-no-warnings
-    (defun my-elfeed-show-visit (&optional use-generic-p)
-      "Visit the current entry in your browser using `browse-url'.
-If there is a prefix argument, visit the current entry in the
-browser defined by `browse-url-generic-program'."
-      (interactive "P")
-      (let ((link (elfeed-entry-link elfeed-show-entry)))
-        (when link
-          (message "Sent to browser: %s" link)
-          (if use-generic-p
-              (browse-url-generic link)
-            (centaur-browse-url link)))))
-    (advice-add #'elfeed-show-visit :override #'my-elfeed-show-visit)
+    ;; Use xwidget if possible
+    (with-no-warnings
+      (defun my-elfeed-show-visit (&optional use-generic-p)
+        "Visit the current entry in your browser using `browse-url'.
+  If there is a prefix argument, visit the current entry in the
+  browser defined by `browse-url-generic-program'."
+        (interactive "P")
+        (let ((link (elfeed-entry-link elfeed-show-entry)))
+          (when link
+            (message "Sent to browser: %s" link)
+            (if use-generic-p
+                (browse-url-generic link)
+              (centaur-browse-url link)))))
+      (advice-add #'elfeed-show-visit :override #'my-elfeed-show-visit)
 
-    (defun my-elfeed-search-browse-url (&optional use-generic-p)
-      "Visit the current entry in your browser using `browse-url'.
-If there is a prefix argument, visit the current entry in the
-browser defined by `browse-url-generic-program'."
-      (interactive "P")
-      (let ((entries (elfeed-search-selected)))
-        (cl-loop for entry in entries
-                 do (elfeed-untag entry 'unread)
-                 when (elfeed-entry-link entry)
-                 do (if use-generic-p
-                        (browse-url-generic it)
-                      (centaur-browse-url it)))
-        (mapc #'elfeed-search-update-entry entries)
-        (unless (or elfeed-search-remain-on-entry (use-region-p))
-          (forward-line))))
-    (advice-add #'elfeed-search-browse-url :override #'my-elfeed-search-browse-url)))
+      (defun my-elfeed-search-browse-url (&optional use-generic-p)
+        "Visit the current entry in your browser using `browse-url'.
+  If there is a prefix argument, visit the current entry in the
+  browser defined by `browse-url-generic-program'."
+        (interactive "P")
+        (let ((entries (elfeed-search-selected)))
+          (cl-loop for entry in entries
+                   do (elfeed-untag entry 'unread)
+                   when (elfeed-entry-link entry)
+                   do (if use-generic-p
+                          (browse-url-generic it)
+                        (centaur-browse-url it)))
+          (mapc #'elfeed-search-update-entry entries)
+          (unless (or elfeed-search-remain-on-entry (use-region-p))
+            (forward-line))))
+      (advice-add #'elfeed-search-browse-url :override #'my-elfeed-search-browse-url)))
 
-;; Another Atom/RSS reader
-(use-package newsticker
-  :ensure nil
-  :bind ("C-x W" . newsticker-show-news)
-  ;; :hook (newsticker-treeview-item-mode . centaur-read-mode)
-  :init (setq newsticker-url-list
-              '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
-                ("Mastering Emacs" "http://www.masteringemacs.org/feed/")
-                ("Oremacs" "https://oremacs.com/atom.xml")
-                ("EmacsCast" "https://pinecast.com/feed/emacscast")
-                ("Emacs TIL" "https://emacstil.com/feed.xml")
-                ;; ("Emacs Reddit" "https://www.reddit.com/r/emacs.rss")
-                )))
+  ;; Another Atom/RSS reader
+  (use-package newsticker
+    :ensure nil
+    :bind ("C-x W" . newsticker-show-news)
+    ;; :hook (newsticker-treeview-item-mode . centaur-read-mode)
+    :init (setq newsticker-url-list
+                '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
+                  ("Mastering Emacs" "http://www.masteringemacs.org/feed/")
+                  ("Oremacs" "https://oremacs.com/atom.xml")
+                  ("EmacsCast" "https://pinecast.com/feed/emacscast")
+                  ("Emacs TIL" "https://emacstil.com/feed.xml")
+                  ;; ("Emacs Reddit" "https://www.reddit.com/r/emacs.rss")
+                  )))
 
 (use-package anki-helper
     :vc (:url https://github.com/Elilif/emacs-anki-helper)
@@ -2979,6 +3517,14 @@ browser defined by `browse-url-generic-program'."
      '(anki-helper-default-note-type "Cloze")
      '(anki-helper-default-deck "org-deck")))
     ;; Make mouse wheel / trackpad scrolling less jerky
+
+;; A multi dictionaries interface
+(use-package fanyi
+:ensure t
+  ;; :bind (("C-c d f" . fanyi-dwim)
+  ;;        ("C-c d d" . fanyi-dwim2)
+  ;;        ("C-c d h" . fanyi-from-history))
+)
 
 ;; (use-package eglot
 ;;   :defer t
@@ -3070,12 +3616,34 @@ browser defined by `browse-url-generic-program'."
 ;;  :password "postgres")
 
 (require 'treesit)
-  (require 'treesit-auto)
-(treesit-auto-mode t)
-  (global-treesit-auto-mode t)
-    (setq treesit-auto-install 'prompt)
-    (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+   (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
+ (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+   (setq treesit-extra-load-path '("~/codebase/src/tree-sitter-module/dist/"))
+ (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+;; Automatic Tree-sitter grammar management
+ (use-package treesit-auto
+   :hook (after-init . global-treesit-auto-mode)
+   :init (setq treesit-auto-install 'prompt))
+
+ ;; Code folding indicators using Tree-sitter
+ (use-package treesit-fold-indicators
+   :ensure treesit-fold
+   :hook (after-init . global-treesit-fold-indicators-mode)
+   :init (setq treesit-fold-indicators-priority -1))
+
+;; Automatic Tree-sitter grammar management
+ (use-package treesit-auto
+   :hook (after-init . global-treesit-auto-mode)
+   :init (setq treesit-auto-install 'prompt))
+
+ ;; Code folding indicators using Tree-sitter
+ (use-package treesit-fold-indicators
+   :ensure treesit-fold
+   :hook (after-init . global-treesit-fold-indicators-mode)
+   :init (setq treesit-fold-indicators-priority -1))
 
 (use-package s
   :vc (:url "https://github.com/magnars/s.el" :branch master))

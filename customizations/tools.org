@@ -900,300 +900,301 @@ https://github.com/abo-abo/hydra
 * Org-mode
 ** org-capture
 #+begin_src emacs-lisp
-  (use-package org-capture
-    :ensure nil
-    :bind ("C-c x" . (lambda () (interactive) (org-capture)))
-    :hook ((org-capture-mode . (lambda ()
-                                 (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
-           (org-capture-mode . delete-other-windows))
-    :custom
-    (org-default-notes-file "~/org/inbox.org")
-    (org-capture-use-agenda-date nil)
-    ;; define common template
-    (defvar my-blog-title "")
-    (defun input-blog-title ()
-      (setq my-blog-title (read-from-minibuffer "Enter blog title: "))
-      my-blog-title)
+    (use-package org-capture
+      :ensure nil
+      :bind ("C-c x" . (lambda () (interactive) (org-capture)))
+      :hook ((org-capture-mode . (lambda ()
+                                   (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
+             (org-capture-mode . delete-other-windows))
+      :custom
+      (org-default-notes-file "~/org/inbox.org")
+      (org-capture-use-agenda-date nil)
+      ;; define common template
+      (defvar my-blog-title "")
+      (defun input-blog-title ()
+        (setq my-blog-title (read-from-minibuffer "Enter blog title: "))
+        my-blog-title)
 
-    (defun my/org-capture-new-file-with-date ()
-      "Prompt for a new Org file name and return full path with date prefix."
-      (let ((title (read-string "New post title: ")))
-        (setq my-blog-title title)
-        (expand-file-name
-         (format "%s-%s.org"
-                 (format-time-string "%Y-%m-%d")
-                 (org-hugo-slug title))
-         "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
+      (defun my/org-capture-new-file-with-date ()
+        "Prompt for a new Org file name and return full path with date prefix."
+        (let ((title (read-string "New post title: ")))
+          (setq my-blog-title title)
+          (expand-file-name
+           (format "%s-%s.org"
+                   (format-time-string "%Y-%m-%d")
+                   (org-hugo-slug title))
+           "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
 
-    (org-capture-templates `(
-                             ("t" "Task")
-                             ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
-                              "** TODO %?   %^g"
-                              :prepend t
-                              :jump-to-captured t)
-                             ("tp" "Weekly-emacs-plugin" entry (file+headline "Task.org" "Weekly-Emacs-Plugin")
-                              ;; "** TODO %?   %^g"
-                              "%(fetch-weather-data)\n"
-                              :prepend t
-                              :jump-to-captured t)
-                             ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
-                              "* TODO %i%?"
-                              :empty-lines-after
-                              :jump-to-captured t
-                              :prepend t)
-                             ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
-                              "* %? %^g\n%i\n"
-                              :empty-lines-after 1)
-                             
-                             ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
-                              "* %U - :%?"
-                              :empty-lines-after 1
-                              :jump-to-captured t
-                              :prepend f)
+      (org-capture-templates `(
+                               ("t" "Task")
+                               ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
+                                "** TODO %?   %^g"
+                                :prepend t
+                                :jump-to-captured t)
+                               ("tp" "Weekly-emacs-plugin" entry (file+headline "Task.org" "Weekly-Emacs-Plugin")
+                                ;; "** TODO %?   %^g"
+                                "%(fetch-weather-data)\n"
+                                :prepend t
+                                :jump-to-captured t)
+                               ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
+                                "* TODO %i%?"
+                                :empty-lines-after
+                                :jump-to-captured t
+                                :prepend t)
+                               ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
+                                "* %? %^g\n%i\n"
+                                :empty-lines-after 1)
+                               
+                               ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
+                                "* %U - :%?"
+                                :empty-lines-after 1
+                                :jump-to-captured t
+                                :prepend f)
 
-                             ("b" "Blog" plain (file ,(function my/org-capture-new-file-with-date))
-                              ,(concat "* TODO %(progn my-blog-title)  :%^g:@%^{categories}:\n"
-                                       ":PROPERTIES:\n"
-                                       ":EXPORT_FILE_NAME: %(org-hugo-slug my-blog-title)\n"
-                                       ":EXPORT_DATE: " (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)) "\n"
-                                       ":END:\n"
-                                       "%?\n"))
-                             ("g" "Gallery")
-                             ("gf" "字体收藏" entry
-                              (file+olp "~/Dropbox/20250518105542-gallery.org" "字体收藏")
-                              "** NAME: %?\n- 特点: \n- 样例: /样例文字/\n- 链接: %a")
-                             
-                             ("gc" "颜色收藏" entry
-                              (file+olp "~/Dropbox/20250518105542-gallery.org" "色彩方案")
-                              "** %?\n- 色号: \n- 用途: \n#+BEGIN_SRC emacs-lisp\n(setq my-color \"\")\n#+END_SRC")
-                             
+                               ("b" "Blog" plain (file ,(function my/org-capture-new-file-with-date))
+                                ,(concat "* TODO %(progn my-blog-title)  :%^g:@%^{categories}:\n"
+                                         ":PROPERTIES:\n"
+                                         ":EXPORT_FILE_NAME: %(org-hugo-slug my-blog-title)\n"
+                                         ":EXPORT_DATE: " (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)) "\n"
+                                         ":END:\n"
+                                         "%?\n"))
+                               ("g" "Gallery")
+                               ("gf" "字体收藏" entry
+                                (file+olp "~/Dropbox/org-roam-files/20250518105542-gallery.org" "字体收藏")
+                                "** %^{font-name} :%^g\n- 特点: %^{features}\n- 样例: /样例文字/\n- 链接: %a"
+                                :jump-to-captured t)
+                               
+                               ("gc" "颜色收藏" entry
+                                (file+olp "~/Dropbox/20250518105542-gallery.org" "色彩方案")
+                                "** %?\n- 色号: \n- 用途: \n#+BEGIN_SRC emacs-lisp\n(setq my-color \"\")\n#+END_SRC")
+                               
+                               )
                              )
-                           )
-)
+  )
 
 
-    (use-package org-agenda
-      :ensure nil
-      :after org
-      :bind
-      ("C-c a" . org-agenda)
-      :custom
-      (org-agenda-include-diary t)
-      (org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
-                                  ;; Indent todo items by level to show nesting
-                                  (todo . " %i %-12:c%l")
-                                  (tags . " %i %-12:c")
-                                  (search . " %i %-12:c")))
-      (org-agenda-start-on-weekday nil)
-      (custom-set-variables '(org-agenda-files
-                              '("~/Dropbox/org/Task.org")))
-      )
+      (use-package org-agenda
+        :ensure nil
+        :after org
+        :bind
+        ("C-c a" . org-agenda)
+        :custom
+        (org-agenda-include-diary t)
+        (org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
+                                    ;; Indent todo items by level to show nesting
+                                    (todo . " %i %-12:c%l")
+                                    (tags . " %i %-12:c")
+                                    (search . " %i %-12:c")))
+        (org-agenda-start-on-weekday nil)
+        (custom-set-variables '(org-agenda-files
+                                '("~/Dropbox/org/Task.org")))
+        )
 
-    (require 'org-habit)
+      (require 'org-habit)
 
-    ;; (use-package org-super-agenda
-    ;;   :defer nil
-    ;;   :custom
-    ;;   (org-super-agenda-groups '((:auto-dir-name t)))
-    ;;   :config
-    ;;   (org-super-agenda-mode))
+      ;; (use-package org-super-agenda
+      ;;   :defer nil
+      ;;   :custom
+      ;;   (org-super-agenda-groups '((:auto-dir-name t)))
+      ;;   :config
+      ;;   (org-super-agenda-mode))
 
-    (use-package org-sidebar :ensure t)
+      (use-package org-sidebar :ensure t)
 
-    (use-package org-journal
-      :ensure t
-      :defer t
-      :bind (("C-x j" . org-journal-new-entry))
-      :config
-      (setq org-journal-dir  "~/Dropbox/org/")
-      (setq org-journal-date-format   "%F, %A")
-      (setq org-journal-time-format  "%T ")
-      (setq org-journal-file-format  "%Y.org")  ; their file names
-      (setq org-journal-file-type  'yearly)
-      (setq org-journal-enable-agenda-integration  t)
-      (setq org-journal-enable-cache  t)
+      (use-package org-journal
+        :ensure t
+        :defer t
+        :bind (("C-x j" . org-journal-new-entry))
+        :config
+        (setq org-journal-dir  "~/Dropbox/org/")
+        (setq org-journal-date-format   "%F, %A")
+        (setq org-journal-time-format  "%T ")
+        (setq org-journal-file-format  "%Y.org")  ; their file names
+        (setq org-journal-file-type  'yearly)
+        (setq org-journal-enable-agenda-integration  t)
+        (setq org-journal-enable-cache  t)
 
-      (defun org-journal-save-entry-and-exit()
-        "Simple convenience function.
-              Saves the buffer of the current day's entry and kills the window
-              Similar to org-capture like behavior"
-        (interactive)
-        (save-buffer)
-        (kill-buffer-and-window))
-      (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
+        (defun org-journal-save-entry-and-exit()
+          "Simple convenience function.
+                Saves the buffer of the current day's entry and kills the window
+                Similar to org-capture like behavior"
+          (interactive)
+          (save-buffer)
+          (kill-buffer-and-window))
+        (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
 
-    (use-package org-alert
-      :config
-      )
+      (use-package org-alert
+        :config
+        )
 
-    (use-package org-zettel-ref-mode
-      :ensure nil
-      :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
-      ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
-      :init
-      (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
-      :config
-      ;; (setq org-zettel-ref-mode-type 'denote)
-      (setq org-zettel-ref-mode-type 'org-roam)
-      ;; (setq org-zettel-ref-mode-type 'normal)
-      (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
-      (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/to-be-converted/")
-      (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted-org")
-      (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
-      (setq org-zettel-ref-python-environment 'venv)
-      (setq org-zettel-ref-python-env-name "venv")
-      (setq org-zettel-ref-debug t)
-      (setq org-zettel-ref-highlight-types
-            (append org-zettel-ref-highlight-types
-                    '(("warning" . (:char "w"
-                                    :face (:background "#FFA726"
-                                           :foreground "#000000"
-                                           :extend t)
-                                    :name "warning"
-                                    :prefix "⚠️"))
-                      ("success" . (:char "s"
-                                    :face (:background "#66BB6A"
-                                           :foreground "#FFFFFF"
-                                           :extend t)
-                                    :name "success"
-                                    :prefix "✅")))))
-      (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
-      (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
-      )
+      (use-package org-zettel-ref-mode
+        :ensure nil
+        :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
+        ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
+        :init
+        (setq org-zettel-ref-overview-directory "~/Dropbox/Notes")
+        :config
+        ;; (setq org-zettel-ref-mode-type 'denote)
+        (setq org-zettel-ref-mode-type 'org-roam)
+        ;; (setq org-zettel-ref-mode-type 'normal)
+        (setq org-zettel-ref-python-file "~/.emacs.d/elpa/org-zettel-ref-mode/convert-to-org.py")
+        (setq org-zettel-ref-temp-folder "~/Dropbox/book-store/to-be-converted/")
+        (setq org-zettel-ref-reference-folder "~/Dropbox/book-store/converted-org")
+        (setq org-zettel-ref-archive-folder "~/Dropbox/book-store/archives/")
+        (setq org-zettel-ref-python-environment 'venv)
+        (setq org-zettel-ref-python-env-name "venv")
+        (setq org-zettel-ref-debug t)
+        (setq org-zettel-ref-highlight-types
+              (append org-zettel-ref-highlight-types
+                      '(("warning" . (:char "w"
+                                      :face (:background "#FFA726"
+                                             :foreground "#000000"
+                                             :extend t)
+                                      :name "warning"
+                                      :prefix "⚠️"))
+                        ("success" . (:char "s"
+                                      :face (:background "#66BB6A"
+                                             :foreground "#FFFFFF"
+                                             :extend t)
+                                      :name "success"
+                                      :prefix "✅")))))
+        (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
+        (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
+        )
 
-    (use-package calendar
-      :ensure nil
-      :hook (calendar-today-visible . calendar-mark-today)
-      :custom
-      ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
-      (calendar-chinese-all-holidays-flag nil)
-      ;; 是否显示节日
-      (calendar-mark-holidays-flag t)
-      ;; 是否显示Emacs的日记，我们使用org的日记
-      (calendar-mark-diary-entries-flag nil)
-      ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
-      (calendar-time-zone-style 'numeric)
-      ;; 日期显示方式：year/month/day
-      (calendar-date-style 'iso)
-      ;; 中文天干地支设置
-      (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
-      (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
-      ;; 设置中文月份
-      (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
-      ;; 设置星期标题显示
-      (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
-      ;; 周一作为一周第一天
-      (calendar-week-start-day 1)
-      )
+      (use-package calendar
+        :ensure nil
+        :hook (calendar-today-visible . calendar-mark-today)
+        :custom
+        ;; 是否显示中国节日，我们使用 `cal-chinese-x' 插件
+        (calendar-chinese-all-holidays-flag nil)
+        ;; 是否显示节日
+        (calendar-mark-holidays-flag t)
+        ;; 是否显示Emacs的日记，我们使用org的日记
+        (calendar-mark-diary-entries-flag nil)
+        ;; 数字方式显示时区，如 +0800，默认是字符方式如 CST
+        (calendar-time-zone-style 'numeric)
+        ;; 日期显示方式：year/month/day
+        (calendar-date-style 'iso)
+        ;; 中文天干地支设置
+        (calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+        (calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+        ;; 设置中文月份
+        (calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"])
+        ;; 设置星期标题显示
+        (calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"])
+        ;; 周一作为一周第一天
+        (calendar-week-start-day 1)
+        )
 
-    ;; 时间解析增加中文拼音
-    (use-package parse-time
-      :ensure nil
-      :defer t
-      :config
-      (setq parse-time-months
-            (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
-                      ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
-                      ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
-                      ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
-                      ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
-                      ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
-                      ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
-                      ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
-                    parse-time-months))
+      ;; 时间解析增加中文拼音
+      (use-package parse-time
+        :ensure nil
+        :defer t
+        :config
+        (setq parse-time-months
+              (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
+                        ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
+                        ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
+                        ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
+                        ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                        ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                        ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                        ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                      parse-time-months))
 
-      (setq parse-time-weekdays
-            (append '(("zri" . 0) ("zqi" . 0)
-                      ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
-                      ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
-                      ("zr" . 0) ("zq" . 0)
-                      ("zy" . 1) ("ze" . 2) ("zs" . 3)
-                      ("zsi" . 4) ("zw" . 5) ("zl" . 6))
-                    parse-time-weekdays)))
+        (setq parse-time-weekdays
+              (append '(("zri" . 0) ("zqi" . 0)
+                        ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                        ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                        ("zr" . 0) ("zq" . 0)
+                        ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                        ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                      parse-time-weekdays)))
 
-    ;; 中国节日设置
-    (use-package cal-china-x
-      :ensure t
-      :commands cal-china-x-setup
-      :hook (after-init . cal-china-x-setup)
-      :config
-      ;; 重要节日设置
-      (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-      ;; 所有节日设置
-      (setq cal-china-x-general-holidays
-            '(;;公历节日
-              (holiday-fixed 1 1 "元旦")
-              (holiday-fixed 2 14 "情人节")
-              (holiday-fixed 3 8 "妇女节")
-              (holiday-fixed 3 14 "白色情人节")
-              (holiday-fixed 4 1 "愚人节")
-              (holiday-fixed 5 1 "劳动节")
-              (holiday-fixed 5 4 "青年节")
-              (holiday-float 5 0 2 "母亲节")
-              (holiday-fixed 6 1 "儿童节")
-              (holiday-float 6 0 3 "父亲节")
-              (holiday-fixed 9 10 "教师节")
-              (holiday-fixed 10 1 "国庆节")
-              (holiday-fixed 10 2 "国庆节")
-              (holiday-fixed 10 3 "国庆节")
-              (holiday-fixed 10 24 "程序员节")
-              (holiday-fixed 11 11 "双11购物节")
-              (holiday-fixed 12 25 "圣诞节")
-              ;; 农历节日
-              (holiday-lunar 12 30 "春节" 0)
-              (holiday-lunar 1 1 "春节" 0)
-              (holiday-lunar 1 2 "春节" 0)
-              (holiday-lunar 1 15 "元宵节" 0)
-              (holiday-solar-term "清明" "清明节")
-              (holiday-solar-term "小寒" "小寒")
-              (holiday-solar-term "大寒" "大寒")
-              (holiday-solar-term "立春" "立春")
-              (holiday-solar-term "雨水" "雨水")
-              (holiday-solar-term "惊蛰" "惊蛰")
-              (holiday-solar-term "春分" "春分")
-              (holiday-solar-term "谷雨" "谷雨")
-              (holiday-solar-term "立夏" "立夏")
-              (holiday-solar-term "小满" "小满")
-              (holiday-solar-term "芒种" "芒种")
-              (holiday-solar-term "夏至" "夏至")
-              (holiday-solar-term "小暑" "小暑")
-              (holiday-solar-term "大暑" "大暑")
-              (holiday-solar-term "立秋" "立秋")
-              (holiday-solar-term "处暑" "处暑")
-              (holiday-solar-term "白露" "白露")
-              (holiday-solar-term "秋分" "秋分")
-              (holiday-solar-term "寒露" "寒露")
-              (holiday-solar-term "霜降" "霜降")
-              (holiday-solar-term "立冬" "立冬")
-              (holiday-solar-term "小雪" "小雪")
-              (holiday-solar-term "大雪" "大雪")
-              (holiday-solar-term "冬至" "冬至")
-              (holiday-lunar 5 5 "端午节" 0)
-              (holiday-lunar 8 15 "中秋节" 0)
-              (holiday-lunar 7 7 "七夕情人节" 0)
-              (holiday-lunar 12 8 "腊八节" 0)
-              (holiday-lunar 9 9 "重阳节" 0)))
-      ;; 设置日历的节日，通用节日已经包含了所有节日
-      (setq calendar-holidays (append cal-china-x-general-holidays)))
+      ;; 中国节日设置
+      (use-package cal-china-x
+        :ensure t
+        :commands cal-china-x-setup
+        :hook (after-init . cal-china-x-setup)
+        :config
+        ;; 重要节日设置
+        (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+        ;; 所有节日设置
+        (setq cal-china-x-general-holidays
+              '(;;公历节日
+                (holiday-fixed 1 1 "元旦")
+                (holiday-fixed 2 14 "情人节")
+                (holiday-fixed 3 8 "妇女节")
+                (holiday-fixed 3 14 "白色情人节")
+                (holiday-fixed 4 1 "愚人节")
+                (holiday-fixed 5 1 "劳动节")
+                (holiday-fixed 5 4 "青年节")
+                (holiday-float 5 0 2 "母亲节")
+                (holiday-fixed 6 1 "儿童节")
+                (holiday-float 6 0 3 "父亲节")
+                (holiday-fixed 9 10 "教师节")
+                (holiday-fixed 10 1 "国庆节")
+                (holiday-fixed 10 2 "国庆节")
+                (holiday-fixed 10 3 "国庆节")
+                (holiday-fixed 10 24 "程序员节")
+                (holiday-fixed 11 11 "双11购物节")
+                (holiday-fixed 12 25 "圣诞节")
+                ;; 农历节日
+                (holiday-lunar 12 30 "春节" 0)
+                (holiday-lunar 1 1 "春节" 0)
+                (holiday-lunar 1 2 "春节" 0)
+                (holiday-lunar 1 15 "元宵节" 0)
+                (holiday-solar-term "清明" "清明节")
+                (holiday-solar-term "小寒" "小寒")
+                (holiday-solar-term "大寒" "大寒")
+                (holiday-solar-term "立春" "立春")
+                (holiday-solar-term "雨水" "雨水")
+                (holiday-solar-term "惊蛰" "惊蛰")
+                (holiday-solar-term "春分" "春分")
+                (holiday-solar-term "谷雨" "谷雨")
+                (holiday-solar-term "立夏" "立夏")
+                (holiday-solar-term "小满" "小满")
+                (holiday-solar-term "芒种" "芒种")
+                (holiday-solar-term "夏至" "夏至")
+                (holiday-solar-term "小暑" "小暑")
+                (holiday-solar-term "大暑" "大暑")
+                (holiday-solar-term "立秋" "立秋")
+                (holiday-solar-term "处暑" "处暑")
+                (holiday-solar-term "白露" "白露")
+                (holiday-solar-term "秋分" "秋分")
+                (holiday-solar-term "寒露" "寒露")
+                (holiday-solar-term "霜降" "霜降")
+                (holiday-solar-term "立冬" "立冬")
+                (holiday-solar-term "小雪" "小雪")
+                (holiday-solar-term "大雪" "大雪")
+                (holiday-solar-term "冬至" "冬至")
+                (holiday-lunar 5 5 "端午节" 0)
+                (holiday-lunar 8 15 "中秋节" 0)
+                (holiday-lunar 7 7 "七夕情人节" 0)
+                (holiday-lunar 12 8 "腊八节" 0)
+                (holiday-lunar 9 9 "重阳节" 0)))
+        ;; 设置日历的节日，通用节日已经包含了所有节日
+        (setq calendar-holidays (append cal-china-x-general-holidays)))
 
-    (use-package org-roam
-      :ensure t
-      :custom
-      (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
-      :bind (("C-c n l" . org-roam-buffer-toggle)
-             ("C-c n f" . org-roam-node-find)
-             ("C-c n g" . org-roam-graph)
-             ("C-c n i" . org-roam-node-insert)
-             ("C-c n c" . org-roam-capture)
-             ;; Dailies
-             ("C-c n j" . org-roam-dailies-capture-today))
-      :config
-      ;; If you're using a vertical completion framework, you might want a more informative completion interface
-      (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-      (org-roam-db-autosync-mode)
-      ;; If using org-roam-protocol
-      ;; (require 'org-roam-protocol)
-      )
+      (use-package org-roam
+        :ensure t
+        :custom
+        (org-roam-directory (file-truename "~/Dropbox/org-roam-files/"))
+        :bind (("C-c n l" . org-roam-buffer-toggle)
+               ("C-c n f" . org-roam-node-find)
+               ("C-c n g" . org-roam-graph)
+               ("C-c n i" . org-roam-node-insert)
+               ("C-c n c" . org-roam-capture)
+               ;; Dailies
+               ("C-c n j" . org-roam-dailies-capture-today))
+        :config
+        ;; If you're using a vertical completion framework, you might want a more informative completion interface
+        (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+        (org-roam-db-autosync-mode)
+        ;; If using org-roam-protocol
+        ;; (require 'org-roam-protocol)
+        )
 
 #+end_src
 ** org-agenda
@@ -2090,9 +2091,9 @@ https://github.com/abo-abo/hydra
       (use-package vertico
         :custom (vertico-count 15)
         :bind (:map vertico-map
-        ;;        ("RET" . vertico-directory-enter)
+               ("RET" . vertico-directory-enter)
                ("DEL" . vertico-directory-delete-char)
-        ;;        ("M-DEL" . vertico-directory-delete-word)
+               ("M-DEL" . vertico-directory-delete-word)
                )
         :hook ((after-init . vertico-mode)
                (rfn-eshadow-update-overlay . vertico-directory-tidy)
@@ -2100,20 +2101,20 @@ https://github.com/abo-abo/hydra
     )
 
 
-      (use-package vertico-posframe
-        :hook (vertico-mode . vertico-posframe-mode)
-        :after posframe
-        :init (setq
-    	 vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
-               vertico-posframe-parameters
-               '((left-fringe  . 8)
-                 (right-fringe . 8))))
+      ;; (use-package vertico-posframe
+      ;;   :hook (vertico-mode . vertico-posframe-mode)
+      ;;   :after posframe
+      ;;   :init (setq
+      ;;    vertico-posframe-poshandler #'posframe-poshandler-frame-center-near-bottom
+      ;;          vertico-posframe-parameters
+      ;;          '((left-fringe  . 8)
+      ;;            (right-fringe . 8))))
 
       (use-package nerd-icons-completion
         :hook (vertico-mode . nerd-icons-completion-mode))
 
-      ;; (use-package marginalia
-      ;;   :hook (after-init . marginalia-mode))
+      (use-package marginalia
+        :hook (after-init . marginalia-mode))
 
       (use-package consult
         :bind (;; C-c bindings in `mode-specific-map'
@@ -2413,13 +2414,13 @@ https://depp.brause.cc/shackle/
 #+begin_src emacs-lisp
   (use-package shackle
     :ensure t
-    ;; :defer nil
+    :defer nil
     :custom
      (shackle-lighter "")
      (shackle-select-reused-windows nil) ; default nil
      (shackle-default-alignment 'below) ; default below
      (shackle-default-size 0.4) ; default 0.5
-     (shackle-default-rule '(:select t))
+     ;; (shackle-default-rule '(:select t))
      (shackle-rules
            ;; CONDITION(:regexp)            :select     :inhibit-window-quit   :size+:align|:other     :same|:popup
            '((compilation-mode              :select nil                                                            )
@@ -2808,9 +2809,11 @@ https://github.com/karthink/popper
 #+begin_src emacs-lisp
     ;; A tree layout file explorer
   (use-package treemacs
+:defer nil
     :commands (treemacs-follow-mode
                treemacs-filewatch-mode
                treemacs-git-mode)
+    :hook (after-init . treemacs)
     :custom-face
     (cfrs-border-color ((t (:inherit posframe-border))))
     :bind (([f8]        . treemacs)
@@ -2830,6 +2833,9 @@ https://github.com/karthink/popper
           treemacs-width                   30
           ;; treemacs-no-png-images           (not centaur-icon)
           )
+(setq treemacs-position 'left
+      treemacs-display-in-side-window t)
+
 
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -2858,12 +2864,12 @@ https://github.com/karthink/popper
     (use-package treemacs-tab-bar
       :demand t
       :config (treemacs-set-scope-type 'Tabs)))
-
     ;; (treemacs-start-on-boot)
+
 #+end_src
 
 #+RESULTS:
-: treemacs-single-click-expand-action
+: #s(hash-table data (:use-package (26667 58527 878431 856000) :init (26667 58527 877991 898000) :init-secs (0 0 2511 442000) :use-package-secs (0 0 3226 513000) :config (26667 58527 877987 179000) :config-secs (0 0 2489 240000)))
 
 * Gptel-AI copilot
 #+begin_src emacs-lisp
@@ -2996,7 +3002,13 @@ https://github.com/karthink/popper
 #+end_src
 ** readers
 #+begin_src emacs-lisp
-  ;;epub reading
+  (setq package-vc-allow-build-commands t)
+  (use-package reader
+    :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
+  	    :make "all"))  
+
+
+;;epub reading
   (use-package eww
     :hook (eww-mode . my-nov-font-setup))
 
@@ -3259,6 +3271,10 @@ https://github.com/karthink/popper
                   )))
 
 #+end_src
+
+#+RESULTS:
+: #s(hash-table data (:use-package (26666 58123 545775 984000) :init (26666 58123 545712 381000) :init-secs (0 0 13 326000) :use-package-secs (0 0 79 804000)))
+
 ** Anki-helper
 #+begin_src emacs-lisp
     (use-package anki-helper
@@ -3276,6 +3292,16 @@ https://github.com/karthink/popper
 #+RESULTS:
 : t
 
+** Dictionaries
+#+begin_src emacs-lisp
+;; A multi dictionaries interface
+(use-package fanyi
+:ensure t
+  ;; :bind (("C-c d f" . fanyi-dwim)
+  ;;        ("C-c d d" . fanyi-dwim2)
+  ;;        ("C-c d h" . fanyi-from-history))
+)
+#+end_src
 * Development Tools
 ** Eglot
 #+begin_src emacs-lisp
