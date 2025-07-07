@@ -6,6 +6,7 @@
 
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
+
 (setq debug-on-error t)
 (setq debug-on-quit nil)
 ;; Allow access from emacsclient
@@ -60,14 +61,12 @@ Otherwise the startup will be very slow."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ad-redefinition-action 'accept)
- '(anki-helper-cloze-use-emphasis 'verbatim)
- '(anki-helper-default-deck "org-deck")
- '(anki-helper-default-note-type "Cloze")
+ '(anki-helper-default-deck selected-deck)
  '(before-save-hook '(time-stamp font-lock-flush))
  '(blink-matching-paren-highlight-offscreen t)
  '(centaur-archives-package archives)
  '(confirm-kill-processes nil)
- '(custom-enabled-themes '(doom-one))
+ '(custom-enabled-themes '(modus-operandi-tinted))
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874"
      "b41d0a9413fb0034cea34eb8c9f89f6e243bdd76bccecf8292eb1fefa42eaf0a"
@@ -76,20 +75,15 @@ Otherwise the startup will be very slow."
      "6a5584ee8de384f2d8b1a1c30ed5b8af1d00adcbdcd70ba1967898c265878acf"
      "00d7122017db83578ef6fba39c131efdcb59910f0fac0defbe726da8072a0729" default))
  '(deft-extensions '("org"))
- '(elfeed-feeds
-   '("https://planet.emacslife.com/atom.xml"
-     (("https://planet.emacslife.com/atom.xml" planet emacslife))
-     ("https://planet.emacslife.com/atom.xml" planet emacslife)
-     ("http://www.masteringemacs.org/feed/" mastering)
-     ("https://oremacs.com/atom.xml" oremacs)
-     ("https://pinecast.com/feed/emacscast" emacscast)
-     ("https://emacstil.com/feed.xml" Emacs TIL)))
  '(kill-whole-line t)
- '(load-prefer-newer t t)
+ '(lisp-indent-function 'common-lisp-indent-function)
+ '(load-prefer-newer t)
  '(mouse-yank-at-point t)
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
- '(org-agenda-files '("/Users/dingyu/Dropbox/org/2025.org"))
+ '(org-agenda-files
+   '("/Users/dingyu/Dropbox/org/2025.org"
+     "/Users/dingyu/Dropbox/Journals/2025-06.org"))
  '(package-archives
    '(("ts-gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
      ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
@@ -101,23 +95,23 @@ Otherwise the startup will be very slow."
                        cal-china-x calibredb cape capf-autosuggest cdlatex
                        circadian clipetty cljsbuild-mode clojure-ts-mode
                        colorful-mode consult-flyspell consult-todo
-                       consult-yasnippet counsel dash-functional datetime deft
-                       denote diminish dimmer dired-git-info dired-quick-sort
-                       dired-rsync diredfl docker docker-compose-mode
-                       doom-modeline eask ef-themes eglot-java ejc-sql eldoc-box
-                       elein elfeed elisp-def elpy embark-consult
-                       eshell-syntax-highlighting esup evil-nerd-commenter
-                       ewal-doom-themes exec-path-from-shell fanyi fd-dired
-                       flx-ido flycheck-clojure gcmh ghub
-                       gnu-elpa-keyring-update go-translate goggles
-                       google-translate gptel gptel-quick groovy-mode
-                       gruvbox-theme haskell-mode helm-lsp helpful hideshow-org
-                       highlight-defined highlight-parentheses hl-todo
-                       ibuffer-project ibuffer-projectile ibuffer-vc iedit
-                       imenu-anywhere indent-bars inf-clojure ivy-prescient
-                       json-mode json-navigator justify-kp keycast lsp-brigde
-                       lsp-ivy lsp-java lsp-ui macrostep marginalia mct memoize
-                       meow nano-minibuffer nano-modeline nano-theme
+                       consult-yasnippet counsel dash-functional datetime
+                       default-text-scale deft denote diminish dimmer
+                       dired-git-info dired-quick-sort dired-rsync diredfl
+                       docker docker-compose-mode doom-modeline eask ef-themes
+                       eglot-java ejc-sql eldoc-box elein elfeed elfeed-webkit
+                       elisp-def elpy embark-consult eshell-syntax-highlighting
+                       esup evil-nerd-commenter ewal-doom-themes
+                       exec-path-from-shell fanyi fd-dired flx-ido
+                       flycheck-clojure gcmh ghub gnu-elpa-keyring-update
+                       go-translate goggles google-translate gptel gptel-quick
+                       groovy-mode gruvbox-theme haskell-mode helm-lsp helpful
+                       hideshow-org highlight-defined highlight-parentheses
+                       hl-todo ibuffer-project ibuffer-projectile ibuffer-vc
+                       iedit imenu-anywhere indent-bars inf-clojure
+                       ivy-prescient json-mode json-navigator justify-kp keycast
+                       lsp-brigde lsp-ivy lsp-java lsp-ui macrostep marginalia
+                       mct memoize meow nano-minibuffer nano-modeline nano-theme
                        nerd-icons-completion nerd-icons-corfu nerd-icons-dired
                        nerd-icons-ibuffer nerd-icons-ivy-rich
                        netease-cloud-music no-littering nov nova ob-rust
@@ -125,20 +119,21 @@ Otherwise the startup will be very slow."
                        org-contrib org-journal org-make-toc org-modern org-node
                        org-noter org-preview-html org-protocol-jekyll org-remark
                        org-roam-ui org-ros org-sidebar org-supertag
-                       org-zettel-ref-mode origami ox-hugo pangu-spacing paredit
-                       parent-mode pdf-tools pinyinlib pkg-info popper
-                       pretty-symbols promise rainbow-delimiters
+                       org-zettel-ref-mode origami overseer ox-hugo
+                       pangu-spacing paredit parent-mode pdf-tools pinyinlib
+                       pkg-info popper pretty-symbols promise rainbow-delimiters
                        rainbow-identifiers reader region-occurrences-highlighter
                        rg rime rust-mode setup shackle shrface smartparens
                        smooth-scrolling sort-tab spacemacs-theme svg-tag-mode
                        tabspaces tagedit telega toc-org transient-posframe
-                       transwin tree-sitter-langs treemacs-evil
-                       treemacs-icons-dired treemacs-magit treemacs-nerd-icons
-                       treemacs-persp treemacs-perspective treemacs-projectile
-                       treemacs-tab-bar treesit-auto vertico-posframe vundo
-                       workgroups2 xterm-color zeft zotxt))
+                       transwin tree-sitter-langs treemacs-icons-dired
+                       treemacs-magit treemacs-nerd-icons treemacs-persp
+                       treemacs-perspective treemacs-projectile treemacs-tab-bar
+                       treesit-auto valign vertico-posframe vundo workgroups2
+                       xterm-color yasnippet-capf yasnippet-snippets zeft zotxt))
  '(package-vc-selected-packages
-   '((reader :url "https://codeberg.org/divyaranjan/emacs-reader" :make "all")
+   '((anki-helper :url "https://github.com/Elilif/emacs-anki-helper")
+     (reader :url "https://codeberg.org/divyaranjan/emacs-reader" :make "all")
      (sort-tab :url "https://github.com/manateelazycat/sort-tab")
      (pos-tag-highlight :url "https://github.com/yibie/pos-tag-highlight")
      (gptel-quick :url "https://github.com/karthink/gptel-quick")
@@ -225,7 +220,6 @@ This issue has been addressed in 28."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Maybe some code up here ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'org)
 
 ;; (defun zz/org-babel-tangle-async (file)
 ;;   "Invoke `org-babel-tangle-file' asynchronously."
@@ -245,24 +239,70 @@ This issue has been addressed in 28."
 
 ;; (zz/org-babel-tangle-async "~/.emacs.d/customizations/tools.org")
 
-(org-babel-tangle-file "~/.emacs.d/customizations/tools.org"
-                       "~/.emacs.d/customizations/tools.el")
+;; (org-babel-tangle-file "~/.emacs.d/customizations/tools.org"
+;;                        "~/.emacs.d/customizations/tools.el")
 
-(load "~/.emacs.d/customizations/tools.el")
 
 ;; (setq gc-cons-threshold (* 2 1000 1000))
 
 
 ;; Customize
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 
+(require 'init-package)
+(require 'init-core-overriding)
+;; Preferences
+(require 'init-base)
+;; (require 'init-hydra)
 
+(require 'init-ui)
+(require 'init-edit)
+(require 'init-completion)
+(require 'init-snippet)
+
+;; (require 'init-bookmark)
+;; (require 'init-calendar)
+;; (require 'init-dashboard)
+(require 'init-dired)
+(require 'init-highlight)
+(require 'init-ibuffer)
+;; (require 'init-kill-ring)
+(require 'init-workspace)
+(require 'init-window)
+;; (require 'init-treemacs)
+
+(require 'init-eshell)
+;; (require 'init-shell)
+
+;; (require 'init-markdown)
+(require 'init-org)
+(require 'init-reader)
+
+(require 'init-ai)
+(require 'init-dict)
+;; (require 'init-docker)
+;; (require 'init-player)
+
+(require 'init-utils)
+
+(require 'init-fold)
+;; Programming
+(require 'init-vcs)
+;; (require 'init-check)
+;; (require 'init-lsp)
+;; (require 'init-dap)
+
+(require 'init-progn)
+(require 'init-elisp)
+
+(load "~/.emacs.d/customizations/tools.el")
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-default ((t (:inherit default)))))
 
 
 (provide 'init)

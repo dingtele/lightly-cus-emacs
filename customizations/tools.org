@@ -234,13 +234,14 @@ Return the fastest package archive."
 ** modules loading
 #+begin_src emacs-lisp
 
-   ;; (require 'shell-integration)
-   ;; (require 'init-site-lisp)
-   (require 'init-core-overriding)
-   ;; ;; Langauage-specific
-   ;; (require 'elisp-editing)
-   ;; (require 'init-minibuffer-completion)
+  ;; (require 'shell-integration)
+  ;; (require 'init-site-lisp)
+  (require 'init-core-overriding)
+  ;; ;; Langauage-specific
+  ;; (require 'elisp-editing)
+  ;; (require 'init-minibuffer-completion)
   (require 'init-org)
+  (require 'init-snippet)
 #+end_src
 * Editing & KeyBinding
 ** editing
@@ -539,83 +540,83 @@ Return the fastest package archive."
 ** Rime
 #+begin_src emacs-lisp
 
-  ;; (use-package rime
-  ;;   :commands (toggle-input-method)
-  ;;   :hook
-  ;;   ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
-  ;;                                     (set-input-method "rime"))))
-  ;;    (meow-insert-exit . (lambda() (set-input-method nil))))
-  ;;   :bind
-  ;;   (:map rime-mode-map
-  ;;    ("C-j" . rime-inline-ascii)
-  ;;    :map rime-mode-map
-  ;;    ("C-l" . rime-force-enable))
-  ;;   :custom
-  ;;   (default-input-method 'rime)
-  ;;   (rime-show-candidate 'posframe)
-  ;;   (rime-posframe-style 'vertical)
-  ;;   (rime-posframe-properties 
-  ;;    (list :background-color "#333333"
-  ;;          :foreground-color "#dcdccc"
-  ;;          :internal-border-width 5))
-  ;;   (rime-disable-predicates
-  ;;    '(rime-predicate-prog-in-code-p
+  (use-package rime
+    :commands (toggle-input-method)
+    :hook
+    ((meow-insert-enter . (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)
+                                      (set-input-method "rime"))))
+     (meow-insert-exit . (lambda() (set-input-method nil))))
+    :bind
+    (:map rime-mode-map
+     ("C-j" . rime-inline-ascii)
+     :map rime-mode-map
+     ("C-l" . rime-force-enable))
+    :custom
+    (default-input-method 'rime)
+    (rime-show-candidate 'posframe)
+    (rime-posframe-style 'vertical)
+    (rime-posframe-properties 
+     (list :background-color "#333333"
+           :foreground-color "#dcdccc"
+           :internal-border-width 5))
+    (rime-disable-predicates
+     '(rime-predicate-prog-in-code-p
 
-  ;;      rime-predicate-auto-english-p
+       rime-predicate-auto-english-p
 
-  ;;      rime-predicate-punctuation-after-ascii-p
-  ;;      rime-predicate-punctuation-line-begin-p
-  ;;      my/rime-predicate-punctuation-next-char-is-paired-p
-  ;;      rime-predicate-tex-math-or-command-p
-  ;;      rime-predicate-org-latex-mode-p
-  ;;      rime-predicate-current-uppercase-letter-p
-  ;;      (lambda () (button-at (point)))
-  ;;      meow-normal-mode-p
-  ;;      meow-motion-mode-p
-  ;;      meow-keypad-mode-p
-  ;;      ;; +rime--punctuation-line-begin-p
-  ;;      ;; +rime--english-prober
-  ;;      ;; If the cursor is after a alphabet character.
-  ;;      rime-predicate-after-alphabet-char-p
-  ;;      ;; If input a punctuation after
-  ;;      ;; a Chinese charactor with whitespace.
-  ;;      rime-predicate-punctuation-after-space-cc-p
-  ;;      rime-predicate-special-ascii-line-begin-p
-  ;;      ))
-  ;;   (rime-inline-predicates
-  ;;    ;; If cursor is after a whitespace
-  ;;    ;; which follow a non-ascii character.
-  ;;    '(rime-predicate-space-after-cc-p
-  ;;      ;; If the current charactor entered is a uppercase letter.
-  ;;      rime-predicate-current-uppercase-letter-p))
+       rime-predicate-punctuation-after-ascii-p
+       rime-predicate-punctuation-line-begin-p
+       my/rime-predicate-punctuation-next-char-is-paired-p
+       rime-predicate-tex-math-or-command-p
+       rime-predicate-org-latex-mode-p
+       rime-predicate-current-uppercase-letter-p
+       (lambda () (button-at (point)))
+       meow-normal-mode-p
+       meow-motion-mode-p
+       meow-keypad-mode-p
+       ;; +rime--punctuation-line-begin-p
+       ;; +rime--english-prober
+       ;; If the cursor is after a alphabet character.
+       rime-predicate-after-alphabet-char-p
+       ;; If input a punctuation after
+       ;; a Chinese charactor with whitespace.
+       rime-predicate-punctuation-after-space-cc-p
+       rime-predicate-special-ascii-line-begin-p
+       ))
+    (rime-inline-predicates
+     ;; If cursor is after a whitespace
+     ;; which follow a non-ascii character.
+     '(rime-predicate-space-after-cc-p
+       ;; If the current charactor entered is a uppercase letter.
+       rime-predicate-current-uppercase-letter-p))
 
-  ;;   (rime-user-data-dir "~/.emacs.d/rime/")
-  ;;   (rime-librime-root "~/.emacs.d/librime/dist")
-  ;;   (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+    (rime-user-data-dir "~/.emacs.d/rime/")
+    (rime-librime-root "~/.emacs.d/librime/dist")
+    (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
 
-  ;;   (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+    (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
 
-  ;;   :init
-  ;;   (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
-  ;;     (if (not (eq (point) (point-max)))
-  ;;         (and (rime-predicate-current-input-punctuation-p)
-  ;;              (not (string-match-p
-  ;;                    (rx (any "\"\(\[\{"))
-  ;;                    (buffer-substring (point) (1- (point)))
-  ;;                    )
-  ;;                   )
-  ;;              (string-match-p
-  ;;               (rx (any "\}\]\)\""))
-  ;;               (buffer-substring (point) (1+ (point)))))
-  ;;       nil))
+    :init
+    (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
+      (if (not (eq (point) (point-max)))
+          (and (rime-predicate-current-input-punctuation-p)
+               (not (string-match-p
+                     (rx (any "\"\(\[\{"))
+                     (buffer-substring (point) (1- (point)))
+                     )
+                    )
+               (string-match-p
+                (rx (any "\}\]\)\""))
+                (buffer-substring (point) (1+ (point)))))
+        nil))
 
-  ;;   (defun rime-predicate-special-ascii-line-begin-p ()
-  ;;     "If '/' or '#' at the beginning of the line."
-  ;;     (and (> (point) (save-excursion (back-to-indentation) (point)))
-  ;;          (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
-  ;;            (string-match-p "^[\/#]" string))))
+    (defun rime-predicate-special-ascii-line-begin-p ()
+      "If '/' or '#' at the beginning of the line."
+      (and (> (point) (save-excursion (back-to-indentation) (point)))
+           (let ((string (buffer-substring (point) (max (line-beginning-position) (- (point) 80)))))
+             (string-match-p "^[\/#]" string))))
 
-  ;;   )
+    )
 
 
   (use-package pangu-spacing
@@ -648,6 +649,9 @@ Return the fastest package archive."
 
   (global-set-key (kbd "C-c C-s") 'get-sentence-around-word)
       #+end_src
+
+      #+RESULTS:
+      : get-sentence-around-word
 
 ** shortcut
 #+begin_src emacs-lisp
@@ -902,7 +906,7 @@ https://github.com/abo-abo/hydra
 #+begin_src emacs-lisp
     (use-package org-capture
       :ensure nil
-      :bind ("C-c x" . (lambda () (interactive) (org-capture)))
+      :bind ("C-c x" . org-capture)
       :hook ((org-capture-mode . (lambda ()
                                    (setq-local org-complete-tags-always-offer-all-agenda-tags t)))
              (org-capture-mode . delete-other-windows))
@@ -923,7 +927,8 @@ https://github.com/abo-abo/hydra
            (format "%s-%s.org"
                    (format-time-string "%Y-%m-%d")
                    (org-hugo-slug title))
-           "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
+"~/codeBase/blogs/dingtele.github.io/content-org/")))
+           ;; "~/codebase/blog-bus/dingtele.github.io/content-org/")))  ;; Adjust this directory as needed
 
       (org-capture-templates `(
                                ("t" "Task")
@@ -945,7 +950,7 @@ https://github.com/abo-abo/hydra
                                 "* %? %^g\n%i\n"
                                 :empty-lines-after 1)
                                
-                               ("l" "today i learned..." entry (file+olp+datetree "Journal.org" "Today i Learned")
+                               ("l" "today i learned..." entry (file+headline "Journal.org" "Today i Learned")
                                 "* %U - :%?"
                                 :empty-lines-after 1
                                 :jump-to-captured t
@@ -1197,6 +1202,10 @@ https://github.com/abo-abo/hydra
         )
 
 #+end_src
+
+#+RESULTS:
+: #s(hash-table data (:use-package (26677 7415 474204 0) :init (26677 7415 472883 0) :init-secs (0 0 68 0) :use-package-secs (0 0 1583 0)))
+
 ** org-agenda
 ** org-supertag
 #+begin_src emacs-lisp
@@ -1518,7 +1527,10 @@ https://github.com/abo-abo/hydra
   (defun my-nov-font-setup ()
     (face-remap-add-relative 'variable-pitch
                              :family "TsangerJinKai03 W04"
-                             :height 1.1))
+                             :height 1.2))
+(add-hook 'org-journal-mode-hook 'variable-pitch-mode)
+(add-hook 'org-mode #'my-nov-font-setup)
+(add-hook 'org-journal-mode-hook #'my-nov-font-setup)
 #+end_src
 ** Frame
 #+begin_src emacs-lisp
@@ -1787,7 +1799,8 @@ https://github.com/abo-abo/hydra
     ;; (require 'lib-svg-tag-mode)
     ;; (add-hook 'tab-bar-new-tab 'lib-svg-tag-mode)
     :bind (("s-t" . tab-bar-new-tab)
-           ("s-w" . tab-bar-close-tab))
+           ("s-w" . tab-bar-close-tab)
+           ("s-r" . tab-bar-rename-tab))
     :custom
     (tab-bar-close-button-show nil)
     (tab-bar-new-button-show nil)
@@ -1814,10 +1827,8 @@ https://github.com/abo-abo/hydra
     )
 #+end_src
 
-#+RESULTS:
-: tab-bar-close-tab
 
-- style for telega ， from https://github.com/LuciusChen/.emacs.d/blob/646e42fce207117de0e73d7cf16a04e4c21a11e4/lib/lib-tabbar.el
+- style for *telega* from https://github.com/LuciusChen/.emacs.d/blob/646e42fce207117de0e73d7cf16a04e4c21a11e4/lib/lib-tabbar.el
 #+begin_src emacs-lisp
 
   ;; telega notification
@@ -2749,57 +2760,55 @@ https://github.com/karthink/popper
 #+end_src
 ** desktop save/restore/recovery
 #+begin_src emacs-lisp
-    (use-package auto-save
-      :defer nil
-      :vc (:url "https://github.com/manateelazycat/auto-save")
-      :init
-      (setq auto-save-silent nil)   ; quietly save
-      ;; (setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
-      :config
-      (auto-save-enable)
-    ;;; custom predicates if you don't want auto save.
-    ;;; disable auto save mode when current filetype is an gpg file.
-      (setq auto-save-disable-predicates
-            '((lambda ()
-                (string-suffix-p
-                 "gpg"
-                 (file-name-extension (buffer-name)) t)))))
-  ;; (Require 'auto-save)
-  ;; (auto-save-enable)
-  ;;     (setq auto-save-silent nil)
+      (use-package auto-save
+        :defer nil
+        :vc (:url "https://github.com/manateelazycat/auto-save")
+        :custom      
+        (auto-save-silent t)   ; quietly save
+        (auto-save-idle 3)
+        ;; (setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
+        :config
+        (auto-save-enable)
+      ;;; custom predicates if you don't want auto save.
+      ;;; disable auto save mode when current filetype is an gpg file.
+        (setq auto-save-disable-predicates
+              '((lambda ()
+                  (string-suffix-p
+                   "gpg"
+                   (file-name-extension (buffer-name)) t)))))
 
-    ;; ;; Restore Opened Files
-    ;; (progn
-    ;;   (desktop-save-mode 1)
-    ;;   ;; save when quit
-    ;;   (setq desktop-save t)
+      ;; ;; Restore Opened Files
+      ;; (progn
+      ;;   (desktop-save-mode 1)
+      ;;   ;; save when quit
+      ;;   (setq desktop-save t)
 
-    ;;   ;; no ask if crashed
-    ;;   (setq desktop-load-locked-desktop t)
-    ;;   (setq desktop-restore-frames t)
-    ;;   (setq desktop-auto-save-timeout 300)
+      ;;   ;; no ask if crashed
+      ;;   (setq desktop-load-locked-desktop t)
+      ;;   (setq desktop-restore-frames t)
+      ;;   (setq desktop-auto-save-timeout 300)
 
-    ;;   ;; save some global vars
-    ;;   (setq desktop-globals-to-save nil)
-    ;;   ;; 2023-09-16 default
-    ;;   ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
-    ;;   (setq desktop-dirname "~/.emacs.d/var/desktop/")
-    ;;   )
+      ;;   ;; save some global vars
+      ;;   (setq desktop-globals-to-save nil)
+      ;;   ;; 2023-09-16 default
+      ;;   ;; '(desktop-missing-file-warning tags-file-name tags-table-list search-ring regexp-search-ring register-alist file-name-history)
+      ;;   (setq desktop-dirname "~/.emacs.d/var/desktop/")
+      ;;   )
 
-    ;; ;; (progn
-    ;; ;;   (require
-  ;; ' desktop-recover)
-    ;;   ;; optionallly:
-    ;;     (setq desktop-recover-location
-    ;;           (desktop-recover-fixdir "~/.emacs.d/var/desktop/"))
-    ;;     ;; Brings up the interactive buffer restore menu
-    ;;     (desktop-recover-interactive)
-    ;;     ;; Note that after using this menu, your desktop will be saved
-    ;;     ;; automatically (triggered by the auto-save mechanism).
-    ;;     ;; For finer-grained control of the frequency of desktop saves,
-    ;;     ;; you can add the standard keybindings to your set-up:
-    ;;     (desktop-recover-define-global-key-bindings "\C-c%")
-    ;;   )
+      ;; ;; (progn
+      ;; ;;   (require
+    ;; ' desktop-recover)
+      ;;   ;; optionallly:
+      ;;     (setq desktop-recover-location
+      ;;           (desktop-recover-fixdir "~/.emacs.d/var/desktop/"))
+      ;;     ;; Brings up the interactive buffer restore menu
+      ;;     (desktop-recover-interactive)
+      ;;     ;; Note that after using this menu, your desktop will be saved
+      ;;     ;; automatically (triggered by the auto-save mechanism).
+      ;;     ;; For finer-grained control of the frequency of desktop saves,
+      ;;     ;; you can add the standard keybindings to your set-up:
+      ;;     (desktop-recover-define-global-key-bindings "\C-c%")
+      ;;   )
 #+end_src
 
 #+RESULTS:
@@ -2807,69 +2816,70 @@ https://github.com/karthink/popper
 
 ** treemacs
 #+begin_src emacs-lisp
-    ;; A tree layout file explorer
-  (use-package treemacs
-:defer nil
-    :commands (treemacs-follow-mode
-               treemacs-filewatch-mode
-               treemacs-git-mode)
-    :hook (after-init . treemacs)
-    :custom-face
-    (cfrs-border-color ((t (:inherit posframe-border))))
-    :bind (([f8]        . treemacs)
-           ("M-0"       . treemacs-select-window)
-           ("C-x t 1"   . treemacs-delete-other-windows)
-           ("C-x t t"   . treemacs)
-           ("C-x t b"   . treemacs-bookmark)
-           ("C-x t C-t" . treemacs-find-file)
-           ("C-x t M-t" . treemacs-find-tag)
-           :map treemacs-mode-map
-           ([mouse-1]   . treemacs-single-click-expand-action))
-    :config
-    (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
-          treemacs-missing-project-action  'remove
-          treemacs-sorting                 'alphabetic-asc
-          treemacs-follow-after-init       t
-          treemacs-width                   30
-          ;; treemacs-no-png-images           (not centaur-icon)
-          )
-(setq treemacs-position 'left
-      treemacs-display-in-side-window t)
-
-
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null (executable-find "python3"))))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple)))
-
-    (use-package treemacs-nerd-icons
-      :demand t
-      ;; :when (icons-displayable-p)
+      ;; A tree layout file explorer
+    (use-package treemacs
+  :defer nil
+      :commands (treemacs-follow-mode
+                 treemacs-filewatch-mode
+                 treemacs-git-mode)
+      :hook (after-init . treemacs)
       :custom-face
-      (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
-      (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
-      :config (treemacs-load-theme "nerd-icons"))
+      (cfrs-border-color ((t (:inherit posframe-border))))
+      :bind (([f8]        . treemacs)
+             ("M-0"       . treemacs-select-window)
+             ("C-x t 1"   . treemacs-delete-other-windows)
+             ("C-x t t"   . treemacs)
+             ("C-x t b"   . treemacs-bookmark)
+             ("C-x t C-t" . treemacs-find-file)
+             ("C-x t M-t" . treemacs-find-tag)
+             ("C-x t d"   . treemacs-select-directory)
+             :map treemacs-mode-map
+             ([mouse-1]   . treemacs-single-click-expand-action))
+      :config
+      (setq treemacs-collapse-dirs           (if treemacs-python-executable 3 0)
+            treemacs-missing-project-action  'remove
+            treemacs-sorting                 'alphabetic-asc
+            treemacs-follow-after-init       t
+            treemacs-width                   30
+            ;; treemacs-no-png-images           (not centaur-icon)
+            )
+  (setq treemacs-position 'left
+        treemacs-display-in-side-window t)
 
-    (use-package treemacs-magit
-      :hook ((magit-post-commit
-              git-commit-post-finish
-              magit-post-stage
-              magit-post-unstage)
-             . treemacs-magit--schedule-update))
 
-    (use-package treemacs-tab-bar
-      :demand t
-      :config (treemacs-set-scope-type 'Tabs)))
-    ;; (treemacs-start-on-boot)
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null (executable-find "python3"))))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
+
+      (use-package treemacs-nerd-icons
+        :demand t
+        ;; :when (icons-displayable-p)
+        :custom-face
+        (treemacs-nerd-icons-root-face ((t (:inherit nerd-icons-green :height 1.3))))
+        (treemacs-nerd-icons-file-face ((t (:inherit nerd-icons-dsilver))))
+        :config (treemacs-load-theme "nerd-icons"))
+
+      (use-package treemacs-magit
+        :hook ((magit-post-commit
+                git-commit-post-finish
+                magit-post-stage
+                magit-post-unstage)
+               . treemacs-magit--schedule-update))
+
+      (use-package treemacs-tab-bar
+        :demand t
+        :config (treemacs-set-scope-type 'Tabs)))
+      ;; (treemacs-start-on-boot)
 
 #+end_src
 
 #+RESULTS:
-: #s(hash-table data (:use-package (26667 58527 878431 856000) :init (26667 58527 877991 898000) :init-secs (0 0 2511 442000) :use-package-secs (0 0 3226 513000) :config (26667 58527 877987 179000) :config-secs (0 0 2489 240000)))
+: #s(hash-table data (:use-package (26674 32999 944324 0) :init (26674 32999 943163 0) :config (26674 32999 943160 0) :config-secs (0 0 12215 0) :init-secs (0 0 12231 0) :use-package-secs (0 0 13760 0)))
 
 * Gptel-AI copilot
 #+begin_src emacs-lisp
@@ -3002,10 +3012,10 @@ https://github.com/karthink/popper
 #+end_src
 ** readers
 #+begin_src emacs-lisp
-  (setq package-vc-allow-build-commands t)
-  (use-package reader
-    :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
-  	    :make "all"))  
+  ;; (setq package-vc-allow-build-commands t)
+  ;; (use-package reader
+  ;;   :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
+  ;; 	    :make "all"))  
 
 
 ;;epub reading
@@ -3256,6 +3266,10 @@ https://github.com/karthink/popper
             (forward-line))))
       (advice-add #'elfeed-search-browse-url :override #'my-elfeed-search-browse-url)))
 
+(use-package elfeed-webkit
+  :ensure
+  :after elfeed)
+
   ;; Another Atom/RSS reader
   (use-package newsticker
     :ensure nil
@@ -3277,20 +3291,16 @@ https://github.com/karthink/popper
 
 ** Anki-helper
 #+begin_src emacs-lisp
-    (use-package anki-helper
-      :vc (:url https://github.com/Elilif/emacs-anki-helper)
-  :defer t
-      :config
-      (custom-set-variables
-       '(anki-helper-cloze-use-emphasis 'verbatim)
-       '(anki-helper-default-note-type "Cloze")
-       '(anki-helper-default-deck "org-deck")))
-      ;; Make mouse wheel / trackpad scrolling less jerky
-
+  (use-package anki-helper
+    :vc (:url "https://github.com/Elilif/emacs-anki-helper" :rev :newest)
+    :custom
+    (anki-helper-cloze-use-emphasis nil)
+    (anki-helper-default-note-type "Cloze")
+    (anki-helper-default-deck "saladict"))
 #+end_src
 
 #+RESULTS:
-: t
+: #s(hash-table data (:use-package (26679 46538 872890 0) :init (26679 45547 691498 0) :init-secs (0 0 13 0) :use-package-secs (0 0 4 0) :config (26679 46271 471986 0) :config-secs (0 0 3 0)))
 
 ** Dictionaries
 #+begin_src emacs-lisp
@@ -3519,11 +3529,13 @@ https://github.com/gregsexton/origami.el
 #+end_src
 * Coding language
 ** Common
-[[https://github.com/Malabarba/aggressive-indent-mode][- aggressive-indent-mode]]
+- [[https://github.com/Malabarba/aggressive-indent-mode][aggressive-indent-mode]]
 - [[https://ebzzry.com/en/emacs-pairs/#configuration][smart-paren-mode]]
 
 #+begin_src emacs-lisp
-      (global-set-key "\C-h\C-f" 'find-function-at-point)
+    
+
+  (global-set-key "\C-h\C-f" 'find-function-at-point)
 
     ;; Minor mode to aggressively keep your code always indented
     (use-package aggressive-indent

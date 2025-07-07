@@ -22,3 +22,7 @@ eln-cache/*
 org-persist/*
 transient
 eshell/*
+librime/*
+rime/*
+tree-sitter/*
+.DS_Store
