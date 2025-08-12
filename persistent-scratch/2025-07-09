@@ -1,0 +1,15 @@
+(["*scratch*" "./config
+
+
+./configure  CPPFLAGS=-I$MPS_ARTIFACTS \\
+             LDFLAGS=-L$MPS_ARTIFACTS \\
+             --enable-link-time-optimization \\
+             --with-tree-sitter \\
+             --with-dbus \\
+             --with-x-toolkit=lucid \\
+             --with-mps=yes \\
+             --with-native-compilation=aot \\
+             --without-compress-install \\
+             --with-modules
+
+" (385 . 383) bash-ts-mode nil t])

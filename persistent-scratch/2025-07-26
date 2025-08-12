@@ -1,0 +1,14 @@
+(["*scratch*" ";; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with ‘C-x C-f’ and enter text in its buffer.
+
+   CXXFLAGS=\"-stdlib=libc++\"
+   CC=/usr/bin/clang
+   CXX=/usr/bin/clang++
+   cmake
+   -DCMAKE_BUILD_TYPE=Release
+   -DCMAKE_INSTALL_PREFIX:PATH=/usr/local
+   -DTD_ENABLE_LTO=ON
+   -DCMAKE_AR=/usr/bin/llvm-ar
+   -DCMAKE_NM=/usr/bin/llvm-nm
+   -DCMAKE_OBJDUMP=/usr/bin/llvm-objdump
+   -DCMAKE_RANLIB=/usr/bin/llvm-ranlib .." (469 . 469) bash-ts-mode nil nil])
