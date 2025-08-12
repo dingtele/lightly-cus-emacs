@@ -54,4 +54,33 @@
       (posframe-hide transient--buffer-name))
     (advice-add #'transient-posframe--delete :override #'my-transient-posframe--hide)))
 
+
+(use-package git-gutter
+
+  :bind
+  ("C-M-z" . git-gutter:revert-hunk)
+  ("s-j" . git-gutter:next-hunk)
+  ("s-k" . git-gutter:previous-hunk)
+
+  :hook 
+  (after-init . global-git-gutter-mode)
+  :config
+  (custom-set-faces '(git-gutter:added ((t (:foreground "black" :background "green")))))
+  (custom-set-faces '(git-gutter:deleted ((t (:foreground "black" :background "red")))))
+  (custom-set-faces '(git-gutter:modified ((t (:foreground "black" :background "yellow")))))
+
+  (setq
+   git-gutter:ask-p nil
+   git-gutter:modified-sign "改"
+   git-gutter:added-sign "加"
+   git-gutter:deleted-sign "刪"
+   git-gutter:separator-sign nil
+   git-gutter:unchanged-sign nil
+   git-gutter:diff-option  "")
+
+  ;; (advice-add #'git-gutter:next-hunk :after #'exec/recenter)
+  ;; (advice-add #'git-gutter:previous-hunk :after #'exec/recenter)
+
+  (add-hook 'git-gutter:update-hooks 'focus-in-hook))
+
 (provide 'init-vcs)

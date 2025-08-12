@@ -1,3 +1,19 @@
+;;; init-package.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;; Homepage: homepage
+;; Keywords: keywords
+
+
+;;; Commentary:
+
+;; commentary
+
+;;; Code:
+
+
+
+
 (require 'package)
 
 ;; Emacs Lisp Package Archive (ELPA)
@@ -111,12 +127,12 @@ Return the fastest package archive."
 (use-package gnu-elpa-keyring-update)
 
 ;; Update packages
-(unless (fboundp 'package-upgrade-all)
-  (use-package auto-package-update
-    :init
-    (setq auto-package-update-delete-old-versions t
-          auto-package-update-hide-results t)
-    (defalias 'package-upgrade-all #'auto-package-update-now)))
+;; (use-package auto-package-update
+;;   :init
+;;   (setq auto-package-update-delete-old-versions t
+;;         auto-package-update-hide-results t
+;;         auto-package-update-interval 7)
+;;   (auto-package-update-maybe))
 
 (use-package auto-compile
   :defer nil
@@ -179,3 +195,5 @@ Return the fastest package archive."
          (message "No missing packages."))))
 
 (provide 'init-package)
+
+;;; init-package.el ends here

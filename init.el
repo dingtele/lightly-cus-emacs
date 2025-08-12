@@ -1,4 +1,4 @@
-;;; init.el --- Load the full configuration -*- lexical-binding: t -*-
+;;; init.el --- Load the full configuration
 
 ;; global keyword to turn on / off:
 ;; TODO: review the operation in detail when it is needed
@@ -10,17 +10,19 @@
 (setq debug-on-error t)
 (setq debug-on-quit nil)
 ;; Allow access from emacsclient
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'server)
-            (unless (server-running-p)
-              (server-start))))
+;; (add-hook 'after-init-hook
+;;           (lambda ()
+;;             (require 'server)
+;;             (unless (server-running-p)
+;;               (server-start))))
 
 ;; ;; ignore native compile warning
 (setq warning-minimum-level :emergency)
 ;; (setq default-directory "/home/jordi/")
 
 (setq gc-cons-threshold most-positive-fixnum)
+
+(setq trusted-content '("~/.emacs.d/"))
 
 ;; Load path
 ;; Optimize: Force "lisp"" and "site-lisp" at the head to reduce the startup time.
@@ -61,12 +63,11 @@ Otherwise the startup will be very slow."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ad-redefinition-action 'accept)
- '(anki-helper-default-deck selected-deck)
  '(before-save-hook '(time-stamp font-lock-flush))
  '(blink-matching-paren-highlight-offscreen t)
  '(centaur-archives-package archives)
  '(confirm-kill-processes nil)
- '(custom-enabled-themes '(modus-operandi-tinted))
+ '(custom-enabled-themes '(modus-vivendi-tinted))
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874"
      "b41d0a9413fb0034cea34eb8c9f89f6e243bdd76bccecf8292eb1fefa42eaf0a"
@@ -88,56 +89,50 @@ Otherwise the startup will be very slow."
    '(("ts-gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
      ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
  '(package-selected-packages
-   '(aggressive-indent all-the-icons-nerd-fonts anki-helper auctex auto-compile
-                       auto-complete auto-dark auto-dim-other-buffers
-                       auto-package-update auto-save beginend benchmark-init
-                       bing-dict buffer-name-relative bufferlo bug-hunter burly
-                       cal-china-x calibredb cape capf-autosuggest cdlatex
-                       circadian clipetty cljsbuild-mode clojure-ts-mode
-                       colorful-mode consult-flyspell consult-todo
-                       consult-yasnippet counsel dash-functional datetime
-                       default-text-scale deft denote diminish dimmer
-                       dired-git-info dired-quick-sort dired-rsync diredfl
-                       docker docker-compose-mode doom-modeline eask ef-themes
-                       eglot-java ejc-sql eldoc-box elein elfeed elfeed-webkit
-                       elisp-def elpy embark-consult eshell-syntax-highlighting
-                       esup evil-nerd-commenter ewal-doom-themes
-                       exec-path-from-shell fanyi fd-dired flx-ido
-                       flycheck-clojure gcmh ghub gnu-elpa-keyring-update
-                       go-translate goggles google-translate gptel gptel-quick
-                       groovy-mode gruvbox-theme haskell-mode helm-lsp helpful
-                       hideshow-org highlight-defined highlight-parentheses
-                       hl-todo ibuffer-project ibuffer-projectile ibuffer-vc
-                       iedit imenu-anywhere indent-bars inf-clojure
-                       ivy-prescient json-mode json-navigator justify-kp keycast
-                       lsp-brigde lsp-ivy lsp-java lsp-ui macrostep marginalia
-                       mct memoize meow nano-minibuffer nano-modeline nano-theme
-                       nerd-icons-completion nerd-icons-corfu nerd-icons-dired
-                       nerd-icons-ibuffer nerd-icons-ivy-rich
-                       netease-cloud-music no-littering nov nova ob-rust
-                       orderless org-alert org-appear org-block-capf org-bullets
-                       org-contrib org-journal org-make-toc org-modern org-node
-                       org-noter org-preview-html org-protocol-jekyll org-remark
-                       org-roam-ui org-ros org-sidebar org-supertag
-                       org-zettel-ref-mode origami overseer ox-hugo
-                       pangu-spacing paredit parent-mode pdf-tools pinyinlib
-                       pkg-info popper pretty-symbols promise rainbow-delimiters
-                       rainbow-identifiers reader region-occurrences-highlighter
-                       rg rime rust-mode setup shackle shrface smartparens
-                       smooth-scrolling sort-tab spacemacs-theme svg-tag-mode
-                       tabspaces tagedit telega toc-org transient-posframe
-                       transwin tree-sitter-langs treemacs-icons-dired
-                       treemacs-magit treemacs-nerd-icons treemacs-persp
-                       treemacs-perspective treemacs-projectile treemacs-tab-bar
-                       treesit-auto valign vertico-posframe vundo workgroups2
-                       xterm-color yasnippet-capf yasnippet-snippets zeft zotxt))
+   '(a ace-jump-mode aggressive-indent anki-helper auctex auto-compile
+       auto-complete auto-package-update auto-save beginend benchmark-init
+       bind-key bing-dict buffer-name-relative bufferlo bug-hunter cal-china-x
+       calibredb cape capf-autosuggest citeproc clipetty cljsbuild-mode
+       clojure-ts-mode colorful-mode command-log-mode company consult-eglot
+       consult-flyspell consult-yasnippet corfu counsel datetime
+       default-text-scale deft devdocs diminish dimmer dired-git-info
+       dired-quick-sort dired-rsync diredfl docker docker-compose-mode doom
+       doom-modeline eask editorconfig ef-themes eglot-java ejc-sql eldoc-box
+       elein elfeed embark-consult eshell-syntax-highlighting esup
+       evil-nerd-commenter ewal-doom-themes exec-path-from-shell fanyi fd-dired
+       flx-ido flycheck-clojure flymake-popon gcmh ghub git-gutter
+       gnu-elpa-keyring-update go-translate goggles google-translate gptel-quick
+       groovy-mode gruvbox-theme haskell-mode helm-lsp helpful hideshow-org
+       hierarchy highlight-defined highlight-parentheses hl-todo ibuffer-project
+       ibuffer-projectile ibuffer-vc iedit imenu-anywhere immersive-translate
+       indent-bars ivy-prescient json-mode json-navigator justify-kp keycast
+       lsp-ivy lsp-java lsp-ui macrostep major-mode-hydra marginalia mct memoize
+       meow mindstream mixed-pitch mixed-pitch-mode nerd-icons-completion
+       nerd-icons-corfu nerd-icons-dired nerd-icons-ibuffer nerd-icons-ivy-rich
+       netease-cloud-music no-littering nov ob-rust olivetti olivetti-mode
+       orderless org-alert org-appear org-bullets org-contrib org-journal
+       org-modern org-noter org-preview-html org-protocol-jekyll org-remark
+       org-roam-ui org-ros org-sidebar org-zettel-ref-mode origami overseer
+       ox-hugo pangu-spacing paredit parent-mode pdf-tools persistent-scratch
+       pinyinlib pomidor pomo-cat pomo-cats popon popper pos-tag-highlight
+       pretty-hydra pretty-symbols promise rainbow-delimiters
+       rainbow-identifiers reader region-occurrences-highlighter restclient rg
+       rime s shackle shrface smooth-scrolling sort-tab spacemacs-theme
+       tabspaces tagedit telega toc-org transient-posframe transwin
+       tree-sitter-langs treemacs-magit treemacs-nerd-icons treemacs-tab-bar
+       treesit-auto treesit-fold ts-fold valign valign-mode vertico-posframe
+       vundo workgroups2 writeroom-mode xterm-color yasnippet-capf
+       yasnippet-snippets zeft zotxt))
  '(package-vc-selected-packages
-   '((anki-helper :url "https://github.com/Elilif/emacs-anki-helper")
+   '((pomo-cat :url "https://github.com/kn66/pomo-cat.el")
+     (gptel-quick :url "https://github.com/karthink/gptel-quick")
+     (justify-kp :url "https://github.com/Fuco1/justify-kp")
+     (auto-save :url "https://github.com/manateelazycat/auto-save")
+     (pomo-cats :url "https://github.com/kn66/pomo-cat.el")
+     (anki-helper :url "https://github.com/Elilif/emacs-anki-helper")
      (reader :url "https://codeberg.org/divyaranjan/emacs-reader" :make "all")
      (sort-tab :url "https://github.com/manateelazycat/sort-tab")
      (pos-tag-highlight :url "https://github.com/yibie/pos-tag-highlight")
-     (gptel-quick :url "https://github.com/karthink/gptel-quick")
-     (auto-save :url "https://github.com/manateelazycat/auto-save")
      (zeft :url "https://github.com/casouri/zeft")
      (org-supertag :url "https://github.com/yibie/org-supertag")
      (lsp-brigde :url "https://github.com/manateelazycat/lsp-bridge")))
@@ -253,7 +248,7 @@ This issue has been addressed in 28."
 (require 'init-core-overriding)
 ;; Preferences
 (require 'init-base)
-;; (require 'init-hydra)
+(require 'init-hydra)
 
 (require 'init-ui)
 (require 'init-edit)
@@ -288,21 +283,24 @@ This issue has been addressed in 28."
 (require 'init-fold)
 ;; Programming
 (require 'init-vcs)
-;; (require 'init-check)
-;; (require 'init-lsp)
+(require 'init-check)
+(require 'init-eglot)
 ;; (require 'init-dap)
 
 (require 'init-progn)
 (require 'init-elisp)
+(require 'init-python)
 
-(load "~/.emacs.d/customizations/tools.el")
+(load "~/.emacs.d/var/customizations/tools.el")
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-default ((t (:inherit default)))))
+ '(git-gutter:added ((t (:foreground "black" :background "green"))))
+ '(git-gutter:deleted ((t (:foreground "black" :background "red"))))
+ '(git-gutter:modified ((t (:foreground "black" :background "yellow")))))
 
 
 (provide 'init)

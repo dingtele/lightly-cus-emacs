@@ -1,3 +1,15 @@
+;;; init-edit.el --- summary   -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;; Homepage: homepage
+;; Keywords: keywords
+
+
+;;; Commentary:
+
+;;; Code:
+
+
 (use-package ediff
   :ensure nil
   :hook(;; show org ediffs unfolded
@@ -111,116 +123,140 @@
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
 
 
-(defun meow-setup ()
-  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-  (meow-motion-overwrite-define-key
-   '("j" . meow-next)
-   '("k" . meow-prev)
-   '("<escape>" . ignore))
-  (meow-leader-define-key
-   ;; SPC j/k will run the original command in MOTION state.
-   '("j" . "H-j")
-   '("k" . "H-k")
-   ;; Use SPC (0-9) for digit arguments.
-   '("1" . meow-digit-argument)
-   '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument)
-   '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument)
-   '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument)
-   '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument)
-   '("0" . meow-digit-argument)
-   '("/" . meow-keypad-describe-key)
-   '("?" . meow-cheatsheet))
-  (meow-normal-define-key
-   '("0" . meow-expand-0)
-   '("9" . meow-expand-9)
-   '("8" . meow-expand-8)
-   '("7" . meow-expand-7)
-   '("6" . meow-expand-6)
-   '("5" . meow-expand-5)
-   '("4" . meow-expand-4)
-   '("3" . meow-expand-3)
-   '("2" . meow-expand-2)
-   '("1" . meow-expand-1)
-   '("-" . negative-argument)
-   '(";" . meow-reverse)
-   '("," . meow-inner-of-thing)
-   '("." . meow-bounds-of-thing)
-   '("[" . meow-beginning-of-thing)
-   '("]" . meow-end-of-thing)
-   '("a" . meow-append)
-   '("A" . meow-open-below)
-   '("b" . meow-back-word)
-   '("B" . meow-back-symbol)
-   '("c" . meow-change)
-   '("d" . meow-delete)
-   '("D" . meow-backward-delete)
-   '("e" . meow-next-word)
-   '("E" . meow-next-symbol)
-   '("f" . meow-find)
-   '("g" . meow-cancel-selection)
-   '("G" . meow-grab)
-   '("h" . meow-left)
-   '("H" . meow-left-expand)
-   '("i" . meow-insert)
-   '("I" . meow-open-above)
-   '("j" . meow-next)
-   '("J" . meow-next-expand)
-   '("k" . meow-prev)
-   '("K" . meow-prev-expand)
-   '("l" . meow-right)
-   '("L" . meow-right-expand)
-   '("m" . meow-join)
-   '("n" . meow-search)
-   '("o" . meow-block)
-   '("O" . meow-to-block)
-   '("p" . meow-yank)
-   '("q" . meow-quit)
-   '("Q" . meow-goto-line)
-   '("r" . meow-replace)
-   '("R" . meow-swap-grab)
-   '("s" . meow-kill)
-   '("t" . meow-till)
-   '("u" . meow-undo)
-   '("U" . meow-undo-in-selection)
-   '("v" . meow-visit)
-   '("w" . meow-mark-word)
-   '("W" . meow-mark-symbol)
-   '("x" . meow-line)
-   '("X" . meow-goto-line)
-   '("y" . meow-save)
-   '("Y" . meow-sync-grab)
-   '("z" . meow-pop-selection)
-   '("'" . repeat)
-   '("<escape>" . ignore)))
-
+  (defun meow-setup ()
+    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+    (meow-motion-define-key '("j" . next-line))
+    (meow-motion-overwrite-define-key
+     '("j" . meow-next)
+     '("k" . meow-prev)
+     '("<escape>" . ignore))
+    (meow-leader-define-key
+     ;; SPC j/k will run the original command in MOTION state.
+     '("j" . "H-j")
+     '("k" . "H-k")
+     ;; Use SPC (0-9) for digit arguments.
+     '("1" . meow-digit-argument)
+     '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument)
+     '("4" . meow-digit-argument)
+     '("5" . meow-digit-argument)
+     '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument)
+     '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument)
+     '("0" . meow-digit-argument)
+     '("/" . meow-keypad-describe-key)
+     '("?" . meow-cheatsheet))
+    (meow-normal-define-key
+     '("0" . meow-expand-0)
+     '("9" . meow-expand-9)
+     '("8" . meow-expand-8)
+     '("7" . meow-expand-7)
+     '("6" . meow-expand-6)
+     '("5" . meow-expand-5)
+     '("4" . meow-expand-4)
+     '("3" . meow-expand-3)
+     '("2" . meow-expand-2)
+     '("1" . meow-expand-1)
+     '("-" . negative-argument)
+     '(";" . meow-reverse)
+     '("," . meow-inner-of-thing)
+     '("." . meow-bounds-of-thing)
+     '("[" . meow-beginning-of-thing)
+     '("]" . meow-end-of-thing)
+     '("a" . meow-append)
+     '("A" . meow-open-below)
+     '("b" . meow-back-word)
+     '("B" . meow-back-symbol)
+     '("c" . meow-change)
+     '("d" . meow-delete)
+     '("D" . meow-backward-delete)
+     '("e" . meow-next-word)
+     '("E" . meow-next-symbol)
+     '("f" . meow-find)
+     '("g" . meow-cancel-selection)
+     '("G" . meow-grab)
+     '("h" . meow-left)
+     '("H" . meow-left-expand)
+     '("i" . meow-insert)
+     '("I" . meow-open-above)
+     '("j" . meow-next)
+     '("J" . meow-next-expand)
+     '("k" . meow-prev)
+     '("K" . meow-prev-expand)
+     '("l" . meow-right)
+     '("L" . meow-right-expand)
+     '("m" . meow-join)
+     '("n" . meow-search)
+     '("o" . meow-block)
+     '("O" . meow-to-block)
+     '("p" . meow-yank)
+     '("q" . meow-quit)
+     '("Q" . meow-goto-line)
+     '("r" . meow-replace)
+     '("R" . meow-swap-grab)
+     '("s" . meow-kill)
+     '("t" . meow-till)
+     '("u" . meow-undo)
+     '("U" . meow-undo-in-selection)
+     '("v" . meow-visit)
+     '("w" . meow-mark-word)
+     '("W" . meow-mark-symbol)
+     '("x" . meow-line)
+     '("X" . meow-goto-line)
+     '("y" . meow-save)
+     '("Y" . meow-sync-grab)
+     '("z" . meow-pop-selection)
+     '("'" . repeat)
+     ))
 (require 'meow)
-(meow-setup)
-(meow-global-mode 1)
+  (meow-setup)
+  (meow-global-mode 1)
+  ;; disable meow mode in magit-mode
+  (defun my/no-meow-in-term ()
+    (when (derived-mode-p 'magit-mode)
+      (meow-mode -1)))
+  (add-hook 'after-change-major-mode-hook 'my/no-meow-in-term)
+
+  ;; example: create a new keyboard layout - state
+  (setq meow-reading-keymap (make-keymap))
+  (meow-define-state reading
+    "meow state for interacting with smartparens"
+    :lighter " [📖]"
+    :keymap meow-reading-keymap)
+
+  ;; meow-define-state creates the variable
+  (setq meow-cursor-type-reading 'hollow)
+
+  (meow-define-keys 'reading
+    '("<escape>" . meow-normal-mode)
+    '("d" . bing-dict-brief)
+    '("c" . +anki-helper-capture-cloze-card)
+    '("u" . meow-undo))
+
+  
 
 
-(use-package browse-url
-  :ensure nil
-  :defines dired-mode-map
-  :bind (("C-c C-z ." . browse-url-at-point)
-         ("C-c C-z b" . browse-url-of-buffer)
-         ("C-c C-z r" . browse-url-of-region)
-         ("C-c C-z u" . browse-url)
-         ("C-c C-z e" . browse-url-emacs)
-         ("C-c C-z v" . browse-url-of-file))
-  :init
-  (with-eval-after-load 'dired
-    (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
 
-;; Click to browse URL or to send to e-mail address
-(use-package goto-addr
-  :ensure nil
-  :hook ((text-mode . goto-address-mode)
-         (prog-mode . goto-address-prog-mode)
-         (org-mode . goto-address-mode)))
+  (use-package browse-url
+    :ensure nil
+    :defines dired-mode-map
+    :bind (("C-c C-z ." . browse-url-at-point)
+           ("C-c C-z b" . browse-url-of-buffer)
+           ("C-c C-z r" . browse-url-of-region)
+           ("C-c C-z u" . browse-url)
+           ("C-c C-z e" . browse-url-emacs)
+           ("C-c C-z v" . browse-url-of-file))
+    :init
+    (with-eval-after-load 'dired
+      (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
+
+  ;; Click to browse URL or to send to e-mail address
+  (use-package goto-addr
+    :ensure nil
+    :hook ((text-mode . goto-address-mode)
+           (prog-mode . goto-address-prog-mode)
+           (org-mode . goto-address-mode)))
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
@@ -254,8 +290,8 @@
    (meow-insert-exit . (lambda() (set-input-method nil))))
   :bind
   (:map rime-mode-map
-   ;; ("C-j" . rime-inline-ascii)
-   ("C-~" . 'rime-send-keybinding)
+   ("C-j" . rime-inline-ascii)
+   ("C-`" . 'rime-send-keybinding)
    ("C-l" . rime-force-enable))
   :custom
   ;; 默认值
@@ -267,7 +303,7 @@
   (rime-posframe-properties 
    (list :background-color "#333333"
          :foreground-color "#dcdccc"
-         :internal-border-width 0))
+         :internal-border-width 1))
   (rime-disable-predicates
    '(rime-predicate-prog-in-code-p
 
@@ -300,10 +336,13 @@
      rime-predicate-current-uppercase-letter-p))
 
   (rime-user-data-dir "~/.emacs.d/rime/")
-  (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+  (when *IS-MAC*
+    (rime-librime-root "~/.emacs.d/librime/dist")
+    (rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include/")
+    )
 
-  (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
+
+  ;; (rime-inline-ascii-trigger 'shift-l);; keycode for communicating with rime config,not for users.
 
   :init
   (defun my/rime-predicate-punctuation-next-char-is-paired-p ()
@@ -338,24 +377,7 @@
   (interactive)
   (find-file "~/.emacs.d/init.el")
   (eval-buffer))
-
-(defun open-tools-file()
-  (interactive)
-  (find-file "~/.emacs.d/customizations/tools.el"))
-
-(defun open-task-org-file()
-  (interactive)
-  (find-file "~/Dropbox/org/Task.org"))
-
-(defun open-org-file()
-  (interactive)
-  (find-file "~/.emacs.d/lisp/init-org.el"))
-
 (global-set-key (kbd "<f1>") 'open-init-file-and-eval)
-(global-set-key (kbd "<f10>") 'open-task-org-file)
-(global-set-key (kbd "<f9>") 'open-tools-file)
-(global-set-key (kbd "<f5>") 'open-org-file)
-
 
 (use-package clipetty
   :ensure t
@@ -377,43 +399,34 @@
 
 (define-key global-map (kbd "C-g") #'keyboard-quit-dwim)
 
-;;design a transient key binding
-(use-package hydra
-  :defer t)
-;;use the macro defhydra to define the hydra and its heads
-(defhydra hydra-text-scale (global-map "<f12>")
-  "scale text"
-  ("j" move-line-up "up")
-  ("k" move-line-down "down")
-  ("f" nil "finished" :exit t))
-;; hercules arrives with any other key binding
-;; Flexible text folding
+
+
 (use-package hideshow
   :ensure nil
   :diminish hs-minor-mode
-  ;; :pretty-hydra
-  ;; ((:title (pretty-hydra-title "HideShow" 'octicon "nf-oct-fold")
-  ;;   :color amaranth :quit-key ("q" "C-g"))
-  ;;  ("Fold"
-  ;;   (("t" hs-toggle-all "toggle all")
-  ;;    ("a" hs-show-all "show all")
-  ;;    ("i" hs-hide-all "hide all")
-  ;;    ("g" hs-toggle-hiding "toggle hiding")
-  ;;    ("c" hs-cycle "cycle block")
-  ;;    ("s" hs-show-block "show block")
-  ;;    ("h" hs-hide-block "hide block")
-  ;;    ("l" hs-hide-level "hide level"))
-  ;;   "Move"
-  ;;   (("C-a" mwim-beginning-of-code-or-line "⭰")
-  ;;    ("C-e" mwim-end-of-code-or-line "⭲")
-  ;;    ("C-b" backward-char "←")
-  ;;    ("C-n" next-line "↓")
-  ;;    ("C-p" previous-line "↑")
-  ;;    ("C-f" forward-char "→")
-  ;;    ("C-v" pager-page-down "↘")
-  ;;    ("M-v" pager-page-up "↖")
-  ;;    ("M-<" beginning-of-buffer "⭶")
-  ;;    ("M->" end-of-buffer "⭸"))))
+  :pretty-hydra
+  ((:title (pretty-hydra-title "HideShow" 'octicon "nf-oct-fold")
+    :color amaranth :quit-key ("q" "C-g"))
+   ("Fold"
+    (("t" hs-toggle-all "toggle all")
+     ("a" hs-show-all "show all")
+     ("i" hs-hide-all "hide all")
+     ("g" hs-toggle-hiding "toggle hiding")
+     ("c" hs-cycle "cycle block")
+     ("s" hs-show-block "show block")
+     ("h" hs-hide-block "hide block")
+     ("l" hs-hide-level "hide level"))
+    "Move"
+    (("C-a" mwim-beginning-of-code-or-line "⭰")
+     ("C-e" mwim-end-of-code-or-line "⭲")
+     ("C-b" backward-char "←")
+     ("C-n" next-line "↓")
+     ("C-p" previous-line "↑")
+     ("C-f" forward-char "→")
+     ("C-v" pager-page-down "↘")
+     ("M-v" pager-page-up "↖")
+     ("M-<" beginning-of-buffer "⭶")
+     ("M->" end-of-buffer "⭸"))))
   :bind (:map hs-minor-mode-map
          ("C-~" . hideshow-hydra/body)
          ("C-S-<escape>" . hideshow-hydra/body))
@@ -472,3 +485,5 @@
 
 
 (provide 'init-edit)
+
+;;; init-edit.el ends her

@@ -69,18 +69,18 @@
   ;; :config (global-colorful-mode) ; Enable it globally
   ...)
 
-(defun exec/lsp-mode-string()
-  (concat
-   (propertize " eglot "
-               'face '(:foreground "white" :background "brown"))
-   (propertize
-    (format (if (derived-mode-p 'eglot-mode)
-                " on  "" off "))
-    'face '(:foreground "white" :background "gray40"))))
+;; (defun exec/lsp-mode-string()
+;;   (concat
+;;    (propertize " eglot "
+;;                'face '(:foreground "white" :background "brown"))
+;;    (propertize
+;;     (format (if (derived-mode-p 'eglot-mode)
+;;                 " on  "" off "))
+;;     'face '(:foreground "white" :background "gray40"))))
 
-(add-to-list 'header-line-format '(:eval (exec/lsp-mode-string)) t)
+;; (add-to-list 'header-line-format '(:eval (exec/lsp-mode-string)) t)
 
-(setq-default header-line-format  '("" keycast-header-line (:eval (exec/lsp-mode-string))))
+;; (setq-default header-line-format  '("" keycast-header-line (:eval (exec/lsp-mode-string))))
 
 
 (provide 'init-highlight)

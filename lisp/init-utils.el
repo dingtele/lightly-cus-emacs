@@ -28,5 +28,11 @@
             (when (executable-find "afplay")
               (start-process "pomidor-play-sound" nil "afplay" file))))))
 
+(use-package pomo-cat
+  :defer nil
+  :vc (:url "https://github.com/kn66/pomo-cat.el"
+       :rev :newest)
+  :config
+  (setq pomo-cat-cat-image-path "~/Pictures/cat.png"))
 
 (provide 'init-utils)

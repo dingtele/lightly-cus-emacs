@@ -1,39 +1,41 @@
+;;; init-dict.el --- summary -*- lexical-binding: t -*-
 
-(use-package go-translate
-  ;; (setq gt-langs '(en fr))
-  :custom  
-  (gt-preset-translators
-   `((ts-1 . ,(gt-translator
-               :taker (gt-taker :langs '(en zh) :text 'buffer)
-               :engines (list (gt-google-engine))
-               ;; :render (gt-overlay-render)
-               ;; :render (gt-buffer-render)
-               :render (gt-overlay-render :type 'help-echo)
-               ;; :render (gt-insert-render)
-               )))))
+;; Author: madcomet
+
+;;; Commentary:
+
+;;; Code:
+
+
+(use-package gt
+  :commands gt-translate
+  :config
+  (setq gt-default-translator
+        (gt-translator
+         :taker (gt-taker :langs '(en zh) :text 'paragraph :pick 'paragraph)
+         :engines (list (gt-google-engine))
+         :render (gt-overlay-render)))
+  ;; :custom
+  ;; (gt-preset-translators
+  ;;  `((ts-1 . ,(gt-translator
+  ;;              :taker (gt-taker :langs '(en zh) :text 'buffer)
+  ;;              :engines (list (gt-google-engine))
+  ;;              :render (gt-overlay-render)
+  ;;              ;; :render (gt-buffer-render)
+  ;;              ;; :render (gt-overlay-render :type 'help-echo)
+  ;;              ;; :render (gt-insert-render)
+  ;;              ))))
+  )
 
 ;; bing-dict
-(use-package bing-dict :ensure t)
-(global-set-key (kbd "C-c d") 'bing-dict-brief)
-(setq bing-dict-vocabulary-save t)
-(setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org")
+(use-package bing-dict
+  :ensure t
+  :commands bing-dict-brief
+  :bind ("C-c d" . bing-dict-brief)
+  :custom
+  (setq bing-dict-vocabulary-save t)
+  (setq bing-dict-vocabulary-file "~/Dropbox/vocabulary.org"))
 
-(defun capture-sentence-at-point ()
-  "Capture the sentence where the word at point is located."
-  (interactive)
-  (let* ((word (thing-at-point 'word))  ; Get the word at point
-         (sentence (save-excursion
-                     (let ((sentence-start (progn
-                                             (backward-sentence)  ; Move to the beginning of the sentence
-                                             (point)))
-                           (sentence-end (progn
-                                           (forward-sentence)  ; Move to the end of the sentence
-                                           (point))))
-                       (message "000-sentence-start: %s\n111-sentence-end: %s\n" sentence-start sentence-end)
-                       (buffer-substring-no-properties sentence-start sentence-end)))))  ; Get the sentence text
-    (if word
-        (message "The word is: %s\nThe sentence is: %s" word sentence)
-      (message "No word found at point."))))
 
 ;; google-translate
 (use-package google-translate
@@ -44,14 +46,18 @@
   )
 
 
-
-
 (use-package anki-helper
-  :vc (:url "https://github.com/Elilif/emacs-anki-helper" :rev :newest)
+  ;; :vc (:url "https://github.com/Elilif/emacs-anki-helper" :rev :newest)
+  :load-path "~/.emacs.d/site-lisp/anki-helper.el"
+  :defer nil
+  :commands +anki-helper-capture-cloze-card
   :custom
   (anki-helper-cloze-use-emphasis 'bold)
   (anki-helper-default-note-type "Cloze")
-  (anki-helper-default-deck "saladict"))
+  (anki-helper-default-deck "saladict")
+  :config
+  (bind-key "C-c c c" '+anki-helper-capture-cloze-card)
+  )
 
 ;; A multi dictionaries interface
 (use-package fanyi
@@ -73,3 +79,5 @@
 ;;       immersive-translate-chatgpt-host "api.deepseek.com")
 
 (provide 'init-dict)
+
+;;; init-dict.el ends here

@@ -1,4 +1,9 @@
-(when *IS-MAC*
+;;; init-base.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
+(when (eq *IS-MAC* t)
   ;; modify meta from ⌥ to ⌘
   (custom-set-variables
    '(mac-command-modifier 'meta)
@@ -30,6 +35,31 @@
     :init
     (when *IS-LINUX*
       (setq transwin-parameter-alpha 'alpha-background))))
+
+
+;; Child frame
+(use-package posframe
+  :hook (after-load-theme . posframe-delete-all)
+  :init
+  (defface posframe-border
+    `((t (:inherit region)))
+    "Face used by the `posframe' border."
+    :group 'posframe)
+  (defvar posframe-border-width 1
+    "Default posframe border width.")
+  :config
+  (with-no-warnings
+    (defun my-posframe--prettify-frame (&rest _)
+      (set-face-background 'fringe nil posframe--frame))
+    (advice-add #'posframe--create-posframe :after #'my-posframe--prettify-frame)
+
+    (defun posframe-poshandler-frame-center-near-bottom (info)
+      (cons (/ (- (plist-get info :parent-frame-width)
+                  (plist-get info :posframe-width))
+               2)
+            (/ (+ (plist-get info :parent-frame-height)
+                  (* 2 (plist-get info :font-height)))
+               2)))))
 
 ;; PERF
 ;; Garbage Collector Magic Hack
@@ -66,3 +96,4 @@
                         (message "cancelled."))))
 
 (provide 'init-base)
+;;; init-base.el ends here

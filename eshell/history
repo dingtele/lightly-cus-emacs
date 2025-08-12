@@ -16,3 +16,4 @@ dnf install chromium
 chromium
 cd ~/00-mli-codeBase/genesis-root/install/ 
 emacs install.sh 
+python3 -m pdb convert-to-org.py

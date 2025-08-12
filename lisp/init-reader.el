@@ -1,5 +1,5 @@
 (use-package org-zettel-ref-mode
-  :ensure nil
+  :ensure t
   :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
   ;; :load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode/"
   :init
@@ -29,12 +29,18 @@
                                        :extend t)
                                 :name "success"
                                 :prefix "✅")))))
-  (define-key org-zettel-ref-minor-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
-  (define-key org-zettel-ref-minor-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
+  (define-key org-zettel-ref-mode-map (kbd "C-c q") 'org-zettel-ref-add-quick-note)
+  (define-key org-zettel-ref-mode-map (kbd "C-c p") 'org-zettel-ref-quick-markup)
   )
 
+(use-package mindstream
+  :custom
+  (mindstream-path "/home/madcomet/mindstream/anon")
+  :config
+  (mindstream-mode))
 
 (use-package zeft
+  :defer nil
   :vc (:url "https://github.com/casouri/zeft")
   :config
   (setq zeft-directory "~/Dropbox/Notes"))
@@ -70,34 +76,56 @@
 ;; 	    :make "all"))  
 
 
-;;epub reading
 (use-package eww
   :hook (eww-mode . my-nov-font-setup))
 
+(use-package mixed-pitch
+  ;; :hook  (nov-mode .  mixed-pitch-mode)
+  )
+(use-package olivetti
+  :defer nil
+  :hook (nov-mode . olivetti-mode))
+
+ ;;;;;; set for reading mode
+;; (defun my-nov-font-setup ()
+;;   (interactive)
+;;   (face-remap-add-relative 'default
+;;                            :family "times new roman"
+;;                            :height 1.2)
+;;   (face-remap-add-relative 'variable-pitch
+;;                            :family "TsangerJinKai02"
+;;                            :height 1.4))
+;; (add-hook 'org-journal-mode-hook 'variable-pitch-mode)
+;; (add-hook 'org-mode #'my-nov-font-setup)
+;; (add-hook 'org-journal-mode-hook #'my-nov-font-setup)
+
+
+;;epub reading
 (use-package nov
-  :ensure t
-  :defer t
+  :defer nil
   :mode ("\\.epub\\'" . nov-mode)
   :bind (:map nov-mode-map
          ("j" . scroll-up-line)
-         ("k" . scroll-down-line)))
+         ("k" . scroll-down-line))
+  :hook (nov-mode . olivetti-mode)
+  :custom
+  (nov-text-width 100)
+  :init
+  ;; (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  ;; (visual-line-mode 1)
+  ;; (setq visual-fill-column-center-text t)
+  ;; (add-hook 'nov-mode-hook 'visual-line-mode)
+  ;; (add-hook 'nov-mode-hook 'visual-fill-column-mode)
 
-(add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-(setq nov-text-width 80)
-;; (setq nov-text-width t)
-(setq visual-fill-column-center-text t)
-(add-hook 'nov-mode-hook 'visual-line-mode)
-(add-hook 'nov-mode-hook 'visual-fill-column-mode)
+  ;; (text-scale-set +1)
+  ) 
 
-(add-hook 'nov-mode-hook 'my-nov-font-setup)
+;; (add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-;;Nov-rendering
-(add-to-list 'load-path "~/.emacs.d/elpa/justify-kp/")
-(require 'justify-kp)
+;;Nov-rendering 
 (use-package justify-kp
-  :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) :defer t)
-
-(setq nov-text-width t)
+  :vc (:url "https://github.com/Fuco1/justify-kp" :rev latest-release) 
+  :defer nil)
 
 (defun my-nov-window-configuration-change-hook ()
   (my-nov-post-html-render-hook)
@@ -232,19 +260,19 @@ Returns default if no match."
            (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
            (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
            (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
-                   (title-width (- (frame-width)
-                         ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
-                         date-width elfeed-search-trailing-width))
-                   (title-column (elfeed-format-column
-                        title (elfeed-clamp
-                               elfeed-search-title-min-width
-                               title-width
-                               elfeed-search-title-max-width) :left))
+           (title-width (- (frame-width)
+                           ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
+                           date-width elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width) :left))
 
-                   ;; Title/Feed ALIGNMENT
-                   (align-to-feed-pixel (+ date-width
-                                 (max elfeed-search-title-min-width
-                                      (min title-width elfeed-search-title-max-width)))))
+           ;; Title/Feed ALIGNMENT
+           (align-to-feed-pixel (+ date-width
+                                   (max elfeed-search-title-min-width
+                                        (min title-width elfeed-search-title-max-width)))))
       (insert (propertize date 'face 'elfeed-search-date-face) " ")
       (insert (propertize title-column 'face title-faces 'kbd-help title))
       (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))

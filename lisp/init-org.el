@@ -1,5 +1,14 @@
+;;; init-org.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
+
+
 (use-package org
-  :ensure t  :ensure org-contrib
+  :ensure t
+  :ensure org-contrib
+  :ensure valign
   :mode ("\\.org\\'" . org-mode)
   :init
   
@@ -28,7 +37,7 @@
    ;;                                  'zz/org-babel-tangle-current-buffer-async
    ;;                                  'run-at-end 'only-in-org-mode)))
    (org-babel-after-execute . org-redisplay-inline-images)
-;;   (org-mode . (lambda ()  (set-font "avenir next" "TsangerJinKai02 W04" '(14 . 16))))
+   ;;   (org-mode . (lambda ()  (set-font "avenir next" "TsangerJinKai02 W04" '(14 . 16))))
    )
   ;; :diminish visual-line-mode
   ;; :diminish org-indent-mode
@@ -346,15 +355,15 @@
   )
 ;; NTC org ends
 ;;config babel languages
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)
-     (shell . t)
-     (rust . t))
-   )
-  (push '("conf-unix" . conf-unix) org-src-lang-modes)) ;;TODO what is this?
+;; (with-eval-after-load 'org
+;;   (org-babel-do-load-languages
+;;    'org-babel-load-languages
+;;    '((emacs-lisp . t)
+;;      (python . t)
+;;      (shell . t)
+;;      (rust . t))
+;;    )
+;;   (push '("conf-unix" . conf-unix) org-src-lang-modes)) ;;TODO what is this?
 
 ;; (use-package org-bullets
 ;;   :after org
@@ -725,9 +734,9 @@
   )
 
 ;; (use-package org-supertag
-;;   :defer t
+;;   :defer nil
 ;;   :after org-mode
-;;   :vc (:url "https://github.com/yibie/org-supertag" :rev :newest)
+;;   :vc (:url "https://github.com/yibie/org-supertag.git" :rev :newest)
 ;;   :hook
 ;;   (after-init . org-supertag-config))
 

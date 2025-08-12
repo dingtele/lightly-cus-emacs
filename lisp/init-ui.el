@@ -23,10 +23,10 @@
 
 ;; (set-frame-parameter (selected-frame) 'alpha frame-transparency)
 ;; (add-to-list 'default-frame-alist `(alpha . ,frame-transparency))
-;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . dark))
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
 (add-hook 'server-after-make-frame-hook
           (lambda ()
             (if (display-graphic-p)
@@ -35,7 +35,7 @@
 
 
 ;; hide the frame title
-;; (add-to-list 'default-frame-alist '(undecorated . t))
+(add-to-list 'default-frame-alist '(undecorated . t))
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -54,7 +54,7 @@
 (require 'visual-fill-column)
 (add-hook 'visual-line-mode-hook #'visual-fill-column-mode)
 (setq-default visual-fill-column-center-text t)
-(setq-default visual-fill-column-width 120)
+(setq-default visual-fill-column-width 150)
 
 
 ;; Easily adjust the font size in all frames
@@ -249,21 +249,11 @@
       nil
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
-(defvar zh-font-list '("TsangerJinKai02 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
-(defvar en-font-list '("Iosevka Fixed SS14" "JetBrains Maple Mono" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
+(defvar zh-font-list '("TsangerJinKai05 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
+(defvar en-font-list '("PragmataPro Mono" "LXGW Bright code GB" "Iosevka Fixed SS14" "JetBrains Maple Mono" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 (defvar font-size
-  (cond (*IS-LINUX* 12)
+  (cond (*IS-LINUX* 14)
         (*IS-MAC* 18)))
-
-;; (defun +set-fonts (en-font)
- ;;  (interactive
- ;;   (list
- ;;    (intern
- ;;     (completing-read "Select english font: "
- ;;                      (mapcar #'car en-font-list)))))
- ;;  ;; Set option
- ;;   (set-face-attribute 'default nil :font en-font))
-
 
 (defun ding-make-font-string (font-name font-size)
   (if (and (stringp font-size)
@@ -275,7 +265,7 @@
                       english-font-size
                       chinese-fonts
                       &optional chinese-font-scale)
-
+  
   (setq chinese-font-scale (or chinese-font-scale 1))
   (setq face-font-rescale-alist
         (cl-loop for x in zh-font-list
@@ -297,23 +287,9 @@
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))))
 
-
     ;;;;;;  set fonts HERE!!! ;;;;;;
-(ding-set-font en-font-list 16 zh-font-list 16)
+(ding-set-font en-font-list 12 zh-font-list 16)
 (add-to-list 'face-font-rescale-alist '("Apple Color Emoji" . 0.8))
-
-    ;;;;;; set for reading mode ;;;;;;
-(defun my-nov-font-setup ()
-  (interactive)
-  (face-remap-add-relative 'default
-                           :family "times new roman"
-                           :height 1.2)
-  (face-remap-add-relative 'variable-pitch
-                           :family "TsangerJinKai02"
-                           :height 1.4))
-(add-hook 'org-journal-mode-hook 'variable-pitch-mode)
-(add-hook 'org-mode #'my-nov-font-setup)
-(add-hook 'org-journal-mode-hook #'my-nov-font-setup)
 
 (use-package dimmer
   :ensure t
