@@ -1,3 +1,9 @@
+;;; init-reader.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
+
 (use-package org-zettel-ref-mode
   :ensure t
   :vc (:url "https://github.com/yibie/org-zettel-ref-mode" :rev :newest)
@@ -35,7 +41,7 @@
 
 (use-package mindstream
   :custom
-  (mindstream-path "/home/madcomet/mindstream/anon")
+  (mindstream-path "~/.emacs.d/mindstream/anon")
   :config
   (mindstream-mode))
 
@@ -334,4 +340,16 @@ browser defined by `browse-url-generic-program'."
                 ;; ("Emacs Reddit" "https://www.reddit.com/r/emacs.rss")
                 )))
 
+(defun set-line-spacing-based-on-buffer-name ()
+  (interactive)
+  (let ((buffer-name (buffer-name))
+        (chinese-regex "[\u4e00-\u9fa5]")) ; Basic Chinese character range
+    (if (string-match chinese-regex buffer-name)
+        (setq-local line-spacing 0.7) ; Adjust as needed for Chinese
+      (setq-local line-spacing 0.3)))) ; Or your default for English
+
+(add-hook 'find-file-hook 'set-line-spacing-based-on-buffer-name)
+(add-hook 'after-change-major-mode-hook 'set-line-spacing-based-on-buffer-name) ; handle mode changes
+
 (provide 'init-reader)
+;;; init-reader.el ends here 

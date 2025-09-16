@@ -82,29 +82,27 @@ Otherwise the startup will be very slow."
  '(mouse-yank-at-point t)
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
- '(org-agenda-files
-   '("/Users/dingyu/Dropbox/org/2025.org"
-     "/Users/dingyu/Dropbox/Journals/2025-06.org"))
  '(package-archives
    '(("ts-gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
      ("ts-melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
  '(package-selected-packages
-   '(a ace-jump-mode aggressive-indent anki-helper auctex auto-compile
-       auto-complete auto-package-update auto-save beginend benchmark-init
-       bind-key bing-dict buffer-name-relative bufferlo bug-hunter cal-china-x
-       calibredb cape capf-autosuggest citeproc clipetty cljsbuild-mode
-       clojure-ts-mode colorful-mode command-log-mode company consult-eglot
-       consult-flyspell consult-yasnippet corfu counsel datetime
+   '(a ace-jump-mode aggressive-indent all-the-icons anki-helper auctex
+       auto-compile auto-complete auto-package-update auto-save beginend
+       benchmark-init bind-key bing-dict buffer-name-relative bufferlo
+       bug-hunter cal-china-x calibredb cape capf-autosuggest citeproc clipetty
+       cljsbuild-mode clojure-ts-mode colorful-mode command-log-mode company
+       consult-eglot consult-flyspell consult-yasnippet corfu counsel datetime
        default-text-scale deft devdocs diminish dimmer dired-git-info
-       dired-quick-sort dired-rsync diredfl docker docker-compose-mode doom
-       doom-modeline eask editorconfig ef-themes eglot-java ejc-sql eldoc-box
-       elein elfeed embark-consult eshell-syntax-highlighting esup
-       evil-nerd-commenter ewal-doom-themes exec-path-from-shell fanyi fd-dired
-       flx-ido flycheck-clojure flymake-popon gcmh ghub git-gutter
-       gnu-elpa-keyring-update go-translate goggles google-translate gptel-quick
-       groovy-mode gruvbox-theme haskell-mode helm-lsp helpful hideshow-org
-       hierarchy highlight-defined highlight-parentheses hl-todo ibuffer-project
-       ibuffer-projectile ibuffer-vc iedit imenu-anywhere immersive-translate
+       dired-quick-sort dired-rsync dired-sidebar diredfl docker
+       docker-compose-mode doom doom-modeline eask editorconfig ef-themes
+       eglot-java ejc-sql eldoc-box elein elfeed embark-consult
+       eshell-syntax-highlighting esup evil-nerd-commenter ewal-doom-themes
+       exec-path-from-shell fanyi fd-dired flx-ido flycheck-clojure
+       flymake-popon gcmh ghub git-gutter gnu-elpa-keyring-update go-translate
+       goggles google-translate gptel-quick groovy-mode gruvbox-theme
+       haskell-mode helm-lsp helpful hideshow-org hierarchy highlight-defined
+       highlight-parentheses hl-todo ibuffer-project ibuffer-projectile
+       ibuffer-sidebar ibuffer-vc iedit imenu-anywhere immersive-translate
        indent-bars ivy-prescient json-mode json-navigator justify-kp keycast
        lsp-ivy lsp-java lsp-ui macrostep major-mode-hydra marginalia mct memoize
        meow mindstream mixed-pitch mixed-pitch-mode nerd-icons-completion
@@ -115,16 +113,18 @@ Otherwise the startup will be very slow."
        org-roam-ui org-ros org-sidebar org-zettel-ref-mode origami overseer
        ox-hugo pangu-spacing paredit parent-mode pdf-tools persistent-scratch
        pinyinlib pomidor pomo-cat pomo-cats popon popper pos-tag-highlight
-       pretty-hydra pretty-symbols promise rainbow-delimiters
+       pretty-hydra pretty-symbols promise queue ragmacs rainbow-delimiters
        rainbow-identifiers reader region-occurrences-highlighter restclient rg
        rime s shackle shrface smooth-scrolling sort-tab spacemacs-theme
-       tabspaces tagedit telega toc-org transient-posframe transwin
+       superchat tabspaces tagedit telega toc-org transient-posframe transwin
        tree-sitter-langs treemacs-magit treemacs-nerd-icons treemacs-tab-bar
        treesit-auto treesit-fold ts-fold valign valign-mode vertico-posframe
        vundo workgroups2 writeroom-mode xterm-color yasnippet-capf
        yasnippet-snippets zeft zotxt))
  '(package-vc-selected-packages
-   '((pomo-cat :url "https://github.com/kn66/pomo-cat.el")
+   '((superchat :url "https://github.com/yibie/superchat")
+     (ragmacs :url "https://github.com/positron-solutions/ragmacs.git")
+     (pomo-cat :url "https://github.com/kn66/pomo-cat.el")
      (gptel-quick :url "https://github.com/karthink/gptel-quick")
      (justify-kp :url "https://github.com/Fuco1/justify-kp")
      (auto-save :url "https://github.com/manateelazycat/auto-save")
@@ -138,6 +138,8 @@ Otherwise the startup will be very slow."
      (lsp-brigde :url "https://github.com/manateelazycat/lsp-bridge")))
  '(read-buffer-completion-ignore-case t)
  '(read-file-name-completion-ignore-case t)
+ '(safe-local-variable-directories
+   '("/home/madcomet/codebase/+project/clojure-playground/caveman-clojure/"))
  '(show-trailing-whitespace nil)
  '(use-package-always-defer t)
  '(use-package-always-ensure t)
@@ -238,11 +240,13 @@ This issue has been addressed in 28."
 ;;                        "~/.emacs.d/customizations/tools.el")
 
 
-;; (setq gc-cons-threshold (* 2 1000 1000))
+
 
 
 ;; Customize
 (add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/")
+
 
 (require 'init-package)
 (require 'init-core-overriding)
@@ -265,7 +269,6 @@ This issue has been addressed in 28."
 (require 'init-workspace)
 (require 'init-window)
 ;; (require 'init-treemacs)
-
 (require 'init-eshell)
 ;; (require 'init-shell)
 
@@ -273,6 +276,7 @@ This issue has been addressed in 28."
 (require 'init-org)
 (require 'init-reader)
 
+(require 'init-social)
 (require 'init-ai)
 (require 'init-dict)
 ;; (require 'init-docker)
@@ -291,8 +295,11 @@ This issue has been addressed in 28."
 (require 'init-elisp)
 (require 'init-python)
 
+
+
 (load "~/.emacs.d/var/customizations/tools.el")
 
+(setq gc-cons-threshold (* 2 1000 1000))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

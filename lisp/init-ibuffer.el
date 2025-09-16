@@ -1,3 +1,9 @@
+;;; init-ibuffer.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
+
 (use-package ibuffer
   :ensure nil
   :bind ("C-x C-b" . ibuffer)
@@ -54,6 +60,13 @@
                 " "
                 project-relative-file))))
 
+(use-package ibuffer-sidebar
+  ;; :load-path "~/.emacs.d/fork/ibuffer-sidebar"
+  :ensure t
+  :commands (ibuffer-sidebar-toggle-sidebar)
+  :config
+  (setq ibuffer-sidebar-use-custom-font t)
+  (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
 
 ;; (use-package buffer-name-relative-mode
 ;;   :ensure t
@@ -62,19 +75,5 @@
 ;;   :config
 ;;   (setq buffer-name-relative-prefix '("" . "/")))
 
-;; (use-package ibuffer-sidebar
-;;   :load-path "~/.emacs.d/fork/ibuffer-sidebar"
-;;   :ensure nil
-;;   :commands (ibuffer-sidebar-toggle-sidebar)
-;;   :config
-;;   (setq ibuffer-sidebar-use-custom-font t)
-;;   (setq ibuffer-sidebar-face `(:family "Helvetica" :height 140)))
-
-;; (defun +sidebar-toggle ()
-;;   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
-;;   (interactive)
-;;   (dired-sidebar-toggle-sidebar)
-;;   (ibuffer-sidebar-toggle-sidebar))
-
-
 (provide 'init-ibuffer)
+;;; init-ibuffer.el ends here

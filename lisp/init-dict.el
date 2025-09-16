@@ -67,7 +67,12 @@
   ;;        ("C-c d h" . fanyi-from-history))
   )
 
-
+(use-package org-anki
+  :load-path "~/.emacs.d/site-lisp/org-anki/"
+  :commands (org-anki-sync-entry org-anki-syn)
+  :bind ("C-c b" . org-anki-sync-entry)
+  :custom
+  (org-anki-default-deck "Saladict"))
 
 ;; (use-package immersive-translate
 ;;   :ensure t

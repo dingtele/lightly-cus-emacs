@@ -1,7 +1,12 @@
+;;; init-highlight.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
 
 (use-package hl-todo
   :ensure t
-  :defer t
+  :defer nil
   :config
   (setq hl-todo-keyword-faces
         '(("TODO"   . "#FF0000")
@@ -84,3 +89,4 @@
 
 
 (provide 'init-highlight)
+;;; init-highlight.el ends here

@@ -28,7 +28,8 @@
   (add-to-list 'eglot-server-programs '(clojure-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-mode . ("clojure-lsp")))
   (add-to-list 'eglot-server-programs '(clojure-ts-clojurescript-mode . ("clojure-lsp")))
-
+  (add-to-list 'eglot-server-programs '(yaml-mode . ("yaml-language-server" "--stdio")))
+  
   (defun my/eglot-capf ()
     "Set custom completion-at-point functions for Eglot."
     (setq-local completion-at-point-functions '(eglot-completion-at-point)))

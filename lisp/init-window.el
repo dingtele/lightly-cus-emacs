@@ -1,3 +1,8 @@
+;;; init-window.el --- summary -*- lexical-binding: t -*-
+
+;; Author: madcomet
+;;; Code:
+
 (use-package shackle
   :ensure t
   :defer nil
@@ -19,8 +24,8 @@
      (helpful-mode                  :select t                                      :align right)
      ("*Completions*"                                                  :size 0.3  :align t    )
      ("*Messages*"                  :select nil :inhibit-window-quit nil :align below :size 0.3)
-     ("\\*[Wo]*Man.*\\*"  :regexp t :select t   :inhibit-window-quit t :other t               )
-     ("\\*poporg.*\\*"    :regexp t :select t                          :other t               )
+     ("\\*[Wo]*Man.*\\*"  :regexp t :select t   :inhibit-window-quit t :other t               ) ;TODO ?
+     ("\\*poporg.*\\*"    :regexp t :select t                          :other t               ) ;TODO ?
      ("*Calendar*"                  :select t                          :size 0.3  )
      ("*info*"                      :select t   :inhibit-window-quit t  :same t)
      (magit-status-mode             :select t   :inhibit-window-quit t :same t)
@@ -30,7 +35,7 @@
      ("*Packages*" :select t :same t)
      (pdf-outline-buffer-mode :select t :align 'below)
      ("*eshell*" :select t :align below :size 0.3 :popup t)
-     ("*Gemini*" :select t :align right :size 0.4 :popup t)
+     ("*Gemini*" :select t  :inhibit-window-quit t  :same t :align right :size 0.4)
      ;; (treemacs-mode                 :select t :inhibit-window-quit t :align left :size 0.4 :popup t)
      ))
   :hook
@@ -83,4 +88,10 @@
   )
 
 
+
+
+
+
+
 (provide 'init-window)
+;;; name.el ends here

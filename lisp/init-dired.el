@@ -47,7 +47,8 @@
 
   ;; Shows icons
   (use-package nerd-icons-dired
-    :diminish
+    :diminish    
+    :commands (nerd-icons-dired-mode)
     :custom-face
     (nerd-icons-dired-dir-face ((t (:inherit nerd-icons-dsilver :foreground unspecified))))
     :hook (dired-mode . nerd-icons-dired-mode)
@@ -61,6 +62,30 @@
         (overlay-put ov 'after-string
                      (propertize "_" 'display string))))
     (advice-add #'nerd-icons-dired--add-overlay :override #'my-nerd-icons-dired--add-overlay))
+
+  (use-package dired-sidebar
+    :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+    :ensure t
+    :commands (dired-sidebar-toggle-sidebar)
+    :init
+    (add-hook 'dired-sidebar-mode-hook
+              (lambda ()
+                (unless (file-remote-p default-directory)
+                  (auto-revert-mode))))
+    :config
+    (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+    (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+
+    (setq dired-sidebar-subtree-line-prefix "__")
+    (setq dired-sidebar-theme 'nerd-icons)
+    (setq dired-sidebar-use-term-integration t)
+    (setq dired-sidebar-use-custom-font t))
+
+  (defun +sidebar-toggle ()
+    "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
+    (interactive)
+    (dired-sidebar-toggle-sidebar)
+    (ibuffer-sidebar-toggle-sidebar))
 
   ;; Extra Dired functionality
   (use-package dired-aux :ensure nil)

@@ -35,4 +35,12 @@
   :config
   (setq pomo-cat-cat-image-path "~/Pictures/cat.png"))
 
+;; Search tools
+;; Writable `grep' buffer
+(use-package wgrep
+  :defer nil
+  :init
+  (setq wgrep-auto-save-buffer t
+        wgrep-change-readonly-file t))
+
 (provide 'init-utils)

@@ -12,10 +12,15 @@
 ;;modeline 上显示我的所有的按键和执行的命令
 (require 'keycast)
 (keycast-header-line-mode t)
-
-                                        ;(setq-default cursor-type '(bar . 5))
 (column-number-mode)
-(global-display-line-numbers-mode t)
+
+;; Show line numbers
+(use-package display-line-numbers
+  :ensure nil
+  :hook ((prog-mode messages-buffer-mode backtrace-mode conf-mode toml-ts-mode
+                    yaml-mode yaml-ts-mode)
+         . display-line-numbers-mode)
+  :init (setq display-line-numbers-width-start t))
 
 ;; Set frame transparency
 ;; Make frame transparency overridable
@@ -45,7 +50,7 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(scroll-bar-mode -1)        ; Disable visible scrollbar
+(scroll-bar-mode 1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 ;; (set-fringe-mode 2)        ; Give some breathing room
@@ -249,7 +254,7 @@
       nil
     t))
 ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
-(defvar zh-font-list '("TsangerJinKai05 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
+(defvar zh-font-list '("AI Kai" "TsangerJinKai04 W04" "LXGW Bright GB" "LXGW Bright Medium" "HanaMinB"))
 (defvar en-font-list '("PragmataPro Mono" "LXGW Bright code GB" "Iosevka Fixed SS14" "JetBrains Maple Mono" "JetBrains Mono" "Fira Code" "IBM Plex Mono"))
 (defvar font-size
   (cond (*IS-LINUX* 14)

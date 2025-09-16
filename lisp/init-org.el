@@ -6,7 +6,6 @@
 
 
 (use-package org
-  :ensure t
   :ensure org-contrib
   :ensure valign
   :mode ("\\.org\\'" . org-mode)
@@ -28,20 +27,12 @@
   ((org-mode . visual-line-mode)
    (org-mode . my/org-prettify-symbols)
    ;; (org-mode . org-indent-mode)
+   ;; (org-mode . (lambda () (setq-local line-spacing 0.7)))  ;; 根据需要调整数值: english - 0.3; chinese - 0.7(ai kai)
    (org-mode . toc-org-mode)
    (org-mode . valign-mode)
    ;; (org-mode . variable-pitch-mode)
-   ;; (org-mode . my-nov-font-setup)
-   ;; (org-mode . (lambda () (add-hook 'after-save-hook 'org-babel-tangle :append :local)))
-   ;; (org-mode . (lambda () (add-hook 'after-save-hook
-   ;;                                  'zz/org-babel-tangle-current-buffer-async
-   ;;                                  'run-at-end 'only-in-org-mode)))
    (org-babel-after-execute . org-redisplay-inline-images)
-   ;;   (org-mode . (lambda ()  (set-font "avenir next" "TsangerJinKai02 W04" '(14 . 16))))
    )
-  ;; :diminish visual-line-mode
-  ;; :diminish org-indent-mode
-  ;; :defer t
   :bind
   (:map org-mode-map
    ("C-c l" . org-store-link)
@@ -57,17 +48,6 @@
   :commands (org-find-exact-headline-in-buffer
 	         org-set-tags) ;;TODO
   ;; :custom-face
-  ;; ;; 设置 Org mode 标题以及每级标题行的大小
-  ;; (org-document-title ((t (:height 1.75 :weight bold))))
-  ;; (org-level-1 ((t (:height 1.2 :weight bold))))
-  ;; (org-level-2 ((t (:height 1.15 :weight bold))))
-  ;; (org-level-3 ((t (:height 1.1 :weight bold))))
-  ;; (org-level-4 ((t (:height 1.05 :weight bold))))
-  ;; (org-level-5 ((t (:height 1.0 :weight bold))))
-  ;; (org-level-6 ((t (:height 1.0 :weight bold))))
-  ;; (org-level-7 ((t (:height 1.0 :weight bold))))
-  ;; (org-level-8 ((t (:height 1.0 :weight bold))))
-  ;; (org-level-9 ((t (:height 1.0 :weight bold))))
   ;; ;; 设置代码块用上下边线包裹
   ;; (org-block-begin-line ((t (:underline t :background unspecified))))
   ;; (org-block-end-line ((t (:overline t :underline nil :background unspecified))))
@@ -255,7 +235,7 @@
   ;; TOOD 的关键词设置，可以设置不同的组
   ;; 待办-暂停-进行中-稍后-完成-取消
   (org-todo-keywords '(
-                       (sequence "TODO(t)" "|" "DONE(d)")
+                       (sequence "TODO(t)" "|" "DONE(d)" "ABANDON(a)")
                        ))
   ;; Custom colors for the keywords
   (setq org-todo-keyword-faces
@@ -383,7 +363,6 @@
   ;; 标题行型号字符
   (setq org-modern-star ["◉" "○" "✸" "✳" "◈" "◇" "✿" "❀" "✜"])
   ;; 额外的行间距，0.1 表示 10%，1表示 1px
-  (setq-default line-spacing 0.1)
   ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
   (setq org-modern-label-border 1)
   ;; ;; 设置表格竖线宽度，默认为 3
@@ -623,17 +602,17 @@
                            ("tt" "Task" entry (file+headline "Task.org" "TO-DO Queque")
                             "** TODO %?   %^g"
                             :prepend t
-                            :jump-to-captured t)
-                           ("tp" "Weekly-emacs-plugin" entry (file+headline "Task.org" "Weekly-Emacs-Plugin")
+                            :jump-to-captured t)  
+                           ("tl" "Lab Tour (It's fun time!)" entry (file+headline "Task.org" "Lab Tour (It's fun time!)")
                             ;; "** TODO %?   %^g"
                             "%(fetch-weather-data)\n"
                             :prepend t
                             :jump-to-captured t)
-                           ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
-                            "* TODO %i%?"
-                            :empty-lines-after
-                            :jump-to-captured t
-                            :prepend t)
+                           ;; ("tc" "Class-Schedule" entry (file+headline "Task.org" "Class-Schedule")
+                           ;;  "* TODO %i%?"
+                           ;;  :empty-lines-after
+                           ;;  :jump-to-captured t
+                           ;;  :prepend t)
                            ("n" "Notes" entry (file+headline "Reading-Summary.org" "Notes")
                             "* %? %^g\n%i\n"
                             :empty-lines-after 1)
@@ -693,8 +672,99 @@
                               (tags . " %i %-12:c")
                               (search . " %i %-12:c")))
   (org-agenda-start-on-weekday nil)
-  (custom-set-variables '(org-agenda-files
-                          '("~/Dropbox/org/Task.org")))
+  (org-agenda-files '("~/Dropbox/org/Task.org"))
+  (org-agenda-sort-notime-is-late nil)
+  ;; 时间显示为两位数(9:30 -> 09:30)
+  (org-agenda-time-leading-zero t)
+  ;; 过滤掉 dynamic
+  (org-agenda-hide-tags-regexp (regexp-opt '("dynamic")))
+  (org-agenda-compact-blocks t)
+  (org-agenda-sticky t)
+  (org-agenda-start-on-weekday nil)
+  (org-agenda-span 'day)
+  (org-agenda-include-diary nil)
+  (org-agenda-current-time-string (concat "◀┈┈┈┈┈┈┈┈┈┈┈┈┈ ⏰"))
+  (org-agenda-sorting-strategy
+   '((agenda habit-down time-up user-defined-up effort-up category-keep)
+     (todo category-up effort-up)
+     (tags category-up effort-up)
+     (search category-up)))
+  (org-agenda-window-setup 'current-window)
+  (org-agenda-custom-commands
+   `(("N" "Notes" tags "NOTE"
+      ((org-agenda-overriding-header "Notes")
+       (org-tags-match-list-sublevels t)))
+     ("g" "GTD"
+      ((agenda "" nil)
+       (tags-todo "-inbox"
+                  ((org-agenda-overriding-header "Next Actions")
+                   (org-agenda-tags-todo-honor-ignore-options t)
+                   (org-agenda-todo-ignore-scheduled 'future)
+                   (org-agenda-skip-function
+                    (lambda ()
+                      (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
+                          (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy
+                    '(todo-state-down effort-up category-keep))))
+       (tags-todo "-reading/PROJECT"
+                  ((org-agenda-overriding-header "Project")
+                   (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       (tags-todo "+reading/PROJECT"
+                  ((org-agenda-overriding-header "Reading")
+                   (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       (tags-todo "/WAITING"
+                  ((org-agenda-overriding-header "Waiting")
+                   (org-agenda-tags-todo-honor-ignore-options t)
+                   (org-agenda-todo-ignore-scheduled 'future)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       (tags-todo "/DELEGATED"
+                  ((org-agenda-overriding-header "Delegated")
+                   (org-agenda-tags-todo-honor-ignore-options t)
+                   (org-agenda-todo-ignore-scheduled 'future)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       (tags-todo "-inbox"
+                  ((org-agenda-overriding-header "On Hold")
+                   (org-agenda-skip-function
+                    (lambda ()
+                      (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
+                          (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
+                   (org-tags-match-list-sublevels nil)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       ))
+     ("v" "Orphaned Tasks"
+      ((agenda "" nil)
+       (tags "inbox"
+             ((org-agenda-overriding-header "Inbox")
+              (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+              (org-tags-match-list-sublevels nil)))
+       (tags-todo "+book&-reading/PROJECT"
+                  ((org-agenda-overriding-header "Book Plan")
+                   (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))
+       (tags-todo "-inbox/-NEXT"
+                  ((org-agenda-overriding-header "Orphaned Tasks")
+                   (org-agenda-tags-todo-honor-ignore-options t)
+                   (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                   (org-agenda-todo-ignore-scheduled 'future)
+                   (org-agenda-skip-function
+                    (lambda ()
+                      (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
+                          (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy
+                    '(category-keep))))))))
   )
 
 ;; (require 'org-habit)
@@ -733,11 +803,11 @@
   ;; (require 'org-roam-protocol)
   )
 
-;; (use-package org-supertag
-;;   :defer nil
-;;   :after org-mode
-;;   :vc (:url "https://github.com/yibie/org-supertag.git" :rev :newest)
-;;   :hook
-;;   (after-init . org-supertag-config))
+(use-package org-supertag
+  :defer nil
+  :after org-mode
+  :load-path "~/.emacs.d/site-lisp/org-supertag/"
+  :hook
+  (after-init . org-supertag-config))
 
 (provide 'init-org)
