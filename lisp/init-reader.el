@@ -344,12 +344,13 @@ browser defined by `browse-url-generic-program'."
   (interactive)
   (let ((buffer-name (buffer-name))
         (chinese-regex "[\u4e00-\u9fa5]")) ; Basic Chinese character range
-    (if (string-match chinese-regex buffer-name)
-        (setq-local line-spacing 0.7) ; Adjust as needed for Chinese
-      (setq-local line-spacing 0.3)))) ; Or your default for English
+    (if (or (string-match chinese-regex buffer-name)
+            (not (derived-mode-p 'prog-mode 'minibuffer-mode)))
+        (setq-local line-spacing 0.7) ; for reading mode
+      (setq-local line-spacing 0.1)))) ; for prog-mode
 
-(add-hook 'find-file-hook 'set-line-spacing-based-on-buffer-name)
-(add-hook 'after-change-major-mode-hook 'set-line-spacing-based-on-buffer-name) ; handle mode changes
+;; (add-hook 'find-file-hook 'set-line-spacing-based-on-buffer-name)
+(add-hook 'after-change-major-mode-hook 'set-line-spacing-based-on-buffer-name)   ; handle mode changes
 
 (provide 'init-reader)
 ;;; init-reader.el ends here 

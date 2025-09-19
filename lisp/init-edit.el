@@ -233,6 +233,7 @@
     '("<escape>" . meow-normal-mode)
     '("d" . bing-dict-brief)
     '("c" . +anki-helper-capture-cloze-card)
+    '("g" . gt-translate)
     '("u" . meow-undo))
 
   

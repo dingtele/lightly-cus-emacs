@@ -335,15 +335,16 @@
   )
 ;; NTC org ends
 ;;config babel languages
-;; (with-eval-after-load 'org
-;;   (org-babel-do-load-languages
-;;    'org-babel-load-languages
-;;    '((emacs-lisp . t)
-;;      (python . t)
-;;      (shell . t)
-;;      (rust . t))
-;;    )
-;;   (push '("conf-unix" . conf-unix) org-src-lang-modes)) ;;TODO what is this?
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (shell . t)
+     (rust . t)
+     (clojure .t))
+   )
+  (push '("conf-unix" . conf-unix) org-src-lang-modes)) ;;TODO what is this?
 
 ;; (use-package org-bullets
 ;;   :after org
