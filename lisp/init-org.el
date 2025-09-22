@@ -811,4 +811,6 @@
   :hook
   (after-init . org-supertag-config))
 
+(use-package org-noter)
+
 (provide 'init-org)

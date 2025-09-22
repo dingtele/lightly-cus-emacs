@@ -157,9 +157,36 @@
 
 (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
 
-(require 'pdf-tools)
-(pdf-tools-install)  ; Standard activation command
-(pdf-loader-install) ; On demand loading, leads to faster startup time
+
+;; PDF reader
+(when (display-graphic-p)
+  (use-package pdf-view
+    :ensure pdf-tools
+    :diminish (pdf-view-themed-minor-mode
+               pdf-view-midnight-minor-mode
+               pdf-view-printer-minor-mode)
+    :defines pdf-annot-activate-created-annotations
+    :hook ((pdf-tools-enabled . pdf-view-auto-slice-minor-mode)
+           (pdf-tools-enabled . pdf-isearch-minor-mode))
+    :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+    :magic ("%PDF" . pdf-view-mode)
+    :bind (:map pdf-view-mode-map
+           ("C-s" . isearch-forward)
+           ("C-f" . fanyi-dwim))
+    :init (setq pdf-view-use-scaling t
+                pdf-view-use-imagemagick nil
+                pdf-annot-activate-created-annotations t)
+    :config
+    ;; Activate the package
+    (pdf-tools-install t nil t nil)
+
+    ;; Recover last viewed position
+    (use-package saveplace-pdf-view
+      :when (ignore-errors (pdf-info-check-epdfinfo) t)
+      :autoload (saveplace-pdf-view-find-file-advice saveplace-pdf-view-to-alist-advice)
+      :init
+      (advice-add 'save-place-find-file-hook :around #'saveplace-pdf-view-find-file-advice)
+      (advice-add 'save-place-to-alist :around #'saveplace-pdf-view-to-alist-advice))))
 
 ;; == Markdown ==
 (use-package markdown-mode
@@ -344,10 +371,12 @@ browser defined by `browse-url-generic-program'."
   (interactive)
   (let ((buffer-name (buffer-name))
         (chinese-regex "[\u4e00-\u9fa5]")) ; Basic Chinese character range
-    (if (or (string-match chinese-regex buffer-name)
-            (not (derived-mode-p 'prog-mode 'minibuffer-mode)))
-        (setq-local line-spacing 0.7) ; for reading mode
-      (setq-local line-spacing 0.1)))) ; for prog-mode
+    (if (string-match chinese-regex buffer-name)
+        (setq-local line-spacing 0.7) ; for chinese reading mode
+      (if (derived-mode-p 'prog-mode)
+          (setq-local line-spacing 0.1)
+        (setq-local line-spacing 0.3))
+      ))) ; for prog-mode
 
 ;; (add-hook 'find-file-hook 'set-line-spacing-based-on-buffer-name)
 (add-hook 'after-change-major-mode-hook 'set-line-spacing-based-on-buffer-name)   ; handle mode changes

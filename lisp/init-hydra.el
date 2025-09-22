@@ -50,19 +50,7 @@
   ;; (add-hook 'after-load-theme-hook #'hydra-set-posframe-show-params t)
   
   ;;use the macro defhydra to define the hydra and its heads
-  (defhydra hydra-text-scale (global-map "<f12>")
-    "scale text"
-    ("j" move-line-up "up")
-    ("k" move-line-down "down")
-    ("f" nil "finished" :exit t))
-
-  (defhydra hydra-bing-dict (global-map "<f9>")
-    "scale text"
-    ("b" bing-dict-brief "brief search" :exit nil)
-    ("c" +anki-helper-capcture-cloze-card "send to anki" :exit nil)
-    ("g" gt-translate "gt translate")
-    ("f" nil "finished" :exit t)
-    )
+  
   ;; hercules arrives with any ther key binding
   ;; Flexible text folding
   )

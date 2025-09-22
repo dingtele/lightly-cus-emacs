@@ -211,54 +211,53 @@
    '("'" . repeat)
    ))
 (require 'meow)
-  (meow-setup)
-  (meow-global-mode 1)
-  ;; disable meow mode in magit-mode
-  (defun my/no-meow-in-term ()
-    (when (derived-mode-p 'magit-mode)
-      (meow-mode -1)))
-  (add-hook 'after-change-major-mode-hook 'my/no-meow-in-term)
+(meow-setup)
+(meow-global-mode 1)
+;; disable meow mode in magit-mode
+(defun my/no-meow-in-term ()
+  (when (derived-mode-p 'magit-mode)
+    (meow-mode -1)))
+(add-hook 'after-change-major-mode-hook 'my/no-meow-in-term)
 
-  ;; example: create a new keyboard layout - state
-  (setq meow-reading-keymap (make-keymap))
-  (meow-define-state reading
-    "meow state for interacting with smartparens"
-    :lighter " [📖]"
-    :keymap meow-reading-keymap)
+;; example: create a new keyboard layout - state
+(setq meow-reading-keymap (make-keymap))
+(meow-define-state reading
+  "meow state for interacting with smartparens"
+  :lighter " [R]"
+  :keymap meow-reading-keymap)
 
-  ;; meow-define-state creates the variable
-  (setq meow-cursor-type-reading 'hollow)
+;; meow-define-state creates the variable
+(setq meow-cursor-type-reading 'hollow)
 
-  (meow-define-keys 'reading
-    '("<escape>" . meow-normal-mode)
-    '("d" . bing-dict-brief)
-    '("c" . +anki-helper-capture-cloze-card)
-    '("g" . gt-translate)
-    '("u" . meow-undo))
+(meow-define-keys 'reading
+  '("<escape>" . meow-normal-mode)
+  '("d" . bing-dict-brief)
+  '("c" . +anki-helper-capture-cloze-card)
+  '("g" . gt-translate)
+  '("f" . fanyi-dwim)
+  '("w" . fanyi-dwim2)
+  '("u" . meow-undo))
 
-  
 
+(use-package browse-url
+  :ensure nil
+  :defines dired-mode-map
+  :bind (("C-c C-z ." . browse-url-at-point)
+         ("C-c C-z b" . browse-url-of-buffer)
+         ("C-c C-z r" . browse-url-of-region)
+         ("C-c C-z u" . browse-url)
+         ("C-c C-z e" . browse-url-emacs)
+         ("C-c C-z v" . browse-url-of-file))
+  :init
+  (with-eval-after-load 'dired
+    (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
 
-
-  (use-package browse-url
-    :ensure nil
-    :defines dired-mode-map
-    :bind (("C-c C-z ." . browse-url-at-point)
-           ("C-c C-z b" . browse-url-of-buffer)
-           ("C-c C-z r" . browse-url-of-region)
-           ("C-c C-z u" . browse-url)
-           ("C-c C-z e" . browse-url-emacs)
-           ("C-c C-z v" . browse-url-of-file))
-    :init
-    (with-eval-after-load 'dired
-      (bind-key "C-c C-z f" #'browse-url-of-file dired-mode-map)))
-
-  ;; Click to browse URL or to send to e-mail address
-  (use-package goto-addr
-    :ensure nil
-    :hook ((text-mode . goto-address-mode)
-           (prog-mode . goto-address-prog-mode)
-           (org-mode . goto-address-mode)))
+;; Click to browse URL or to send to e-mail address
+(use-package goto-addr
+  :ensure nil
+  :hook ((text-mode . goto-address-mode)
+         (prog-mode . goto-address-prog-mode)
+         (org-mode . goto-address-mode)))
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
